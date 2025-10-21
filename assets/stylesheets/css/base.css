@@ -56,6 +56,10 @@
     margin-right: auto;
     width: 90px;
   }
+
+  .credit{
+     display: none;
+  }
 }
 /* line 47, ../sass/_logo.sass */
 .logo-small:hover {
