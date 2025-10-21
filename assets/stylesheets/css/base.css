@@ -399,7 +399,7 @@ body, html {
   /* line 128, ../sass/_scaffolding.sass */
   #epic .content .work {
     width: auto;
-    bottom: 30px;
+    bottom: 80px;
     right: 0;
   }
 }
