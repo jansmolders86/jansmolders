@@ -289,12 +289,7 @@ body, html {
   background-size: cover;
   opacity: 0;
 }
-@media only screen and (max-width: 991px) {
-  /* line 53, ../sass/_scaffolding.sass */
-  #epic #hero {
-    display: none;
-  }
-}
+
 /* line 66, ../sass/_scaffolding.sass */
 #epic .content {
   position: absolute;
