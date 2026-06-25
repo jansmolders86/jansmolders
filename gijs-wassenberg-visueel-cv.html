@@ -82,6 +82,12 @@ a{color:inherit}
 .brand .dot{width:13px;height:13px;border-radius:50%;background:var(--tangerine);box-shadow:0 0 0 4px rgba(232,100,30,.18)}
 .brand .logo-mark{height:30px;width:auto;display:block}
 .nav-actions{display:flex;align-items:center;gap:10px}
+/* mobile only (below tablet): show icons, hide button text */
+@media(max-width:767px){
+  .nav .btn{width:46px;height:46px;padding:0;gap:0;border-radius:50%;justify-content:center}
+  .nav .btn svg{width:19px;height:19px}
+  .nav .btn-label{display:none}
+}
 
 .btn{
   font-family:var(--body);font-weight:600;font-size:15px;
@@ -378,8 +384,8 @@ a{color:inherit}
       <span class="pulse" aria-hidden="true"></span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg>
     </button>
-    <a class="btn" href="#contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg>Contact</a>
-    <a class="btn btn--solid" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Download PDF</a>
+    <a class="btn" href="#contact" aria-label="Contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg><span class="btn-label">Contact</span></a>
+    <a class="btn btn--solid" href="#" aria-label="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span class="btn-label">Download PDF</span></a>
   </nav>
 </header>
 
@@ -405,7 +411,7 @@ a{color:inherit}
   <!-- foreground intro player, revealed when the play button is clicked -->
   <div class="hero-player" id="heroPlayer" aria-hidden="true">
     <video class="hero-player-video" controls playsinline preload="metadata">
-      <source src="output-full.mp4" type="video/mp4">
+      <source src="output.mp4" type="video/mp4">
     </video>
     <button class="hero-close" id="heroClose" type="button" aria-label="Sluit video en toon de header">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
