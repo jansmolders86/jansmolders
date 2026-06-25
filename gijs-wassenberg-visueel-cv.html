@@ -389,7 +389,7 @@ a{color:inherit}
 <section class="hero">
   <div class="hero-bg" aria-hidden="true"></div>
   <video class="hero-video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
-    <source src="output.mp4" type="video/mp4">
+    <source src="output-full.mp4" type="video/mp4">
   </video>
   <div class="hero-inner wrap">
     <span class="eyebrow"><span class="chip"></span>Visueel CV · HRM-consultant bij Reijn</span>
@@ -786,7 +786,7 @@ a{color:inherit}
       player.setAttribute('aria-hidden', 'false');
       if(bgVideo){ try { bgVideo.pause(); } catch(e){} }   // stop the ambient bg loop
       if(!audio.paused){ audio.pause(); }                  // stop the read-aloud if running
-      try { pVideo.currentTime = 0; } catch(e){}
+      pVideo.load();                                       // reset so playback starts from the very beginning
       var p = pVideo.play();
       if(p && p.catch){ p.catch(function(){}); }
       if(closeBtn){ closeBtn.focus(); }
