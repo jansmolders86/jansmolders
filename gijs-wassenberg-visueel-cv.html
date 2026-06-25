@@ -684,38 +684,47 @@ a{color:inherit}
     });
   });
 
-  /* voice reader (accessibility) + hero play button share one engine */
+  /* ---------- voice reader (pre-rendered audio) ---------- */
+  /* Place the generated MP3 next to this HTML file (or adjust the path). */
+  var AUDIO_SRC = 'gijs_intro.mp3';
+
   var voiceBtn = document.getElementById('voice');
   var heroPlay = document.getElementById('heroPlay');
-  var speaking = false;
+  var heroLabel = heroPlay.childNodes[heroPlay.childNodes.length - 1]; // trailing text node
+  var HERO_PLAY_TEXT = ' Speel mijn introductie af';
+  var HERO_STOP_TEXT = ' Pauzeer introductie';
 
-  function gatherText(){
-    var parts = [];
-    parts.push('Gijs Wassenberg, HRM-consultant bij Reijn.');
-    document.querySelectorAll('[data-read]').forEach(function(el){ parts.push(el.textContent.trim()); });
-    return parts.join(' ');
-  }
-  function stop(){
-    if(window.speechSynthesis) window.speechSynthesis.cancel();
-    speaking = false;
-    voiceBtn.setAttribute('aria-pressed','false');
-  }
-  function toggleSpeech(){
-    if(!('speechSynthesis' in window)){
-      alert('Voorlezen wordt niet ondersteund in deze browser.');
-      return;
+  var audio = new Audio(AUDIO_SRC);
+  audio.preload = 'none';
+
+  function setActive(on){
+    voiceBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    heroPlay.classList.toggle('is-playing', on);
+    if(heroLabel && heroLabel.nodeType === 3){
+      heroLabel.nodeValue = on ? HERO_STOP_TEXT : HERO_PLAY_TEXT;
     }
-    if(speaking){ stop(); return; }
-    var u = new SpeechSynthesisUtterance(gatherText());
-    u.lang = 'nl-NL'; u.rate = 1; u.pitch = 1;
-    u.onend = function(){ speaking=false; voiceBtn.setAttribute('aria-pressed','false'); };
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(u);
-    speaking = true;
-    voiceBtn.setAttribute('aria-pressed','true');
   }
-  voiceBtn.addEventListener('click', toggleSpeech);
-  heroPlay.addEventListener('click', toggleSpeech);
+
+  audio.addEventListener('play',  function(){ setActive(true); });
+  audio.addEventListener('pause', function(){ setActive(false); });
+  audio.addEventListener('ended', function(){ setActive(false); audio.currentTime = 0; });
+  audio.addEventListener('error', function(){
+    setActive(false);
+    alert('Audiobestand niet gevonden. Plaats "' + AUDIO_SRC + '" naast deze pagina.');
+  });
+
+  function toggleAudio(){
+    if(audio.paused){
+      var p = audio.play();
+      if(p && p.catch){ p.catch(function(){ /* error event handles messaging */ }); }
+    } else {
+      audio.pause();
+    }
+  }
+
+  voiceBtn.addEventListener('click', toggleAudio);
+  heroPlay.addEventListener('click', toggleAudio);
+  window.addEventListener('beforeunload', function(){ audio.pause(); });
 })();
 </script>
 </body>
