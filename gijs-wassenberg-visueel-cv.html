@@ -372,9 +372,73 @@ a{color:inherit}
   .tile:hover .tile-img,.tile:focus-within .tile-img{transform:scale(1.06)}
   .hero-video{display:none}   /* fall back to the static gradient */
 }
+/* hidden on screen, shown only when printing */
+.print-only{display:none}
+
+/* ---------- PRINT ---------- */
+@media print{
+  @page{ margin:1.6cm; }
+  html,body{background:#fff!important;color:var(--ink)!important;font-size:11pt;line-height:1.45}
+  .wrap{max-width:none;padding-inline:0}
+  /* scroll-reveal never fires without scrolling, so force everything visible for print */
+  .reveal{opacity:1!important;transform:none!important}
+
+  /* keep only: header title, intro, work timeline, contact — hide the rest */
+  .nav,.hero-bg,.hero-video,.hero-player,.hero::before,.hero .play,.scroll-cue,
+  .gallery,.stats,.reviews,.summary,.features,.cta,.foot{display:none!important}
+
+  /* branded letterhead */
+  .print-brand{display:flex;align-items:center;gap:8pt;margin-bottom:12pt}
+  .print-brand img{height:30pt;width:auto}
+  .print-brand span{font-family:var(--display);font-weight:800;font-size:19pt;color:var(--ink)}
+
+  /* header title */
+  .hero{display:block;min-height:0;overflow:visible;color:var(--ink)}
+  .hero-inner{padding:0;max-width:none}
+  /* if the intro video was open on screen, still show the header when printing */
+  .hero.playing .hero-inner{opacity:1!important;visibility:visible!important;pointer-events:auto}
+  .hero .eyebrow{color:var(--ink-soft)}
+  .hero .eyebrow .chip{background:var(--ink-soft)}
+  .hero h1{font-size:32pt;line-height:1;margin:.08em 0 .25em;color:var(--ink)}
+  .hero-tag{color:var(--ink-soft);max-width:none;font-size:12pt;margin:0}
+
+  /* intro */
+  .intro,.timeline{padding:14pt 0}
+  .intro-grid{display:block}
+  .intro-side{position:static}
+  .intro-side h2{font-size:15pt;margin:.2em 0 .45em}
+  .intro-lead{font-size:13pt;margin-bottom:.5em}
+  .intro-lead .hl{background:none}
+  .intro-body{color:var(--ink)}
+
+  /* work timeline — fully expanded, no toggles */
+  .sec-head{margin-bottom:10pt}
+  .sec-head h2{font-size:17pt}
+  .sec-head p{color:var(--ink-soft)}
+  .tl-more{display:none!important}
+  .tl-detail{grid-template-rows:1fr!important}
+  .tl-detail-inner{overflow:visible}
+  .tl-item{padding:8pt 0}
+  .tl-body h3{font-size:13pt}
+  .tl-org{color:var(--ink-soft)}
+  .tl-org .badge{background:none!important;color:var(--ink-soft)!important;border:1px solid var(--line)}
+  .tl-sum,.tl-detail p{color:var(--ink)}
+
+  /* contact */
+  .print-contact{display:block;padding:14pt 0 0;break-inside:avoid}
+  .print-contact h2{font-family:var(--display);font-weight:800;font-size:17pt;margin:0 0 .45em}
+  .print-contact p{margin:0 0 .5em;font-weight:600}
+  .print-contact ul{margin:0;padding:0;list-style:none}
+  .print-contact li{margin:0 0 .25em;color:var(--ink-soft)}
+
+  a{color:var(--ink);text-decoration:none}
+}
 </style>
 </head>
 <body>
+
+<!-- print-only letterhead -->
+<div class="print-only print-brand"><img src="reijn-logo.png" alt="Reijn logo"><span>Reijn</span></div>
 
 <!-- ============ NAV ============ -->
 <header class="nav" id="nav">
@@ -385,7 +449,7 @@ a{color:inherit}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg>
     </button>
     <a class="btn" href="#contact" aria-label="Contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg><span class="btn-label">Contact</span></a>
-    <a class="btn btn--solid" href="#" aria-label="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span class="btn-label">Download PDF</span></a>
+    <button class="btn btn--solid" id="downloadPdf" type="button" aria-label="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span class="btn-label">Download PDF</span></button>
   </nav>
 </header>
 
@@ -519,6 +583,18 @@ a{color:inherit}
       </article>
     </div>
   </div>
+</section>
+
+<!-- print-only contact details (appears after the timeline when printed) -->
+<section class="print-only print-contact">
+  <h2>Contact</h2>
+  <p>Gijs Wassenberg — HRM-consultant bij Reijn</p>
+  <ul>
+    <li>E-mail: gijs@reijnhrm.nl</li>
+    <li>Telefoon: +31 (0)40 000 00 00</li>
+    <li>Web: reijnhrm.nl</li>
+    <li>Het Atelier, Helmond</li>
+  </ul>
 </section>
 
 <!-- ============ PRESTATIES ============ -->
@@ -713,6 +789,18 @@ a{color:inherit}
   var nav = document.getElementById('nav');
   var onScroll = function(){ nav.classList.toggle('scrolled', window.scrollY > 8); };
   onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
+
+  /* Download PDF -> browser print dialog (Save as PDF), using the print stylesheet */
+  var dlBtn = document.getElementById('downloadPdf');
+  if(dlBtn){
+    dlBtn.addEventListener('click', function(){
+      var hero = document.querySelector('.hero');
+      if(hero){ hero.classList.remove('playing'); }   // close the intro player first, if open
+      var pv = document.querySelector('.hero-player video');
+      if(pv){ try { pv.pause(); } catch(e){} }
+      window.print();
+    });
+  }
 
   /* scroll reveal */
   var reveals = document.querySelectorAll('.reveal');
