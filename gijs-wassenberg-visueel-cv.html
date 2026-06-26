@@ -344,6 +344,21 @@ a{color:inherit}
 .cta h2{font-family:var(--display);font-weight:800;font-size:clamp(56px,12vw,150px);line-height:.92;letter-spacing:-.04em;margin:.2em 0 .25em;text-wrap:balance}
 .cta p{font-size:clamp(18px,2.2vw,24px);max-width:48ch;margin:0 auto 38px;color:rgba(255,255,255,.92)}
 .cta-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+/* contact-person card */
+.cta-contact{margin:6px auto 32px;max-width:560px}
+.cta-contact-card{display:flex;align-items:center;gap:20px;text-align:left;background:#fff;border-radius:22px;padding:18px 26px 18px 18px;box-shadow:0 26px 54px -28px rgba(20,15,12,.6)}
+.cta-avatar{width:88px;height:88px;border-radius:50%;object-fit:cover;object-position:center 18%;flex:0 0 auto;box-shadow:0 0 0 1px var(--line)}
+.cta-contact-info{display:flex;flex-direction:column;min-width:0}
+.cta-contact-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--tangerine)}
+.cta-contact-name{font-family:var(--display);font-weight:700;font-size:21px;color:var(--ink);line-height:1.1;margin:3px 0 8px}
+.cta-contact-links{display:flex;flex-direction:column;gap:4px}
+.cta-contact-links a{display:inline-flex;align-items:center;gap:9px;color:var(--ink-soft);text-decoration:none;font-size:14px;font-weight:500;word-break:break-word}
+.cta-contact-links a:hover{color:var(--tangerine)}
+.cta-contact-links svg{width:15px;height:15px;flex:0 0 auto;color:var(--tangerine)}
+@media(max-width:520px){
+  .cta-contact-card{flex-direction:column;text-align:center;gap:14px;padding:24px}
+  .cta-contact-info{align-items:center}
+}
 .btn--ghostlight{background:#fff;color:var(--ink);border-color:#fff}
 .btn--ghostlight:hover{box-shadow:0 16px 34px -16px rgba(0,0,0,.5)}
 .btn--outlight{background:transparent;color:#fff;border-color:rgba(255,255,255,.7)}
@@ -733,10 +748,25 @@ a{color:inherit}
   <div class="cta-inner wrap reveal">
     <span class="eyebrow"><span class="chip"></span>Laten we kennismaken</span>
     <h2>Overtuigd?</h2>
-    <p>Benieuwd of ik de juiste match ben voor jouw organisatie? Plan een vrijblijvende kennismaking — onder het genot van een goede kop koffie.</p>
+    <p>Benieuwd of Gijs de juiste match is voor jouw organisatie? Neem contact op met Lieve — zij vertelt je er graag meer over, onder het genot van een goede kop koffie.</p>
+
+    <div class="cta-contact">
+      <div class="cta-contact-card">
+        <img class="cta-avatar" src="lieve.jpg" alt="Lieve van der Weijde">
+        <div class="cta-contact-info">
+          <span class="cta-contact-eyebrow">Jouw contactpersoon</span>
+          <strong class="cta-contact-name">Lieve van der Weijde</strong>
+          <div class="cta-contact-links">
+            <a href="tel:06-50018751"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>06 - 50 01 87 51</a>
+            <a href="mailto:lieve.vanderweijde@reijnhrm.nl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>lieve.vanderweijde@reijnhrm.nl</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="cta-actions">
-      <a class="btn btn--ghostlight" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Plan een kennismaking</a>
-      <a class="btn btn--outlight" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Download CV (PDF)</a>
+      <a class="btn btn--ghostlight" href="mailto:lieve.vanderweijde@reijnhrm.nl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Plan een kennismaking</a>
+      <button class="btn btn--outlight" id="downloadPdf2" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Download CV (PDF)</button>
     </div>
   </div>
 </section>
@@ -791,16 +821,17 @@ a{color:inherit}
   onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
 
   /* Download PDF -> browser print dialog (Save as PDF), using the print stylesheet */
-  var dlBtn = document.getElementById('downloadPdf');
-  if(dlBtn){
-    dlBtn.addEventListener('click', function(){
-      var hero = document.querySelector('.hero');
-      if(hero){ hero.classList.remove('playing'); }   // close the intro player first, if open
-      var pv = document.querySelector('.hero-player video');
-      if(pv){ try { pv.pause(); } catch(e){} }
-      window.print();
-    });
+  function openPrintDialog(){
+    var hero = document.querySelector('.hero');
+    if(hero){ hero.classList.remove('playing'); }   // close the intro player first, if open
+    var pv = document.querySelector('.hero-player video');
+    if(pv){ try { pv.pause(); } catch(e){} }
+    window.print();
   }
+  ['downloadPdf','downloadPdf2'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el){ el.addEventListener('click', openPrintDialog); }
+  });
 
   /* scroll reveal */
   var reveals = document.querySelectorAll('.reveal');
