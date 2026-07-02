@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reijn CMS — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F2EC; --paper-2:#EDE4D3; --surface:#FBF8F2;
+  --ink:#221E1A; --ink-soft:#5A5249; --line:#E0D6C4;
+  --petrol:#14463E; --petrol-deep:#0E332D; --tangerine:#E8641E;
+  --teal:#2A8C82; --mustard:#D9A521; --clay:#C2452D; --plum:#7A3B57;
+  --display:"Bricolage Grotesque",system-ui,sans-serif;
+  --body:"Hanken Grotesk",system-ui,sans-serif;
+  --mono:"Space Mono",monospace;
+  --sb:250px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--tangerine);outline-offset:2px;border-radius:6px}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sb);background:var(--petrol-deep);color:#F6F2EC;display:flex;flex-direction:column;padding:22px 16px;z-index:20}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:6px 8px 22px;border-bottom:1px solid rgba(246,242,236,.12);margin-bottom:16px}
+.sb-brand img{height:30px;width:auto}
+.sb-brand .wm{font-family:var(--display);font-weight:800;font-size:21px}
+.sb-brand .tag{font-family:var(--mono);font-size:9px;letter-spacing:.18em;color:rgba(246,242,236,.5);text-transform:uppercase;margin-left:auto}
+.sb-nav{display:flex;flex-direction:column;gap:3px}
+.sb-nav a{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;color:rgba(246,242,236,.75);font-weight:600;font-size:14.5px}
+.sb-nav a svg{width:19px;height:19px;opacity:.85}
+.sb-nav a:hover{background:rgba(246,242,236,.08);color:#fff}
+.sb-nav a.active{background:var(--tangerine);color:#fff}
+.sb-nav a.active svg{opacity:1}
+.sb-nav .badge{margin-left:auto;font-family:var(--mono);font-size:11px;background:rgba(246,242,236,.16);padding:2px 8px;border-radius:999px}
+.sb-nav a.active .badge{background:rgba(255,255,255,.25)}
+.sb-user{margin-top:auto;display:flex;align-items:center;gap:11px;padding:12px 8px 4px;border-top:1px solid rgba(246,242,236,.12)}
+.sb-user img{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:center 20%}
+.sb-user .nm{font-weight:700;font-size:14px;line-height:1.1}
+.sb-user .rl{font-family:var(--mono);font-size:10px;color:rgba(246,242,236,.55);letter-spacing:.06em;text-transform:uppercase}
+
+/* ---------- MAIN ---------- */
+.main{margin-left:var(--sb);padding:26px clamp(20px,3vw,40px) 60px}
+.topbar{display:flex;align-items:center;gap:16px;margin-bottom:26px}
+.topbar .greet h1{font-family:var(--display);font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0}
+.topbar .greet p{margin:2px 0 0;color:var(--ink-soft);font-size:14px}
+.topbar .grow{flex:1}
+.search{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:9px 16px;min-width:230px;color:var(--ink-soft)}
+.search svg{width:16px;height:16px}
+.search input{border:none;background:transparent;outline:none;font-family:var(--body);font-size:14px;color:var(--ink);width:100%}
+.bell{position:relative;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;color:var(--ink)}
+.bell svg{width:19px;height:19px}
+.bell .dot{position:absolute;top:9px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--tangerine);box-shadow:0 0 0 2px var(--surface)}
+.btn{font-family:var(--body);font-weight:600;font-size:14px;border-radius:999px;padding:11px 18px;cursor:pointer;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn:hover{filter:brightness(1.08)}
+.btn svg{width:16px;height:16px}
+.btn.accent{background:var(--tangerine);border-color:var(--tangerine);color:#fff}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.sm{padding:8px 14px;font-size:13px}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+.kpi .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.kpi .val{font-family:var(--display);font-weight:800;font-size:38px;line-height:1;margin-top:8px;letter-spacing:-.02em}
+.kpi .sub{font-size:12.5px;margin-top:8px;color:var(--ink-soft);display:flex;align-items:center;gap:6px}
+.kpi .up{color:var(--teal);font-weight:700}
+.kpi:nth-child(1) .val{color:var(--ink)}
+.kpi:nth-child(2) .val{color:var(--teal)}
+.kpi:nth-child(3) .val{color:var(--mustard)}
+.kpi:nth-child(4) .val{color:var(--tangerine)}
+
+/* layout grid */
+.grid{display:grid;grid-template-columns:1.65fr 1fr;gap:22px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px}
+.card h2{font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:-.01em;margin:0 0 3px}
+.card .card-sub{color:var(--ink-soft);font-size:13px;margin:0 0 16px}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px}
+.card-head h2{margin:0}
+
+/* review queue */
+.review-item{display:flex;align-items:center;gap:14px;padding:13px;border:1px solid var(--line);border-radius:14px;background:var(--paper);margin-bottom:10px}
+.review-item:last-child{margin-bottom:0}
+.avatar{width:42px;height:42px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;font-family:var(--display);font-weight:700;color:#fff;font-size:16px}
+.review-item .who{flex:1;min-width:0}
+.review-item .who strong{font-size:14.5px;display:block}
+.review-item .who span{font-size:12.5px;color:var(--ink-soft)}
+.review-item .who .var{font-family:var(--mono);font-size:10.5px;color:var(--tangerine)}
+
+/* status pills */
+.pill{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.pub{color:var(--teal);background:rgba(42,140,130,.13)}
+.pill.rev{color:#B8860B;background:rgba(217,165,33,.16)}
+.pill.draft{color:var(--ink-soft);background:rgba(90,82,73,.12)}
+
+/* pages table */
+.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tab{font-size:13px;font-weight:600;padding:7px 14px;border-radius:999px;cursor:pointer;color:var(--ink-soft);border:1px solid transparent}
+.tab.active{background:var(--ink);color:var(--paper)}
+.tab:not(.active):hover{background:var(--paper-2)}
+.rows{display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:2.2fr 1fr 1.4fr 0.9fr auto;align-items:center;gap:14px;padding:13px 6px;border-top:1px solid var(--line)}
+.row:first-child{border-top:none}
+.row .p{display:flex;align-items:center;gap:12px;min-width:0}
+.row .p .nm{font-weight:700;font-size:14.5px;line-height:1.15}
+.row .p .fn{font-size:12.5px;color:var(--ink-soft)}
+.row .variants{font-size:12.5px;color:var(--ink-soft)}
+.row .variants b{color:var(--ink);font-weight:600}
+.row .views{font-family:var(--mono);font-size:13px}
+.row .views span{color:var(--ink-soft);font-size:11px}
+.row .acts{display:flex;gap:7px;justify-content:flex-end}
+.iconbtn{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--paper);display:grid;place-items:center;cursor:pointer;color:var(--ink)}
+.iconbtn:hover{background:var(--paper-2)}
+.iconbtn svg{width:16px;height:16px}
+.row .acts .edit{display:inline-flex;align-items:center;height:34px;width:auto;padding:0 13px;gap:7px;font-weight:600;font-size:13px;background:var(--ink);color:var(--paper);border-color:var(--ink);white-space:nowrap}
+.row .acts .edit:hover{filter:brightness(1.1)}
+
+/* analytics side */
+.spark{display:flex;align-items:flex-end;gap:6px;height:88px;margin:6px 0 4px}
+.spark .bar{flex:1;background:linear-gradient(var(--teal),rgba(42,140,130,.35));border-radius:5px 5px 0 0;min-height:6px}
+.spark .bar.hi{background:linear-gradient(var(--tangerine),rgba(232,100,30,.4))}
+.spark-x{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;color:var(--ink-soft);letter-spacing:.02em}
+
+/* heatmap */
+.heat-note{font-size:12.5px;color:var(--ink-soft);margin:0 0 14px}
+.heat-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.heat-row .hl{width:96px;font-size:12.5px;flex:0 0 auto;color:var(--ink)}
+.heat-track{flex:1;height:18px;border-radius:6px;background:var(--paper-2);overflow:hidden;position:relative}
+.heat-fill{height:100%;border-radius:6px}
+.heat-row .hv{font-family:var(--mono);font-size:11px;color:var(--ink-soft);width:34px;text-align:right;flex:0 0 auto}
+.heat-flag{margin-top:10px;background:rgba(194,69,45,.1);border:1px solid rgba(194,69,45,.3);border-radius:12px;padding:11px 13px;font-size:12.5px;color:#9A3A26;display:flex;gap:9px;align-items:flex-start}
+.heat-flag svg{width:16px;height:16px;flex:0 0 auto;margin-top:1px}
+
+.quick{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+.quick button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:13px;cursor:pointer;font-family:var(--body)}
+.quick button:hover{border-color:var(--tangerine);background:#fff}
+.quick .ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:#fff;flex:0 0 auto}
+.quick .ic svg{width:19px;height:19px}
+.quick .tx strong{display:block;font-size:14px;color:var(--ink)}
+.quick .tx span{font-size:12px;color:var(--ink-soft)}
+
+/* toast */
+.toast{position:fixed;bottom:26px;left:calc(50% + var(--sb)/2);transform:translateX(-50%) translateY(20px);z-index:200;background:var(--petrol-deep);color:#F6F2EC;padding:13px 20px;border-radius:12px;font-weight:600;box-shadow:0 20px 40px -18px rgba(0,0,0,.6);opacity:0;transition:.25s;display:flex;gap:10px;align-items:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast .d{width:9px;height:9px;border-radius:50%;background:#5FBF8F}
+
+@media(max-width:1080px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:820px){:root{--sb:0px}.sidebar{display:none}.main{margin-left:0}.row{grid-template-columns:1.6fr auto;gap:10px}.row .variants,.row .views{display:none}}
+</style>
+</head>
+<body>
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <img src="reijn-logo-light.png" alt="Reijn logo">
+    <span class="wm">Reijn</span>
+    <span class="tag">CMS</span>
+  </div>
+  <nav class="sb-nav">
+    <a class="active" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
+    <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>Pagina's <span class="badge">47</span></a>
+    <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>Analytics</a>
+    <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>Berichten <span class="badge">2</span></a>
+    <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1L14.5 2h-5l-.4 2.6a7 7 0 0 0-1.7 1l-2.3-1-2 3.4L3 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1l.4 2.6h5l.4-2.6a7 7 0 0 0 1.7-1l2.3 1 2-3.4-2-1.5a7 7 0 0 0 .1-1z"/></svg>Instellingen</a>
+  </nav>
+  <div class="sb-user">
+    <img src="lieve.jpg" alt="">
+    <div><div class="nm">Lieve van der Weijde</div><div class="rl">Relatiebeheerder</div></div>
+  </div>
+</aside>
+
+<!-- ============ MAIN ============ -->
+<main class="main">
+  <div class="topbar">
+    <div class="greet">
+      <h1>Goedemiddag, Lieve 👋</h1>
+      <p>Je hebt <b>3 pagina's</b> die wachten op review.</p>
+    </div>
+    <div class="grow"></div>
+    <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg><input placeholder="Zoek een consultant of pagina…"></div>
+    <button class="bell" aria-label="Meldingen"><span class="dot"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
+    <button class="btn accent" data-toast="Nieuwe consultant-pagina aangemaakt (concept)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nieuwe pagina</button>
+  </div>
+
+  <!-- KPIs -->
+  <section class="kpis">
+    <div class="kpi"><div class="lbl">Actieve pagina's</div><div class="val">47</div><div class="sub">over 41 consultants</div></div>
+    <div class="kpi"><div class="lbl">Gepubliceerd</div><div class="val">39</div><div class="sub"><span class="up">▲ 4</span> deze week</div></div>
+    <div class="kpi"><div class="lbl">In review</div><div class="val">3</div><div class="sub">wachten op jou</div></div>
+    <div class="kpi"><div class="lbl">Weergaven · 30d</div><div class="val">2.148</div><div class="sub"><span class="up">▲ 18%</span> t.o.v. vorige maand</div></div>
+  </section>
+
+  <div class="grid">
+    <!-- LEFT COLUMN -->
+    <div>
+      <!-- review queue -->
+      <section class="card" style="margin-bottom:22px">
+        <div class="card-head">
+          <div><h2>Wacht op jouw review</h2><p class="card-sub" style="margin:0">Consultants hebben wijzigingen ingediend</p></div>
+          <span class="pill rev">3 open</span>
+        </div>
+        <div class="review-item">
+          <div class="avatar" style="background:var(--plum)">SdV</div>
+          <div class="who"><strong>Sanne de Vries <span class="var">· variant Ziekenhuis</span></strong><span>Ingediend 5 uur geleden — intro & tijdlijn aangepast</span></div>
+          <a class="btn ghost sm" href="gijs-wassenberg-edit.html">Bekijk</a>
+          <button class="btn sm" data-toast="Gepubliceerd naar productie ✓">Publiceer</button>
+        </div>
+        <div class="review-item">
+          <div class="avatar" style="background:var(--teal)">EV</div>
+          <div class="who"><strong>Emma Visser <span class="var">· variant Gemeente</span></strong><span>Ingediend 1 dag geleden — nieuwe fotogalerij toegevoegd</span></div>
+          <a class="btn ghost sm" href="gijs-wassenberg-edit.html">Bekijk</a>
+          <button class="btn sm" data-toast="Gepubliceerd naar productie ✓">Publiceer</button>
+        </div>
+        <div class="review-item">
+          <div class="avatar" style="background:var(--mustard)">TB</div>
+          <div class="who"><strong>Thomas Bakker <span class="var">· variant Basis</span></strong><span>Ingediend 2 dagen geleden — tekstblok herschreven</span></div>
+          <a class="btn ghost sm" href="gijs-wassenberg-edit.html">Bekijk</a>
+          <button class="btn sm" data-toast="Gepubliceerd naar productie ✓">Publiceer</button>
+        </div>
+      </section>
+
+      <!-- pages table -->
+      <section class="card">
+        <div class="card-head"><h2>Alle pagina's</h2></div>
+        <div class="tabs">
+          <div class="tab active" data-f="all">Alle</div>
+          <div class="tab" data-f="pub">Gepubliceerd</div>
+          <div class="tab" data-f="rev">In review</div>
+          <div class="tab" data-f="draft">Concept</div>
+        </div>
+        <div class="rows" id="rows">
+          <div class="row" data-s="pub">
+            <div class="p"><div class="avatar" style="background:var(--petrol);width:38px;height:38px;font-size:14px">GW</div><div><div class="nm">Gijs Wassenberg</div><div class="fn">HRM-consultant</div></div></div>
+            <span class="pill pub">Gepubliceerd</span>
+            <div class="variants"><b>2 varianten</b><br>Ziekenhuis · Gemeente</div>
+            <div class="views">342 <span>weergaven</span></div>
+            <div class="acts"><a class="iconbtn" href="gijs-wassenberg-visueel-cv.html" target="_blank" title="Live bekijken"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></a><a class="iconbtn edit" href="gijs-wassenberg-edit.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Bewerken</a></div>
+          </div>
+          <div class="row" data-s="rev">
+            <div class="p"><div class="avatar" style="background:var(--plum);width:38px;height:38px;font-size:14px">SdV</div><div><div class="nm">Sanne de Vries</div><div class="fn">Financieel adviseur</div></div></div>
+            <span class="pill rev">In review</span>
+            <div class="variants"><b>1 variant</b><br>Ziekenhuis</div>
+            <div class="views">88 <span>weergaven</span></div>
+            <div class="acts"><a class="iconbtn" href="gijs-wassenberg-visueel-cv.html" target="_blank" title="Live bekijken"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></a><a class="iconbtn edit" href="gijs-wassenberg-edit.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Bewerken</a></div>
+          </div>
+          <div class="row" data-s="pub">
+            <div class="p"><div class="avatar" style="background:var(--clay);width:38px;height:38px;font-size:14px">FE</div><div><div class="nm">Fatima El Amrani</div><div class="fn">Beleidsadviseur</div></div></div>
+            <span class="pill pub">Gepubliceerd</span>
+            <div class="variants"><b>3 varianten</b><br>Ziekenhuis · Gemeente · Onderwijs</div>
+            <div class="views">511 <span>weergaven</span></div>
+            <div class="acts"><a class="iconbtn" href="gijs-wassenberg-visueel-cv.html" target="_blank" title="Live bekijken"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></a><a class="iconbtn edit" href="gijs-wassenberg-edit.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Bewerken</a></div>
+          </div>
+          <div class="row" data-s="draft">
+            <div class="p"><div class="avatar" style="background:var(--ink-soft);width:38px;height:38px;font-size:14px">TB</div><div><div class="nm">Thomas Bakker</div><div class="fn">IT-projectleider</div></div></div>
+            <span class="pill draft">Concept</span>
+            <div class="variants">nog geen varianten</div>
+            <div class="views">— <span>weergaven</span></div>
+            <div class="acts"><a class="iconbtn" href="gijs-wassenberg-visueel-cv.html" target="_blank" title="Live bekijken"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></a><a class="iconbtn edit" href="gijs-wassenberg-edit.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Bewerken</a></div>
+          </div>
+          <div class="row" data-s="pub">
+            <div class="p"><div class="avatar" style="background:var(--teal);width:38px;height:38px;font-size:14px">DM</div><div><div class="nm">Daan Mulder</div><div class="fn">Recruiter</div></div></div>
+            <span class="pill pub">Gepubliceerd</span>
+            <div class="variants"><b>1 variant</b><br>Basis</div>
+            <div class="views">176 <span>weergaven</span></div>
+            <div class="acts"><a class="iconbtn" href="gijs-wassenberg-visueel-cv.html" target="_blank" title="Live bekijken"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></a><a class="iconbtn edit" href="gijs-wassenberg-edit.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Bewerken</a></div>
+          </div>
+          <div class="row" data-s="rev">
+            <div class="p"><div class="avatar" style="background:var(--mustard);width:38px;height:38px;font-size:14px">EV</div><div><div class="nm">Emma Visser</div><div class="fn">Communicatieadviseur</div></div></div>
+            <span class="pill rev">In review</span>
+            <div class="variants"><b>2 varianten</b><br>Gemeente · Zorg</div>
+            <div class="views">63 <span>weergaven</span></div>
+            <div class="acts"><a class="iconbtn" href="gijs-wassenberg-visueel-cv.html" target="_blank" title="Live bekijken"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></a><a class="iconbtn edit" href="gijs-wassenberg-edit.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Bewerken</a></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div>
+      <section class="card" style="margin-bottom:22px">
+        <div class="card-head"><div><h2>Prestaties</h2><p class="card-sub" style="margin:0">Gijs Wassenberg · 30 dagen</p></div><span class="pill pub">Live</span></div>
+        <div class="spark">
+          <div class="bar" style="height:38%"></div><div class="bar" style="height:52%"></div>
+          <div class="bar" style="height:44%"></div><div class="bar" style="height:66%"></div>
+          <div class="bar" style="height:58%"></div><div class="bar hi" style="height:88%"></div>
+          <div class="bar" style="height:72%"></div><div class="bar" style="height:80%"></div>
+        </div>
+        <div class="spark-x"><span>wk 18</span><span>wk 21</span><span>wk 25</span></div>
+      </section>
+
+      <!-- heatmap teaser -->
+      <section class="card" style="margin-bottom:22px">
+        <div class="card-head"><h2>Aandacht-heatmap</h2></div>
+        <p class="heat-note">Hoeveel van de bezoekers ziet elke sectie — Gijs Wassenberg, variant Ziekenhuis.</p>
+        <div class="heat-row"><span class="hl">Videoheader</span><div class="heat-track"><div class="heat-fill" style="width:96%;background:var(--teal)"></div></div><span class="hv">96%</span></div>
+        <div class="heat-row"><span class="hl">Introtekst</span><div class="heat-track"><div class="heat-fill" style="width:88%;background:var(--teal)"></div></div><span class="hv">88%</span></div>
+        <div class="heat-row"><span class="hl">Fotogalerij</span><div class="heat-track"><div class="heat-fill" style="width:38%;background:var(--clay)"></div></div><span class="hv">38%</span></div>
+        <div class="heat-row"><span class="hl">Tijdlijn</span><div class="heat-track"><div class="heat-fill" style="width:64%;background:var(--mustard)"></div></div><span class="hv">64%</span></div>
+        <div class="heat-row"><span class="hl">Reviews</span><div class="heat-track"><div class="heat-fill" style="width:52%;background:var(--mustard)"></div></div><span class="hv">52%</span></div>
+        <div class="heat-row"><span class="hl">Contact</span><div class="heat-track"><div class="heat-fill" style="width:41%;background:var(--clay)"></div></div><span class="hv">41%</span></div>
+        <div class="heat-flag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+          <span><b>62% scrollt langs de fotogalerij.</b> Overweeg deze hoger te plaatsen of te vervangen door een tekstblok.</span>
+        </div>
+      </section>
+
+      <!-- quick actions -->
+      <section class="card">
+        <div class="card-head"><h2>Snelacties</h2></div>
+        <div class="quick">
+          <button data-toast="E-mail-opsteller geopend — kies een variant en ontvanger">
+            <span class="ic" style="background:var(--tangerine)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg></span>
+          <span class="tx"><strong>Verstuur naar klant</strong><span>Deel een variant-link per e-mail</span></span></button>
+          <button data-toast="Herinnering ingepland voor consultants">
+            <span class="ic" style="background:var(--teal)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+          <span class="tx"><strong>Check-in herinneringen</strong><span>Vraag consultants hun pagina bij te werken</span></span></button>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<script>
+(function(){
+  // filter tabs
+  var tabs = document.querySelectorAll('.tab');
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){x.classList.remove('active')}); t.classList.add('active');
+      var f = t.getAttribute('data-f');
+      document.querySelectorAll('#rows .row').forEach(function(r){
+        r.style.display = (f==='all' || r.getAttribute('data-s')===f) ? '' : 'none';
+      });
+    });
+  });
+  // toasts
+  var toastEl;
+  function toast(m){
+    if(!toastEl){toastEl=document.createElement('div');toastEl.className='toast';document.body.appendChild(toastEl);}
+    toastEl.innerHTML='<span class="d"></span>'+m; toastEl.classList.add('show');
+    clearTimeout(toast._t); toast._t=setTimeout(function(){toastEl.classList.remove('show')},2600);
+  }
+  document.querySelectorAll('[data-toast]').forEach(function(b){
+    b.addEventListener('click', function(e){
+      if(b.closest('.review-item')){ b.closest('.review-item').style.opacity='.5'; }
+      toast(b.getAttribute('data-toast'));
+    });
+  });
+})();
+</script>
+</body>
+</html>
