@@ -462,13 +462,26 @@ a{color:inherit}
 .editor-bar .eb-variant{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:rgba(246,242,236,.7)}
 .editor-bar select{font-family:inherit;background:rgba(246,242,236,.1);color:#fff;border:1px solid rgba(246,242,236,.28);border-radius:9px;padding:7px 10px;font-size:13px;cursor:pointer}
 .editor-bar .eb-status{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:5px 11px;border-radius:999px;background:rgba(217,165,33,.18);color:#F0C775;border:1px solid rgba(217,165,33,.45)}
-.editor-bar .eb-spacer{flex:1}
+.editor-bar .eb-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.editor-bar .eb-actions{display:flex;align-items:center;gap:10px;flex:0 0 auto}
 .eb-btn{font-family:inherit;font-weight:600;font-size:13px;border-radius:999px;padding:9px 15px;cursor:pointer;border:1px solid transparent;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center}
 .eb-btn.ghost{background:transparent;color:#F6F2EC;border-color:rgba(246,242,236,.3)}
 .eb-btn.ghost:hover{background:rgba(246,242,236,.12)}
 .eb-btn.primary{background:var(--ed-accent);color:#fff}
 .eb-btn.primary:hover{filter:brightness(1.06)}
-@media(max-width:900px){.editor-bar .eb-title,.editor-bar .eb-variant{display:none}}
+@media(max-width:760px){
+  :root{--ed-bar-h:152px}
+  .editor-bar{height:auto;min-height:var(--ed-bar-h);flex-wrap:wrap;align-content:center;padding:9px 12px;gap:9px}
+  .editor-bar .eb-left{flex:1 1 100%;gap:9px;min-width:0}
+  .editor-bar .eb-back{padding:8px;font-size:0;gap:0}
+  .editor-bar .eb-back svg{width:19px;height:19px}
+  .editor-bar .eb-title{display:flex;font-size:14px;flex:1 1 auto;min-width:0;white-space:normal}
+  .editor-bar .eb-title small{display:none}
+  .editor-bar .eb-variant{display:none}
+  .editor-bar .eb-status{flex:0 0 auto}
+  .editor-bar .eb-actions{flex:1 1 100%;flex-wrap:wrap;gap:8px}
+  .editor-bar .eb-actions > *{flex:1 1 calc(50% - 4px);justify-content:center;text-align:center;padding:10px 8px}
+}
 
 body.edit-mode{padding-top:var(--ed-bar-h)}
 body.edit-mode .nav{top:var(--ed-bar-h)}
@@ -583,21 +596,24 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
 
 <!-- ===== CMS editor bar (demo) ===== -->
 <div class="editor-bar">
-  <a class="eb-back" href="dashboard.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> Dashboard</a>
-  <div class="eb-title">Gijs Wassenberg <small>HRM-consultant</small></div>
-  <span class="eb-variant">Variant
-    <select id="ebVariant">
-      <option value="ziekenhuis">Ziekenhuis</option>
-      <option value="gemeente">Gemeente</option>
-      <option value="basis">Basis</option>
-    </select>
-  </span>
-  <span class="eb-status" id="ebStatus">● Concept</span>
-  <div class="eb-spacer"></div>
-  <a class="eb-btn ghost" href="gijs-wassenberg-visueel-cv.html" target="_blank" rel="noopener">Voorbeeld</a>
-  <button class="eb-btn ghost" data-toast="Concept opgeslagen ✓">Opslaan</button>
-  <button class="eb-btn ghost" data-toast="Gemarkeerd als ‘klaar voor review’ — Lieve krijgt een e-mail">Klaar voor review</button>
-  <button class="eb-btn primary" data-toast="Gepubliceerd naar productie ✓">Publiceren</button>
+  <div class="eb-left">
+    <a class="eb-back" href="dashboard.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> <span class="eb-back-tx">Dashboard</span></a>
+    <div class="eb-title">Gijs Wassenberg <small>HRM-consultant</small></div>
+    <span class="eb-variant">Variant
+      <select id="ebVariant">
+        <option value="ziekenhuis">Ziekenhuis</option>
+        <option value="gemeente">Gemeente</option>
+        <option value="basis">Basis</option>
+      </select>
+    </span>
+    <span class="eb-status" id="ebStatus">● Concept</span>
+  </div>
+  <div class="eb-actions">
+    <a class="eb-btn ghost" href="gijs-wassenberg-visueel-cv.html" target="_blank" rel="noopener">Voorbeeld</a>
+    <button class="eb-btn ghost" data-toast="Concept opgeslagen ✓">Opslaan</button>
+    <button class="eb-btn ghost" data-toast="Gemarkeerd als ‘klaar voor review’ — Lieve krijgt een e-mail">Klaar voor review</button>
+    <button class="eb-btn primary" data-toast="Gepubliceerd naar productie ✓">Publiceren</button>
+  </div>
 </div>
 
 <!-- print-only letterhead -->
