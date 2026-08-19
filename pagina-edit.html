@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Gijs Wassenberg — Visueel CV · Reijn</title>
+<title>Nieuwe pagina — Visueel CV · Reijn</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -594,6 +594,31 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
 .ed-modal-foot .eb-btn.ghost:hover{background:var(--paper-2)}
 
 
+
+/* ---------- LEGE TEMPLATE ---------- */
+.leeg-tekst{border:1.5px dashed var(--line);border-radius:14px;padding:18px 20px;color:var(--ink-soft);
+  background:rgba(246,242,236,.55);font-size:16.5px;line-height:1.55}
+.leeg-tekst b{color:var(--ink);font-weight:700;display:block;margin-bottom:4px;font-size:17px}
+.hero.leeg .hero-bg{background:linear-gradient(150deg,#0E332D,#14463E 55%,#1E5A4E)}
+.hero.leeg .hero-tag{opacity:.85}
+.video-drop{display:inline-flex;align-items:center;gap:10px;border:1.5px dashed rgba(246,242,236,.5);
+  background:rgba(246,242,236,.1);color:#F6F2EC;border-radius:999px;padding:13px 20px;cursor:pointer;
+  font:600 15px/1 "Hanken Grotesk",sans-serif;margin-top:8px}
+.video-drop:hover{background:rgba(246,242,236,.18);border-color:var(--tangerine)}
+.video-drop svg{width:18px;height:18px}
+.stat.leeg .n{color:var(--line)}
+.rev.leeg p{color:var(--ink-soft);font-style:normal}
+/* voortgangsbalk onder de editorbalk */
+.ed-voortgang{position:sticky;top:var(--ed-bar-h);z-index:900;background:var(--paper-2);
+  border-bottom:1px solid var(--line);padding:11px clamp(16px,4vw,40px);
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:13.5px}
+.ed-voortgang .balk{flex:1;min-width:140px;height:8px;border-radius:999px;background:#DDD0BC;overflow:hidden}
+.ed-voortgang .balk i{display:block;height:100%;width:0;background:var(--tangerine);border-radius:999px;transition:width .6s cubic-bezier(.22,1,.36,1)}
+.ed-voortgang .todo{display:flex;gap:7px;flex-wrap:wrap}
+.ed-voortgang .todo span{font:600 11.5px/1 "Space Mono",monospace;letter-spacing:.04em;text-transform:uppercase;
+  background:#fff;border:1px solid var(--line);color:var(--ink-soft);padding:5px 10px;border-radius:999px}
+@media print{.ed-voortgang{display:none!important}}
+
 /* ---------- FOTO-UPLOAD (editor) ---------- */
 .edit-mode .tile .ed-photo,
 .edit-mode .ed-demo-gallery-grid .g .ed-photo{
@@ -640,8 +665,8 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
 <!-- ===== CMS editor bar (demo) ===== -->
 <div class="editor-bar">
   <div class="eb-left">
-    <a class="eb-back" href="paginas.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> <span class="eb-back-tx">Pagina’s</span></a>
-    <div class="eb-title">Gijs Wassenberg <small>HRM-consultant</small></div>
+    <a class="eb-back" id="ebTerug" href="paginas.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> <span class="eb-back-tx">Pagina’s</span></a>
+    <div class="eb-title" id="ebNaam">Nieuwe consultant <small id="ebFunctie">functie nog invullen</small></div>
     <span class="eb-variant">Variant
       <select id="ebVariant">
         <option value="ziekenhuis">Ziekenhuis</option>
@@ -657,6 +682,13 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
     <button class="eb-btn ghost" data-toast="Gemarkeerd als ‘klaar voor review’ — Lieve krijgt een e-mail">Klaar voor review</button>
     <button class="eb-btn primary" data-toast="Gepubliceerd naar productie ✓">Publiceren</button>
   </div>
+</div>
+
+<div class="ed-voortgang">
+  <strong>Pagina invullen</strong>
+  <span class="balk"><i id="vgBalk"></i></span>
+  <span class="mono" id="vgTekst" style="font-family:'Space Mono',monospace;font-size:12px">0 van 6 blokken gevuld</span>
+  <span class="todo" id="vgTodo"></span>
 </div>
 
 <!-- print-only letterhead -->
@@ -678,31 +710,19 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
 <a id="top"></a>
 
 <!-- ============ HERO ============ -->
-<section class="hero">
+<section class="hero leeg">
   <div class="hero-bg" aria-hidden="true"></div>
-  <video class="hero-video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
-    <source src="output.mp4" type="video/mp4">
-  </video>
+  <video class="hero-video" id="heroVid" autoplay muted loop playsinline aria-hidden="true" style="display:none"></video>
   <div class="hero-inner wrap">
-    <span class="eyebrow"><span class="chip"></span>Visueel CV · HRM-consultant bij Reijn</span>
-    <h1>Gijs<br>Wassenberg</h1>
-    <p class="hero-tag">Verbinder tussen mens en organisatie. Ik help publieke organisaties groeien — met aandacht, lef en een flinke dosis nieuwsgierigheid.</p>
-    <button class="play" id="heroPlay" aria-controls="heroPlayer" aria-expanded="false">
-      <span class="ring" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
-      Speel mijn introductie af
+    <span class="eyebrow"><span class="chip"></span><span id="heroEyebrow">Visueel CV · Reijn</span></span>
+    <h1 id="heroNaam">Nieuwe<br>consultant</h1>
+    <p class="hero-tag" id="heroTag">Nog geen pitch ingevuld. Klik rechtsboven op <b>Bewerk header</b> om de naam, functie en introzin te schrijven.</p>
+    <button class="video-drop" type="button" id="videoDrop">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg>
+      Introductievideo uploaden
     </button>
   </div>
   <div class="scroll-cue" aria-hidden="true">SCROLL</div>
-
-  <!-- foreground intro player, revealed when the play button is clicked -->
-  <div class="hero-player" id="heroPlayer" aria-hidden="true">
-    <video class="hero-player-video" controls playsinline preload="metadata">
-      <source src="output.mp4" type="video/mp4">
-    </video>
-    <button class="hero-close" id="heroClose" type="button" aria-label="Sluit video en toon de header">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
-    </button>
-  </div>
 </section>
 
 <!-- ============ INTRO ============ -->
@@ -713,10 +733,9 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
       <h2>De mens achter het CV</h2>
     </div>
     <div>
-      <p class="intro-lead" data-read>Ik geloof dat goede HR begint bij <span class="hl">échte aandacht</span> — voor mensen, voor verhalen en voor wat een organisatie uniek maakt.</p>
+      <p class="intro-lead" data-read><span class="leeg-tekst"><b>Nog geen introtekst</b>Schrijf hier in twee zinnen wie je bent en waar je goed in bent. Klik op <b style="display:inline">Bewerk</b> rechtsboven dit blok.</span></p>
       <div class="intro-body" data-read>
-        <p>Al negen jaar beweeg ik me in de wereld van HRM, het grootste deel daarvan in de publieke sector. Ik werk graag dáár waar strategie en uitvoering elkaar raken: ik vertaal beleid naar werkbare praktijk en houd ondertussen scherp oog voor de mensen die het werk doen.</p>
-        <p>Mijn kracht zit in verbinden. Ik schakel net zo makkelijk met een bestuurder als met een nieuwe collega op de werkvloer, en ik durf het ongemakkelijke gesprek aan te gaan als dat de boel verder helpt. Buiten werk vind je me op een festival, op de piste of achter het fornuis — altijd op zoek naar nieuwe smaken en ervaringen.</p>
+        <p class="leeg-tekst"><b>Nog geen verhaal</b>Vertel wat je drijft, in welke sectoren je werkt en wat opdrachtgevers aan je hebben. Twee tot drie alinea's is genoeg.</p>
       </div>
     </div>
   </div>
@@ -727,26 +746,22 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
   <figure class="tile" tabindex="0">
     <div class="tile-img" aria-hidden="true"></div>
     <div class="tile-scrim" aria-hidden="true"></div>
-    <span class="tile-glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
-    <figcaption class="tile-cap"><div class="k">Energie</div><div class="t">Festivals</div></figcaption>
+    <figcaption class="tile-cap"><div class="k">Thema</div><div class="t">Voeg een foto toe</div></figcaption>
   </figure>
   <figure class="tile" tabindex="0">
     <div class="tile-img" aria-hidden="true"></div>
     <div class="tile-scrim" aria-hidden="true"></div>
-    <span class="tile-glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 20 6-3 5 2 7-4"/><circle cx="17" cy="5" r="2"/><path d="m9 17 3-7 4 2"/></svg></span>
-    <figcaption class="tile-cap"><div class="k">Vrijheid</div><div class="t">Skiën</div></figcaption>
+    <figcaption class="tile-cap"><div class="k">Thema</div><div class="t">Voeg een foto toe</div></figcaption>
   </figure>
   <figure class="tile" tabindex="0">
     <div class="tile-img" aria-hidden="true"></div>
     <div class="tile-scrim" aria-hidden="true"></div>
-    <span class="tile-glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></span>
-    <figcaption class="tile-cap"><div class="k">Doorzetten</div><div class="t">Obstacle runs</div></figcaption>
+    <figcaption class="tile-cap"><div class="k">Thema</div><div class="t">Voeg een foto toe</div></figcaption>
   </figure>
   <figure class="tile" tabindex="0">
     <div class="tile-img" aria-hidden="true"></div>
     <div class="tile-scrim" aria-hidden="true"></div>
-    <span class="tile-glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span>
-    <figcaption class="tile-cap"><div class="k">Avontuur</div><div class="t">Reizen</div></figcaption>
+    <figcaption class="tile-cap"><div class="k">Thema</div><div class="t">Voeg een foto toe</div></figcaption>
   </figure>
 </section>
 
@@ -756,50 +771,17 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
     <div class="sec-head reveal">
       <span class="eyebrow"><span class="chip"></span>Loopbaan</span>
       <h2>Mijn pad, in kleur</h2>
-      <p>Elke fase voegde een kleur toe aan wie ik vandaag als HRM-consultant ben. Klap een hoofdstuk open om het hele verhaal te lezen.</p>
+      <p>Voeg per functie een stap toe. Elke stap krijgt zijn eigen kleur uit de Reijn-waaier.</p>
     </div>
 
     <div class="tl">
       <article class="tl-item reveal">
-        <div class="tl-rail"><div class="tl-year">2021 — heden</div><div class="tl-dot" style="background:var(--c-petrol)"></div></div>
+        <div class="tl-rail"><div class="tl-year">jaartal</div><div class="tl-dot" style="background:var(--c-petrol)"></div></div>
         <div class="tl-body">
-          <h3>HRM-consultant</h3>
-          <div class="tl-org">Reijn HRM <span class="badge" style="background:var(--c-petrol)">Helmond</span></div>
-          <p class="tl-sum">Als consultant ondersteun ik gemeenten en zorgorganisaties bij complexe HR-vraagstukken — van strategische personeelsplanning tot cultuurverandering.</p>
-          <div class="tl-detail"><div class="tl-detail-inner"><p>In deze rol werk ik op interim- en projectbasis bij opdrachtgevers in de publieke sector. Ik leidde onder andere een organisatiebreed traject rond duurzame inzetbaarheid en zette een nieuw onboardingsprogramma op dat de uitstroom van nieuwe medewerkers in het eerste jaar met een derde terugbracht. Daarnaast begeleid ik junior collega's binnen het Kleurgevers-traineeship.</p></div></div>
-          <button class="tl-more" aria-expanded="false">Lees meer <span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></button>
-        </div>
-      </article>
-
-      <article class="tl-item reveal">
-        <div class="tl-rail"><div class="tl-year">2018 — 2021</div><div class="tl-dot" style="background:var(--c-teal)"></div></div>
-        <div class="tl-body">
-          <h3>HR-adviseur</h3>
-          <div class="tl-org">Gemeente Eindhoven <span class="badge" style="background:var(--c-teal)">Overheid</span></div>
-          <p class="tl-sum">Eerste aanspreekpunt voor leidinggevenden rond verzuim, werving en arbeidsvoorwaarden binnen een team van 400 medewerkers.</p>
-          <div class="tl-detail"><div class="tl-detail-inner"><p>Ik adviseerde managers over de volledige medewerkersreis en vertaalde nieuwe wet- en regelgeving naar werkbaar beleid. In deze periode bouwde ik een aanpak voor preventief verzuimbeleid op en werkte ik nauw samen met de OR aan een herziening van het functiehuis. Hier leerde ik hoe je draagvlak creëert in een politiek-bestuurlijke omgeving.</p></div></div>
-          <button class="tl-more" aria-expanded="false">Lees meer <span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></button>
-        </div>
-      </article>
-
-      <article class="tl-item reveal">
-        <div class="tl-rail"><div class="tl-year">2016 — 2018</div><div class="tl-dot" style="background:var(--c-mustard)"></div></div>
-        <div class="tl-body">
-          <h3>HR-trainee · Kleurgevers</h3>
-          <div class="tl-org">Reijn HRM <span class="badge" style="background:var(--c-mustard)">Traineeship</span></div>
-          <p class="tl-sum">Tweejarig traineeship waarin ik bij wisselende opdrachtgevers het HR-ambacht in de volle breedte leerde kennen.</p>
-          <div class="tl-detail"><div class="tl-detail-inner"><p>Van personeelsadministratie tot junior advies: ik draaide mee op uiteenlopende opdrachten en volgde daarnaast een intensief opleidingsprogramma met coaching en intervisie. Deze periode legde het fundament onder mijn vak en bracht me de waarden mee die ik nog steeds hooghoud — verbinding, aandacht en karakter.</p></div></div>
-          <button class="tl-more" aria-expanded="false">Lees meer <span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></button>
-        </div>
-      </article>
-
-      <article class="tl-item reveal">
-        <div class="tl-rail"><div class="tl-year">2012 — 2016</div><div class="tl-dot" style="background:var(--c-clay)"></div></div>
-        <div class="tl-body">
-          <h3>Bachelor Human Resource Management</h3>
-          <div class="tl-org">Fontys Hogeschool <span class="badge" style="background:var(--c-clay)">Opleiding</span></div>
-          <p class="tl-sum">Afgestudeerd met een onderzoek naar de rol van werkgeluk bij het behoud van jong talent.</p>
-          <div class="tl-detail"><div class="tl-detail-inner"><p>Tijdens mijn studie liep ik stage bij een ziekenhuis en een onderwijsinstelling, waar mijn interesse voor de publieke sector werd geboren. Mijn afstudeeronderzoek over werkgeluk en talentbehoud kreeg een mooie beoordeling en vormt tot op de dag van vandaag een rode draad in mijn werk.</p></div></div>
+          <h3>Functietitel</h3>
+          <div class="tl-org">Organisatie <span class="badge" style="background:var(--c-petrol)">Plaats</span></div>
+          <p class="tl-sum">Beschrijf in één zin wat je in deze rol deed en wat het opleverde.</p>
+          <div class="tl-detail"><div class="tl-detail-inner"><p>Hier komt het volledige verhaal: de opdracht, jouw aanpak en het resultaat. Klik op het potlood om deze stap te bewerken.</p></div></div>
           <button class="tl-more" aria-expanded="false">Lees meer <span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></button>
         </div>
       </article>
@@ -807,10 +789,9 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
   </div>
 </section>
 
-<!-- print-only contact details (appears after the timeline when printed) -->
 <section class="print-only print-contact">
   <h2>Contact</h2>
-  <p>Gijs Wassenberg — HRM-consultant bij Reijn</p>
+  <p id="printNaam">Nieuwe consultant — Reijn</p>
   <ul>
     <li>E-mail: gijs@reijnhrm.nl</li>
     <li>Telefoon: +31 (0)40 000 00 00</li>
@@ -824,10 +805,10 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
   <div class="wrap">
     <span class="eyebrow"><span class="chip"></span>Prestaties</span>
     <div class="stats-grid">
-      <div class="stat reveal"><div class="n">9</div><div class="l">jaar ervaring in HRM</div></div>
-      <div class="stat reveal"><div class="n">35+</div><div class="l">organisaties geholpen</div></div>
-      <div class="stat reveal"><div class="n">12</div><div class="l">HR-projecten geleid</div></div>
-      <div class="stat reveal"><div class="n">4.9</div><div class="l">gemiddelde klantbeoordeling</div></div>
+      <div class="stat leeg reveal"><div class="n">—</div><div class="l">jaar ervaring</div></div>
+      <div class="stat leeg reveal"><div class="n">—</div><div class="l">organisaties geholpen</div></div>
+      <div class="stat leeg reveal"><div class="n">—</div><div class="l">projecten geleid</div></div>
+      <div class="stat leeg reveal"><div class="n">—</div><div class="l">gemiddelde beoordeling</div></div>
     </div>
   </div>
 </section>
@@ -840,20 +821,15 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
       <h2>Wat opdrachtgevers zeggen</h2>
     </div>
     <div class="rev-grid">
-      <blockquote class="rev rev--feature reveal">
+      <blockquote class="rev rev--feature leeg reveal">
         <span class="quotemark" aria-hidden="true">&ldquo;</span>
-        <p>Gijs voelt feilloos aan wat een organisatie nodig heeft. Hij is rustig waar het kan en scherp waar het moet — en juist die combinatie maakt het verschil.</p>
-        <div class="rev-who"><div class="rev-av" aria-hidden="true">PA</div><div><div class="rev-name">Priscilla Altum</div><div class="rev-role">Teamleider HRM · Gemeente Vlaardingen</div></div></div>
+        <p>Nog geen quote toegevoegd. Vraag een opdrachtgever om twee zinnen — dat werkt beter dan een hele referentiebrief.</p>
+        <div class="rev-who"><div class="rev-av" aria-hidden="true">?</div><div><div class="rev-name">Naam opdrachtgever</div><div class="rev-role">Functie · Organisatie</div></div></div>
       </blockquote>
-      <blockquote class="rev reveal">
+      <blockquote class="rev leeg reveal">
         <span class="quotemark" aria-hidden="true">&ldquo;</span>
-        <p>Binnen no time stond er een verzuimaanpak die écht werkte. Pragmatisch, geen dikke pakken papier.</p>
-        <div class="rev-who"><div class="rev-av" aria-hidden="true">MD</div><div><div class="rev-name">Marc de Wit</div><div class="rev-role">Directeur Bedrijfsvoering · Zorggroep Helmond</div></div></div>
-      </blockquote>
-      <blockquote class="rev reveal">
-        <span class="quotemark" aria-hidden="true">&ldquo;</span>
-        <p>Hij neemt mensen mee in verandering zonder dat het schuurt. Onze leidinggevenden vragen nog steeds naar hem.</p>
-        <div class="rev-who"><div class="rev-av" aria-hidden="true">SJ</div><div><div class="rev-name">Sanne Jansen</div><div class="rev-role">HR-manager · Onderwijsgroep Brabant</div></div></div>
+        <p>Tweede quote — klik op Bewerk om deze in te vullen of het blok te verwijderen.</p>
+        <div class="rev-who"><div class="rev-av" aria-hidden="true">?</div><div><div class="rev-name">Naam opdrachtgever</div><div class="rev-role">Functie · Organisatie</div></div></div>
       </blockquote>
     </div>
   </div>
@@ -870,40 +846,37 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
       <div class="sum-card reveal">
         <h3><span class="chip" style="background:var(--c-petrol)"></span>Expertise</h3>
         <div class="chips">
-          <span class="pill">Strategisch HR-advies</span>
-          <span class="pill">Verandermanagement</span>
-          <span class="pill">Verzuim &amp; vitaliteit</span>
-          <span class="pill">Werving &amp; selectie</span>
-          <span class="pill">Employer branding</span>
-          <span class="pill">Personeelsplanning</span>
+          <span class="pill">Vakgebied 1</span>
+          <span class="pill">Vakgebied 2</span>
+          <span class="pill">Vakgebied 3</span>
+          <span class="pill">+ toevoegen</span>
         </div>
       </div>
       <div class="sum-card reveal">
         <h3><span class="chip" style="background:var(--c-teal)"></span>Goed om te weten</h3>
         <div class="facts">
-          <div class="fact"><span class="k">Werkgebied</span><span class="v">Publieke sector</span></div>
-          <div class="fact"><span class="k">Standplaats</span><span class="v">Eindhoven · landelijk inzetbaar</span></div>
-          <div class="fact"><span class="k">Talen</span><span class="v">Nederlands · Engels · Duits</span></div>
-          <div class="fact"><span class="k">Beschikbaar</span><span class="v">32 — 36 uur per week</span></div>
+          <div class="fact"><span class="k">Werkgebied</span><span class="v">nog invullen</span></div>
+          <div class="fact"><span class="k">Standplaats</span><span class="v">nog invullen</span></div>
+          <div class="fact"><span class="k">Talen</span><span class="v">nog invullen</span></div>
+          <div class="fact"><span class="k">Beschikbaar</span><span class="v">nog invullen</span></div>
         </div>
       </div>
       <div class="sum-card reveal">
         <h3><span class="chip" style="background:var(--c-mustard)"></span>Hoe collega's mij omschrijven</h3>
         <div class="chips">
-          <span class="pill">Verbinder</span>
-          <span class="pill">Nieuwsgierig</span>
-          <span class="pill">Rustig &amp; scherp</span>
-          <span class="pill">Eerlijk</span>
-          <span class="pill">Doortastend</span>
+          <span class="pill">Eigenschap 1</span>
+          <span class="pill">Eigenschap 2</span>
+          <span class="pill">Eigenschap 3</span>
+          <span class="pill">+ toevoegen</span>
         </div>
       </div>
       <div class="sum-card reveal">
         <h3><span class="chip" style="background:var(--c-clay)"></span>Waar ik energie van krijg</h3>
         <div class="bars">
-          <div class="bar"><div class="lab"><span>Advies &amp; strategie</span><span>sterk</span></div><div class="track"><div class="fill" data-w="92%" style="background:var(--c-petrol)"></div></div></div>
-          <div class="bar"><div class="lab"><span>Verandering begeleiden</span><span>sterk</span></div><div class="track"><div class="fill" data-w="85%" style="background:var(--c-teal)"></div></div></div>
-          <div class="bar"><div class="lab"><span>Coaching &amp; intervisie</span><span>ruim</span></div><div class="track"><div class="fill" data-w="78%" style="background:var(--c-mustard)"></div></div></div>
-          <div class="bar"><div class="lab"><span>Data &amp; rapportage</span><span>solide</span></div><div class="track"><div class="fill" data-w="70%" style="background:var(--c-clay)"></div></div></div>
+          <div class="bar"><div class="lab"><span>Onderwerp 1</span><span>—</span></div><div class="track"><div class="fill" data-w="0%" style="background:var(--c-petrol)"></div></div></div>
+          <div class="bar"><div class="lab"><span>Onderwerp 2</span><span>—</span></div><div class="track"><div class="fill" data-w="0%" style="background:var(--c-teal)"></div></div></div>
+          <div class="bar"><div class="lab"><span>Onderwerp 3</span><span>—</span></div><div class="track"><div class="fill" data-w="0%" style="background:var(--c-mustard)"></div></div></div>
+          <div class="bar"><div class="lab"><span>Onderwerp 4</span><span>—</span></div><div class="track"><div class="fill" data-w="0%" style="background:var(--c-clay)"></div></div></div>
         </div>
       </div>
     </div>
@@ -921,32 +894,33 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
     <div class="feat feat--1 reveal">
       <div class="feat-text">
         <div class="feat-num">01 — Richting</div>
-        <h3>Strategisch HR-advies</h3>
-        <p>Ik help organisaties scherp krijgen wat ze de komende jaren nodig hebben aan mensen en vaardigheden, en vertaal dat naar een plan dat ook echt uitvoerbaar is. Geen abstracte modellen, maar keuzes waar je morgen mee aan de slag kunt.</p>
-        <ul><li>Strategische personeelsplanning</li><li>HR-beleid</li><li>Organisatieontwikkeling</li></ul>
+        <h3>Eerste specialisme</h3>
+        <p>Beschrijf waar je opdrachtgevers je voor bellen. Wat is de vraag, wat doe jij, en wat levert het op? Twee tot drie zinnen is genoeg — klik op Bewerk om deze tekst te vervangen.</p>
+        <ul><li>Onderwerp</li><li>Onderwerp</li><li>Onderwerp</li></ul>
       </div>
-      <div class="feat-media"><div class="art" aria-hidden="true"></div><span class="tag">Strategie</span></div>
+      <div class="feat-media"><div class="art" aria-hidden="true"></div><span class="tag">Thema</span></div>
     </div>
 
     <div class="feat feat--2 reveal">
       <div class="feat-text">
         <div class="feat-num">02 — Beweging</div>
-        <h3>Verandering &amp; cultuur</h3>
-        <p>Verandering lukt pas als mensen zich gezien voelen. Ik begeleid teams en leidinggevenden door transities heen — met aandacht voor weerstand, ruimte voor het gesprek en een vaste hand op het einddoel.</p>
-        <ul><li>Cultuurtrajecten</li><li>Leiderschap</li><li>Duurzame inzetbaarheid</li></ul>
+        <h3>Tweede specialisme</h3>
+        <p>Een tweede terrein waarop je van waarde bent. Denk aan het soort traject dat je vaak doet en de rol die je daarin pakt.</p>
+        <ul><li>Onderwerp</li><li>Onderwerp</li><li>Onderwerp</li></ul>
       </div>
-      <div class="feat-media"><div class="art" aria-hidden="true"></div><span class="tag">Verandering</span></div>
+      <div class="feat-media"><div class="art" aria-hidden="true"></div><span class="tag">Thema</span></div>
     </div>
 
     <div class="feat feat--3 reveal">
       <div class="feat-text">
-        <div class="feat-num">03 — Aantrekkingskracht</div>
-        <h3>Recruitment &amp; employer branding</h3>
-        <p>In een krappe arbeidsmarkt win je geen mensen met een vacaturetekst alleen. Ik help organisaties een geloofwaardig werkgeversverhaal neerzetten en dat door te vertalen naar het hele wervings- en onboardingsproces.</p>
-        <ul><li>Employer branding</li><li>Werving &amp; selectie</li><li>Onboarding</li></ul>
+        <div class="feat-num">03 — Resultaat</div>
+        <h3>Derde specialisme</h3>
+        <p>Sluit af met het onderdeel waar je het meest trots op bent. Concrete voorbeelden werken hier het best.</p>
+        <ul><li>Onderwerp</li><li>Onderwerp</li><li>Onderwerp</li></ul>
       </div>
-      <div class="feat-media"><div class="art" aria-hidden="true"></div><span class="tag">Werving</span></div>
+      <div class="feat-media"><div class="art" aria-hidden="true"></div><span class="tag">Thema</span></div>
     </div>
+
   </div>
 </section>
 
@@ -955,7 +929,7 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
   <div class="cta-inner wrap reveal">
     <span class="eyebrow"><span class="chip"></span>Laten we kennismaken</span>
     <h2>Overtuigd?</h2>
-    <p>Benieuwd of Gijs de juiste match is voor jouw organisatie? Neem contact op met Lieve — zij vertelt je er graag meer over, onder het genot van een goede kop koffie.</p>
+    <p>Benieuwd of <span id="ctaNaam">deze consultant</span> de juiste match is voor jouw organisatie? Neem contact op met Lieve — zij vertelt je er graag meer over, onder het genot van een goede kop koffie.</p>
 
     <div class="cta-contact">
       <div class="cta-contact-card">
@@ -1606,6 +1580,134 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
     else decorateFlex(el, FLEX_TYPE[c]||'Tekst');
   });
   refreshAddZones();
+})();
+</script>
+
+<script id="lege-template-js">
+/* Vult de lege template met de consultant uit de demo-data (?id=...) en
+   houdt bij hoeveel blokken al gevuld zijn. */
+(function(){
+  var KEY = 'reijn-cms-demo-v1';
+
+  function param(n){
+    var m = new RegExp('[?&]'+n+'=([^&]*)').exec(location.search);
+    return m ? decodeURIComponent(m[1].replace(/\+/g,' ')) : null;
+  }
+  function esc(t){ return String(t).replace(/[&<>"]/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function el(id){ return document.getElementById(id); }
+
+  /* ---------- consultantgegevens ---------- */
+  var pagina = null;
+  try {
+    var data = JSON.parse(localStorage.getItem(KEY) || '{}');
+    if (data.pages) pagina = data.pages.filter(function(p){ return p.id === param('id'); })[0];
+  } catch(e){}
+
+  if (pagina) {
+    document.title = pagina.naam + ' — Visueel CV · Reijn';
+    el('ebNaam').firstChild.nodeValue = pagina.naam + ' ';
+    el('ebFunctie').textContent = pagina.functie;
+
+    var delen = pagina.naam.split(' ');
+    var voor = delen.shift(), achter = delen.join(' ');
+    el('heroNaam').innerHTML = esc(voor) + (achter ? '<br>' + esc(achter) : '');
+    el('heroEyebrow').textContent = 'Visueel CV · ' + pagina.functie + ' bij Reijn';
+    el('printNaam').textContent = pagina.naam + ' — ' + pagina.functie + ' bij Reijn';
+    el('ctaNaam').textContent = voor;
+    el('ebTerug').href = 'pagina.html?id=' + encodeURIComponent(pagina.id);
+
+    // variantkiezer vullen met de varianten van déze pagina
+    var sel = el('ebVariant');
+    if (sel && pagina.varianten && pagina.varianten.length) {
+      sel.innerHTML = pagina.varianten.map(function(v){
+        return '<option value="' + v.toLowerCase() + '">' + esc(v) + '</option>';
+      }).join('');
+    }
+
+    // status uit de demo-data overnemen
+    var st = el('ebStatus');
+    if (st) {
+      if (pagina.status === 'pub'){
+        st.textContent = '● Gepubliceerd';
+        st.style.background = 'rgba(95,191,143,.18)'; st.style.color = '#8FE0B0'; st.style.borderColor = 'rgba(95,191,143,.5)';
+      } else if (pagina.status === 'rev'){
+        st.textContent = '● In review';
+      }
+    }
+  }
+
+  /* ---------- introductievideo uploaden ---------- */
+  var vid = el('heroVid'), knop = el('videoDrop');
+  var kiezer = document.createElement('input');
+  kiezer.type = 'file'; kiezer.accept = 'video/*'; kiezer.style.display = 'none';
+  document.body.appendChild(kiezer);
+
+  function toonVideo(){
+    if (!vid) return;
+    vid.style.display = '';
+    if (knop) knop.innerHTML = knop.innerHTML.replace('Introductievideo uploaden', 'Video vervangen');
+    document.querySelector('.hero').classList.remove('leeg');
+    verversVoortgang();
+  }
+  if (vid) vid.addEventListener('loadeddata', toonVideo);
+
+  if (knop) knop.addEventListener('click', function(){ kiezer.click(); });
+  kiezer.addEventListener('change', function(){
+    var f = kiezer.files && kiezer.files[0];
+    if (!f) return;
+    vid.src = URL.createObjectURL(f);
+    try { vid.load(); vid.play(); } catch(e){}
+    toonVideo();
+    kiezer.value = '';
+  });
+  // ook slepen op de header werkt
+  var hero = document.querySelector('.hero');
+  ['dragenter','dragover'].forEach(function(t){
+    hero.addEventListener(t, function(e){ e.preventDefault(); hero.style.outline = '3px dashed #E8641E'; });
+  });
+  ['dragleave','dragend','drop'].forEach(function(t){
+    hero.addEventListener(t, function(){ hero.style.outline = ''; });
+  });
+  hero.addEventListener('drop', function(e){
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (!f || !/^video\//.test(f.type)) return;
+    e.preventDefault();
+    vid.src = URL.createObjectURL(f);
+    try { vid.load(); vid.play(); } catch(e2){}
+    toonVideo();
+  });
+
+  /* ---------- voortgang ---------- */
+  function gevuld(){
+    var q = function(sel){ return document.querySelector(sel); };
+    return {
+      'video':      !!(vid && vid.src),
+      'intro':      !q('.intro .leeg-tekst'),
+      'foto\u2019s':!!Array.prototype.filter.call(document.querySelectorAll('.gallery .tile-img'), function(t){
+                       return t.style.backgroundImage; }).length,
+      'loopbaan':   (function(){ var h = q('.tl-item h3'); return !!h && h.textContent.trim() !== 'Functietitel'; })(),
+      'cijfers':    (function(){ return !!Array.prototype.filter.call(document.querySelectorAll('.stats .n'), function(n){
+                       return n.textContent.trim() !== '\u2014'; }).length; })(),
+      'reviews':    (function(){ var n = q('.rev-name'); return !!n && n.textContent.trim() !== 'Naam opdrachtgever'; })()
+    };
+  }
+
+  function verversVoortgang(){
+    var st = gevuld(), klaar = 0, todo = [];
+    Object.keys(st).forEach(function(k){ if (st[k]) klaar++; else todo.push(k); });
+    var totaal = Object.keys(st).length;
+    el('vgBalk').style.width = Math.round(klaar / totaal * 100) + '%';
+    el('vgTekst').textContent = klaar + ' van ' + totaal + ' blokken gevuld';
+    el('vgTodo').innerHTML = todo.length
+      ? todo.map(function(t){ return '<span>nog te doen: ' + t + '</span>'; }).join('')
+      : '<span style="background:rgba(42,140,130,.16);border-color:rgba(42,140,130,.4);color:#1B6B62">compleet \u2713</span>';
+  }
+
+  verversVoortgang();
+  document.addEventListener('click', function(){ setTimeout(verversVoortgang, 60); });
+  document.addEventListener('input', function(){ clearTimeout(verversVoortgang._t);
+    verversVoortgang._t = setTimeout(verversVoortgang, 400); });
 })();
 </script>
 </body>
