@@ -594,6 +594,25 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
 .ed-modal-foot .eb-btn.ghost:hover{background:var(--paper-2)}
 
 
+
+/* per-profielblok (samenvatting) controls */
+.edit-mode .sum-card{position:relative}
+.edit-mode .sum-card:hover .ed-item-controls,.edit-mode .sum-card.editing .ed-item-controls{opacity:1;transform:none}
+.edit-mode .sum-card.editing{outline:2px dashed var(--ed-accent);outline-offset:6px}
+.edit-mode .sum-card.editing .pill{position:relative}
+.ed-mini{border:none;background:var(--clay);color:#fff;width:19px;height:19px;border-radius:50%;
+  cursor:pointer;font:700 11px/1 "Hanken Grotesk",sans-serif;display:inline-grid;place-items:center;
+  margin-left:8px;vertical-align:1px;padding:0;flex:0 0 auto}
+.ed-mini:hover{filter:brightness(1.12)}
+.ed-plus{border:1.5px dashed var(--ed-accent);background:transparent;color:var(--ed-accent);
+  border-radius:999px;padding:7px 14px;font:600 13px/1 "Hanken Grotesk",sans-serif;cursor:pointer}
+.ed-plus:hover{background:rgba(232,100,30,.1)}
+.ed-schuif{display:flex;align-items:center;gap:10px;margin-top:7px}
+.ed-schuif input[type=range]{flex:1;accent-color:var(--ed-accent);height:18px;cursor:pointer}
+.ed-schuif .pct{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);width:42px;text-align:right}
+.edit-mode .sum-card .fact{align-items:center}
+@media print{.ed-mini,.ed-plus,.ed-schuif{display:none!important}}
+
 /* ---------- FOTO-UPLOAD (editor) ---------- */
 .edit-mode .tile .ed-photo,
 .edit-mode .ed-demo-gallery-grid .g .ed-photo{
@@ -1246,6 +1265,216 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
     setTimeout(function(){ el.remove(); refreshAddZones(); toast('Blok verwijderd'); }, 200);
   }
 
+
+  /* ---- profielblokken: 'Het profiel op één pagina' ---- */
+  function decorateSummary(sec){
+    var grid = sec.querySelector('.sum-grid'); if(!grid) return;
+    Array.prototype.forEach.call(grid.querySelectorAll('.sum-card'), addCardControls);
+    var add = document.createElement('button');
+    add.className = 'ed-add-exp';
+    add.style.marginLeft = '0';
+    add.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Profielblok toevoegen';
+    add.addEventListener('click', function(e){ e.stopPropagation(); openCardMenu(add, grid); });
+    grid.parentNode.insertBefore(add, grid.nextSibling);
+  }
+
+  function addCardControls(card){
+    if(card.__sum) return; card.__sum = true;
+    ensureRelative(card);
+    var c = document.createElement('div');
+    c.className = 'ed-item-controls'; c.setAttribute('contenteditable','false');
+    c.innerHTML = '<button data-a="edit" title="Bewerk">'+PENCIL+'</button>'+
+                  '<button data-a="up" title="Naar voren">\u25b2</button>'+
+                  '<button data-a="down" title="Naar achteren">\u25bc</button>'+
+                  '<button data-a="del" title="Verwijder blok">\ud83d\uddd1</button>';
+    card.appendChild(c);
+    c.addEventListener('click', function(e){
+      var b = e.target.closest('button'); if(!b) return;
+      e.preventDefault(); e.stopPropagation();
+      var a = b.getAttribute('data-a');
+      if(a==='edit') toggleCardEdit(card, b);
+      else if(a==='up') moveCard(card,-1);
+      else if(a==='down') moveCard(card,1);
+      else if(a==='del') delCard(card);
+    });
+  }
+
+  function moveCard(card, dir){
+    var kaarten = Array.prototype.slice.call(card.parentNode.querySelectorAll('.sum-card'));
+    var i = kaarten.indexOf(card), j = i + dir;
+    if(j < 0 || j >= kaarten.length) return;
+    if(dir < 0) card.parentNode.insertBefore(card, kaarten[j]);
+    else card.parentNode.insertBefore(kaarten[j], card);
+    toast('Volgorde aangepast');
+  }
+  function delCard(card){
+    card.style.transition='opacity .2s'; card.style.opacity='0';
+    setTimeout(function(){ card.remove(); toast('Profielblok verwijderd'); }, 200);
+  }
+
+  function toggleCardEdit(card, b){
+    var on = card.classList.toggle('editing');
+    card.setAttribute('contenteditable', on ? 'true' : 'false');
+    if(on){
+      bouwKaartHulp(card);
+      b.classList.add('on'); b.innerHTML = CHECK + 'Klaar';
+      card.scrollIntoView({behavior:'smooth', block:'center'});
+    } else {
+      ruimKaartHulpOp(card);
+      b.classList.remove('on'); b.innerHTML = PENCIL;
+      toast('Profielblok bijgewerkt');
+    }
+    card.querySelectorAll('.ed-item-controls').forEach(function(x){ x.setAttribute('contenteditable','false'); });
+  }
+
+  /* hulpknoppen die alleen tijdens het bewerken bestaan */
+  function bouwKaartHulp(card){
+    var chips = card.querySelector('.chips');
+    var facts = card.querySelector('.facts');
+    var bars  = card.querySelector('.bars');
+
+    if(chips){
+      Array.prototype.forEach.call(chips.querySelectorAll('.pill'), maakChipWisbaar);
+      chips.appendChild(maakPlus('Item toevoegen', function(){
+        var pill = document.createElement('span');
+        pill.className = 'pill'; pill.textContent = 'Nieuw item';
+        chips.insertBefore(pill, chips.querySelector('.ed-plus'));
+        maakChipWisbaar(pill);
+        selecteer(pill);
+      }));
+    }
+
+    if(facts){
+      Array.prototype.forEach.call(facts.querySelectorAll('.fact'), maakFactWisbaar);
+      var plusF = maakPlus('Regel toevoegen', function(){
+        var rij = document.createElement('div');
+        rij.className = 'fact';
+        rij.innerHTML = '<span class="k">Nieuw label</span><span class="v">nog invullen</span>';
+        facts.insertBefore(rij, plusF);
+        maakFactWisbaar(rij);
+        selecteer(rij.querySelector('.k'));
+      });
+      facts.appendChild(plusF);
+    }
+
+    if(bars){
+      Array.prototype.forEach.call(bars.querySelectorAll('.bar'), maakBalkRegelbaar);
+      var plusB = maakPlus('Onderwerp toevoegen', function(){
+        var kleuren = ['var(--c-petrol)','var(--c-teal)','var(--c-mustard)','var(--c-clay)','var(--c-plum)'];
+        var rij = document.createElement('div');
+        rij.className = 'bar';
+        rij.innerHTML = '<div class="lab"><span>Nieuw onderwerp</span><span>ruim</span></div>'+
+          '<div class="track"><div class="fill" data-w="60%" style="background:'+
+          kleuren[bars.querySelectorAll('.bar').length % kleuren.length]+';width:60%"></div></div>';
+        bars.insertBefore(rij, plusB);
+        maakBalkRegelbaar(rij);
+        selecteer(rij.querySelector('.lab span'));
+      });
+      bars.appendChild(plusB);
+    }
+  }
+
+  function ruimKaartHulpOp(card){
+    card.querySelectorAll('.ed-mini,.ed-plus,.ed-schuif').forEach(function(x){ x.remove(); });
+  }
+
+  function maakPlus(label, bijKlik){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'ed-plus'; b.setAttribute('contenteditable','false');
+    b.textContent = '+ ' + label;
+    b.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); bijKlik(); });
+    return b;
+  }
+
+  function maakWis(bijKlik){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'ed-mini'; b.setAttribute('contenteditable','false');
+    b.title = 'Verwijder'; b.textContent = '\u00d7';
+    b.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); bijKlik(); });
+    return b;
+  }
+
+  function maakChipWisbaar(pill){
+    if(pill.querySelector('.ed-mini')) return;
+    pill.appendChild(maakWis(function(){ pill.remove(); }));
+  }
+  function maakFactWisbaar(rij){
+    if(rij.querySelector('.ed-mini')) return;
+    rij.appendChild(maakWis(function(){ rij.remove(); }));
+  }
+
+  /* balk: schuifregelaar die zowel de breedte als data-w bijwerkt */
+  function maakBalkRegelbaar(rij){
+    if(rij.querySelector('.ed-schuif')) return;
+    var fill = rij.querySelector('.fill'); if(!fill) return;
+    var start = parseInt((fill.dataset.w || fill.style.width || '60'), 10) || 60;
+    fill.style.width = start + '%';
+
+    var wrap = document.createElement('div');
+    wrap.className = 'ed-schuif'; wrap.setAttribute('contenteditable','false');
+    var schuif = document.createElement('input');
+    schuif.type = 'range'; schuif.min = '0'; schuif.max = '100'; schuif.step = '5'; schuif.value = start;
+    var pct = document.createElement('span');
+    pct.className = 'pct'; pct.textContent = start + '%';
+    schuif.addEventListener('input', function(){
+      fill.style.width = schuif.value + '%';
+      fill.dataset.w = schuif.value + '%';
+      pct.textContent = schuif.value + '%';
+    });
+    wrap.appendChild(schuif); wrap.appendChild(pct);
+    wrap.appendChild(maakWis(function(){ rij.remove(); }));
+    rij.appendChild(wrap);
+  }
+
+  function selecteer(el){
+    try {
+      var r = document.createRange(); r.selectNodeContents(el);
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    } catch(e){}
+  }
+
+  /* nieuw profielblok kiezen */
+  function openCardMenu(anchor, grid){
+    closePop();
+    pop = document.createElement('div'); pop.className='ed-pop';
+    pop.innerHTML =
+      '<h4>Profielblok toevoegen</h4>'+
+      '<button data-t="chips"><span class="ic" style="background:#14463E"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="6" width="8" height="5" rx="2.5"/><rect x="13" y="6" width="8" height="5" rx="2.5"/><rect x="3" y="14" width="12" height="5" rx="2.5"/></svg></span><span class="tx"><strong>Label-blok</strong><span>Rijtje met korte termen</span></span></button>'+
+      '<button data-t="facts"><span class="ic" style="background:#2A8C82"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></span><span class="tx"><strong>Feiten-blok</strong><span>Label en waarde per regel</span></span></button>'+
+      '<button data-t="bars"><span class="ic" style="background:#E8641E"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 8h13M4 13h9M4 18h16"/></svg></span><span class="tx"><strong>Balken-blok</strong><span>Onderwerpen met een niveau</span></span></button>';
+    document.body.appendChild(pop);
+    var r = anchor.getBoundingClientRect();
+    pop.style.left = Math.min(r.left, window.innerWidth-296)+'px';
+    pop.style.top = (r.bottom+8)+'px';
+    pop.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){ voegKaartToe(b.getAttribute('data-t'), grid); closePop(); });
+    });
+    setTimeout(function(){ document.addEventListener('click', closePop, {once:true}); }, 0);
+  }
+
+  function voegKaartToe(type, grid){
+    var kleuren = ['var(--c-petrol)','var(--c-teal)','var(--c-mustard)','var(--c-clay)','var(--c-plum)'];
+    var kleur = kleuren[grid.querySelectorAll('.sum-card').length % kleuren.length];
+    var card = document.createElement('div');
+    card.className = 'sum-card reveal';
+    var kop = '<h3><span class="chip" style="background:'+kleur+'"></span>Nieuw blok</h3>';
+    if(type === 'chips'){
+      card.innerHTML = kop + '<div class="chips"><span class="pill">Eerste item</span><span class="pill">Tweede item</span></div>';
+    } else if(type === 'facts'){
+      card.innerHTML = kop + '<div class="facts">'+
+        '<div class="fact"><span class="k">Label</span><span class="v">waarde</span></div>'+
+        '<div class="fact"><span class="k">Label</span><span class="v">waarde</span></div></div>';
+    } else {
+      card.innerHTML = kop + '<div class="bars">'+
+        '<div class="bar"><div class="lab"><span>Onderwerp</span><span>sterk</span></div>'+
+        '<div class="track"><div class="fill" data-w="80%" style="background:'+kleur+';width:80%"></div></div></div></div>';
+    }
+    grid.appendChild(card);
+    addCardControls(card);
+    toggleCardEdit(card, card.querySelector('.ed-item-controls button[data-a=edit]'));
+    toast('Profielblok toegevoegd \u2014 vul het in');
+  }
+
   /* ---- "+" add zones ---- */
   function makeAddZone(refNode){
     var z = document.createElement('div'); z.className='ed-add';
@@ -1603,6 +1832,7 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
   FLEX.forEach(function(c){
     var el=byClass(c); if(!el) return;
     if(c==='timeline'){ decorateFlex(el,'Werkervaring',true); decorateTimeline(el); }
+    else if(c==='summary'){ decorateFlex(el,'Profiel',true); decorateSummary(el); }
     else decorateFlex(el, FLEX_TYPE[c]||'Tekst');
   });
   refreshAddZones();
