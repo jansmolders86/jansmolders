@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reijn CMS — Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="cms.css">
+<style>
+  .funnel{display:flex;flex-direction:column;gap:14px}
+  .fstep .fbar{height:42px;border-radius:11px;display:flex;align-items:center;padding:0 14px;color:#fff;font-family:var(--mono);font-weight:700;font-size:14px;min-width:64px}
+  .fstep .flbl{font-size:13.5px;margin-top:6px}
+  .fstep .flbl span{display:block;font-size:12px;color:var(--ink-soft)}
+  .chartcard{display:flex;flex-direction:column;height:100%}
+  .chart-wrap{flex:1;min-height:250px;display:flex}
+  .chart-wrap .chart{width:100%;height:100%}
+  .retention{display:flex;align-items:flex-end;gap:3px;height:120px;margin-top:6px}
+  .retention i{flex:1;background:linear-gradient(var(--petrol),rgba(20,70,62,.3));border-radius:3px 3px 0 0;position:relative}
+  .retention i:hover::after{content:attr(data-v);position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:var(--petrol-deep);color:#F6F2EC;font-family:var(--mono);font-size:10px;padding:3px 6px;border-radius:5px;white-space:nowrap;z-index:5}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand"><img src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><span class="tag">CMS</span></div>
+  <nav class="sb-nav">
+    <a href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
+    <a href="paginas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>Pagina's <span class="badge" data-badge="pages">47</span></a>
+    <a class="active" href="analytics.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>Analytics</a>
+    <a href="berichten.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>Berichten <span class="badge" data-badge="mail">2</span></a>
+    <a href="instellingen.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1L14.5 2h-5l-.4 2.6a7 7 0 0 0-1.7 1l-2.3-1-2 3.4L3 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1l.4 2.6h5l.4-2.6a7 7 0 0 0 1.7-1l2.3 1 2-3.4-2-1.5a7 7 0 0 0 .1-1z"/></svg>Instellingen</a>
+  </nav>
+  <div class="sb-user"><img src="lieve.jpg" alt=""><div><div class="nm">Lieve van der Weijde</div><div class="rl">Relatiebeheerder</div></div></div>
+</aside>
+
+<div class="mobile-top">
+  <img class="lg" src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><span class="tag">CMS</span>
+  <span class="mu"><img src="lieve.jpg" alt=""></span>
+</div>
+<nav class="mobile-nav">
+  <a href="dashboard.html">Dashboard</a><a href="paginas.html">Pagina's</a>
+  <a class="active" href="analytics.html">Analytics</a><a href="berichten.html">Berichten</a><a href="instellingen.html">Instellingen</a>
+</nav>
+
+<main class="main">
+  <div class="topbar">
+    <div class="greet">
+      <div class="crumbs"><a href="dashboard.html">Dashboard</a> › <span>Analytics</span></div>
+      <h1>Analytics</h1>
+      <p>Wat doen bezoekers op de visuele CV's — en waar haken ze af?</p>
+    </div>
+    <div class="grow"></div>
+    <select class="select-sm" id="scope">
+      <option value="all">Alle pagina's</option>
+    </select>
+    <select class="select-sm" id="period">
+      <option value="7">Laatste 7 dagen</option>
+      <option value="30" selected>Laatste 30 dagen</option>
+      <option value="90">Laatste 90 dagen</option>
+    </select>
+    <button class="btn line" data-toast="Rapport gegenereerd — analytics-export.pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Rapport</button>
+  </div>
+
+  <section class="kpis">
+    <div class="kpi"><div class="lbl">Weergaven</div><div class="val" id="kViews">2.148</div><div class="sub"><span class="up" id="kViewsD">▲ 18%</span> t.o.v. vorige periode</div></div>
+    <div class="kpi c-teal"><div class="lbl">Unieke bezoekers</div><div class="val" id="kUniek">1.412</div><div class="sub"><span class="up">▲ 12%</span> nieuwe organisaties: 23</div></div>
+    <div class="kpi c-mustard"><div class="lbl">Gem. leestijd</div><div class="val" id="kTijd">3:04</div><div class="sub"><span class="up">▲ 22 sec</span> mediaan 2:41</div></div>
+    <div class="kpi c-tangerine"><div class="lbl">Contactaanvragen</div><div class="val" id="kLeads">41</div><div class="sub"><span class="up">▲ 9</span> conversie 1,9%</div></div>
+  </section>
+
+  <div class="grid stretch" style="margin-bottom:22px;align-items:stretch">
+    <div>
+      <section class="card chartcard">
+        <div class="card-head">
+          <div><h2>Weergaven over tijd</h2><p class="card-sub" id="chartSub">Laatste 30 dagen · alle pagina's</p></div>
+          <div class="chart-legend" style="margin:0">
+            <span><i style="background:var(--petrol)"></i>Weergaven</span>
+            <span><i style="background:var(--tangerine)"></i>Unieke bezoekers</span>
+            <span><i style="background:var(--line)"></i>Vorige periode</span>
+          </div>
+        </div>
+        <div class="chart-wrap" id="chartWrap">
+          <svg class="chart" id="chart" viewBox="0 0 720 260" role="img" aria-label="Lijngrafiek van weergaven"></svg>
+        </div>
+      </section>
+    </div>
+    <div>
+      <section class="card" style="margin-bottom:22px">
+        <div class="card-head"><h2>Verkeersbronnen</h2></div>
+        <div class="donut-wrap">
+          <svg class="donut" viewBox="0 0 42 42" id="donut"></svg>
+          <div class="donut-key" id="donutKey"></div>
+        </div>
+      </section>
+      <section class="card">
+        <div class="card-head"><h2>Apparaat</h2></div>
+        <div class="barlist">
+          <div class="bl"><span class="k">Desktop</span><span class="t"><i style="width:58%"></i></span><span class="v">58%</span></div>
+          <div class="bl"><span class="k">Mobiel</span><span class="t"><i style="width:34%;background:var(--tangerine)"></i></span><span class="v">34%</span></div>
+          <div class="bl"><span class="k">Tablet</span><span class="t"><i style="width:8%;background:var(--mustard)"></i></span><span class="v">8%</span></div>
+        </div>
+        <div class="note" style="margin-top:16px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+          <span>Klanten openen de link vaak eerst mobiel en later opnieuw op desktop — 1 op de 5 bezoekers komt terug.</span>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="grid even" style="margin-bottom:22px">
+    <section class="card">
+      <div class="card-head"><div><h2>Best presterende pagina's</h2><p class="card-sub">Gesorteerd op weergaven in deze periode</p></div></div>
+      <div class="rows">
+        <div class="row row-top rhead"><div>Pagina</div><div>Weergaven</div><div>Leestijd</div><div>Aanvragen</div><div>Verloop</div></div>
+      </div>
+      <div class="rows" id="topRows"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><div><h2>Varianten vergeleken</h2><p class="card-sub">Welke insteek werkt bij welke opdrachtgever?</p></div></div>
+      <div class="barlist" style="margin-bottom:18px">
+        <div class="bl"><span class="k">Ziekenhuis</span><span class="t"><i style="width:88%"></i></span><span class="v">742</span></div>
+        <div class="bl"><span class="k">Gemeente</span><span class="t"><i style="width:71%"></i></span><span class="v">598</span></div>
+        <div class="bl"><span class="k">Basis</span><span class="t"><i style="width:44%"></i></span><span class="v">371</span></div>
+        <div class="bl"><span class="k">Onderwijs</span><span class="t"><i style="width:31%"></i></span><span class="v">262</span></div>
+        <div class="bl"><span class="k">Zorg &amp; welzijn</span><span class="t"><i style="width:21%"></i></span><span class="v">175</span></div>
+      </div>
+      <div class="card-head" style="margin-bottom:10px"><h2 style="font-size:15px">Conversie naar contactaanvraag</h2></div>
+      <div class="barlist">
+        <div class="bl"><span class="k">Ziekenhuis</span><span class="t"><i style="width:78%;background:var(--tangerine)"></i></span><span class="v">2,8%</span></div>
+        <div class="bl"><span class="k">Gemeente</span><span class="t"><i style="width:52%;background:var(--tangerine)"></i></span><span class="v">1,9%</span></div>
+        <div class="bl"><span class="k">Onderwijs</span><span class="t"><i style="width:41%;background:var(--tangerine)"></i></span><span class="v">1,5%</span></div>
+        <div class="bl"><span class="k">Basis</span><span class="t"><i style="width:25%;background:var(--tangerine)"></i></span><span class="v">0,9%</span></div>
+      </div>
+      <div class="heat-flag good" style="margin-top:16px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12 5 5L20 6"/></svg>
+        <span><b>Sectorvarianten converteren 2,5× beter dan de basisversie.</b> Overweeg voor elke consultant minstens één sectorvariant.</span>
+      </div>
+    </section>
+  </div>
+
+  <div class="grid third" style="margin-bottom:22px">
+    <section class="card">
+      <div class="card-head"><div><h2>Aandacht per sectie</h2><p class="card-sub" id="heatSub">Gijs Wassenberg · Ziekenhuis</p></div></div>
+      <div class="heat-row"><span class="hl">Videoheader</span><div class="heat-track"><div class="heat-fill" style="width:96%;background:var(--teal)"></div></div><span class="hv">96%</span></div>
+      <div class="heat-row"><span class="hl">Introtekst</span><div class="heat-track"><div class="heat-fill" style="width:88%;background:var(--teal)"></div></div><span class="hv">88%</span></div>
+      <div class="heat-row"><span class="hl">Fotogalerij</span><div class="heat-track"><div class="heat-fill" style="width:38%;background:var(--clay)"></div></div><span class="hv">38%</span></div>
+      <div class="heat-row"><span class="hl">Tijdlijn</span><div class="heat-track"><div class="heat-fill" style="width:64%;background:var(--mustard)"></div></div><span class="hv">64%</span></div>
+      <div class="heat-row"><span class="hl">Kerncijfers</span><div class="heat-track"><div class="heat-fill" style="width:57%;background:var(--mustard)"></div></div><span class="hv">57%</span></div>
+      <div class="heat-row"><span class="hl">Reviews</span><div class="heat-track"><div class="heat-fill" style="width:52%;background:var(--mustard)"></div></div><span class="hv">52%</span></div>
+      <div class="heat-row"><span class="hl">Contact</span><div class="heat-track"><div class="heat-fill" style="width:41%;background:var(--clay)"></div></div><span class="hv">41%</span></div>
+      <div class="heat-flag">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+        <span><b>62% scrollt langs de fotogalerij.</b> Hoger plaatsen of vervangen door een casusblok.</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><div><h2>Video-engagement</h2><p class="card-sub">Hoeveel procent kijkt hoe lang door</p></div></div>
+      <div class="retention" id="ret"></div>
+      <div class="spark-x" style="margin-top:6px"><span>0:00</span><span>0:20</span><span>0:40</span></div>
+      <div class="row2" style="margin-top:18px">
+        <div><div class="mono muted" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase">Start-ratio</div><div style="font-family:var(--display);font-weight:800;font-size:26px">74%</div></div>
+        <div><div class="mono muted" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase">Uitgekeken</div><div style="font-family:var(--display);font-weight:800;font-size:26px;color:var(--teal)">41%</div></div>
+      </div>
+      <div class="note" style="margin-top:16px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+        <span>De grootste afhaak zit rond 0:12 — precies waar de intro overgaat in de casus.</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><div><h2>Van link naar gesprek</h2><p class="card-sub">Deze periode, alle verstuurde links</p></div></div>
+      <div class="funnel">
+        <div class="fstep"><div class="fbar" style="background:var(--petrol);width:100%">128</div><div class="flbl"><b>Links verstuurd</b><span>naar 46 opdrachtgevers</span></div></div>
+        <div class="fstep"><div class="fbar" style="background:var(--teal);width:78%">99</div><div class="flbl"><b>Geopend</b><span>77% · gemiddeld binnen 4 uur</span></div></div>
+        <div class="fstep"><div class="fbar" style="background:var(--mustard);width:52%">67</div><div class="flbl"><b>Pagina echt bekeken</b><span>52% · gem. 3:04 leestijd</span></div></div>
+        <div class="fstep"><div class="fbar" style="background:var(--tangerine);width:32%">41</div><div class="flbl"><b>Reactie of aanvraag</b><span>32% · 18 daarvan leidde tot een gesprek</span></div></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="card">
+    <div class="card-head">
+      <div><h2>Recente gebeurtenissen</h2><p class="card-sub">Live meegekeken — bijgewerkt tot enkele minuten geleden</p></div>
+      <span class="pill hot">Live</span>
+    </div>
+    <div class="feed" id="events"></div>
+  </section>
+</main>
+
+<div class="demo-flag">Demo — nepdata</div>
+
+<script src="cms.js"></script>
+<script>
+(function(){
+  var data = Reijn.load();
+
+  /* ---------- paginakiezer ---------- */
+  var scope = document.getElementById('scope');
+  data.pages.filter(function(p){return p.status!=='arch'}).forEach(function(p){
+    var o = document.createElement('option'); o.value = p.id; o.textContent = p.naam; scope.appendChild(o);
+  });
+
+  /* ---------- pseudo-random reeks ---------- */
+  function reeks(n, seed, basis, spreiding){
+    var out = [], s = seed;
+    for (var i=0;i<n;i++){
+      s = (s*9301 + 49297) % 233280;
+      var r = s/233280;
+      var golf = Math.sin(i/3.2)*0.25 + Math.sin(i/9)*0.35;
+      var weekend = (i%7===5||i%7===6) ? -0.35 : 0;
+      out.push(Math.max(2, Math.round(basis*(1 + golf + weekend) + r*spreiding)));
+    }
+    return out;
+  }
+
+  function pad(vals, W, H, min, max, x0, y0){
+    return vals.map(function(v,i){
+      var x = x0 + i*(W/(vals.length-1));
+      var y = y0 + H - ((v-min)/(max-min))*H;
+      return (i? 'L':'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+    }).join(' ');
+  }
+
+  function tekenChart(){
+    var dagen = +document.getElementById('period').value;
+    var sel = scope.value;
+    var factor = sel==='all' ? 1 : 0.22;
+    var seed = sel==='all' ? 77 : sel.length*31;
+
+    var views  = reeks(dagen, seed, 72*factor, 28*factor);
+    var uniek  = views.map(function(v){ return Math.round(v*0.66); });
+    var vorige = reeks(dagen, seed+13, 61*factor, 24*factor);
+
+    // viewBox meebewegen met de werkelijke kaarthoogte, zodat de grafiek
+    // de kolom vult zonder de lijnen of labels uit te rekken
+    var wrap = document.getElementById('chartWrap');
+    var cw = wrap.clientWidth || 720, ch = wrap.clientHeight || 260;
+    var VB_W = 720;
+    var VB_H = Math.max(230, Math.min(620, Math.round(VB_W * ch / (cw || 720))));
+    var x0 = 58, y0 = 20;
+    var W = VB_W - x0 - 24;
+    var H = VB_H - y0 - 42;
+    var max = Math.max.apply(null, views.concat(vorige)) * 1.12;
+    var min = 0;
+
+    var grid = '', labels = '';
+    for (var g=0; g<=4; g++){
+      var y = y0 + H - (g/4)*H;
+      grid += '<line x1="'+x0+'" y1="'+y.toFixed(1)+'" x2="'+(x0+W)+'" y2="'+y.toFixed(1)+'" stroke="#E0D6C4" stroke-width="1"'+(g?'':' stroke-width="1.5"')+'/>';
+      labels += '<text x="'+(x0-10)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end" font-family="Space Mono, monospace" font-size="10" fill="#5A5249">'+Math.round(max*g/4)+'</text>';
+    }
+
+    var pViews = pad(views, W, H, min, max, x0, y0);
+    var pUniek = pad(uniek, W, H, min, max, x0, y0);
+    var pVorig = pad(vorige, W, H, min, max, x0, y0);
+    var area = pViews + ' L '+(x0+W)+' '+(y0+H)+' L '+x0+' '+(y0+H)+' Z';
+
+    var xl = '';
+    var stappen = dagen===7 ? ['ma','di','wo','do','vr','za','zo'] : (dagen===30 ? ['30 d geleden','20 d','10 d','vandaag'] : ['90 d geleden','60 d','30 d','vandaag']);
+    stappen.forEach(function(t,i){
+      var x = x0 + i*(W/(stappen.length-1));
+      var anchor = i===0 ? 'start' : (i===stappen.length-1 ? 'end' : 'middle');
+      xl += '<text x="'+x.toFixed(1)+'" y="'+(y0+H+22)+'" text-anchor="'+anchor+'" font-family="Space Mono, monospace" font-size="10" fill="#5A5249">'+t+'</text>';
+    });
+
+    var punten = views.map(function(v,i){
+      var x = x0 + i*(W/(views.length-1));
+      var y = y0 + H - ((v-min)/(max-min))*H;
+      return '<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="9" fill="transparent"><title>'+v+' weergaven</title></circle>';
+    }).join('');
+
+    var svg = document.getElementById('chart');
+    svg.setAttribute('viewBox', '0 0 ' + VB_W + ' ' + VB_H);
+    svg.innerHTML =
+      '<defs><linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0%" stop-color="#14463E" stop-opacity=".22"/><stop offset="100%" stop-color="#14463E" stop-opacity="0"/></linearGradient></defs>'+
+      grid + labels +
+      '<path d="'+area+'" fill="url(#grad)" data-anim="vlak"/>'+
+      '<path d="'+pVorig+'" fill="none" stroke="#D8CDBA" stroke-width="2" stroke-dasharray="5 5" data-anim="vlak"/>'+
+      '<path d="'+pUniek+'" fill="none" stroke="#E8641E" stroke-width="2" data-anim="lijn"/>'+
+      '<path d="'+pViews+'" fill="none" stroke="#14463E" stroke-width="2.6" stroke-linejoin="round" data-anim="lijn"/>'+
+      punten + xl;
+
+    // KPI's meebewegen
+    var totaal = views.reduce(function(a,b){return a+b},0);
+    var totVorig = vorige.reduce(function(a,b){return a+b},0);
+    var delta = Math.round((totaal/totVorig-1)*100);
+    document.getElementById('kViews').textContent = Reijn.nf(totaal);
+    document.getElementById('kUniek').textContent = Reijn.nf(Math.round(totaal*0.66));
+    document.getElementById('kLeads').textContent = Math.max(1, Math.round(totaal*0.019));
+    var d = document.getElementById('kViewsD');
+    d.textContent = (delta>=0?'▲ ':'▼ ') + Math.abs(delta) + '%';
+    d.className = delta>=0 ? 'up' : 'down';
+
+    var naam = sel==='all' ? "alle pagina's" : (data.pages.filter(function(p){return p.id===sel})[0]||{}).naam;
+    document.getElementById('chartSub').textContent = 'Laatste '+dagen+' dagen · '+naam;
+    document.getElementById('heatSub').textContent = (sel==='all' ? 'Gijs Wassenberg' : naam) + ' · Ziekenhuis';
+
+    // opnieuw laten tekenen en oplopen
+    Array.prototype.forEach.call(document.querySelectorAll('.kpis .val'), function(el){ el.removeAttribute('data-anim-done'); });
+    Reijn.animeer(svg);
+    Reijn.animeer(document.querySelector('.kpis'));
+  }
+
+  // hertekenen als het venster van formaat verandert
+  var hertekenTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(hertekenTimer);
+    hertekenTimer = setTimeout(tekenChart, 180);
+  });
+
+  document.getElementById('period').addEventListener('change', tekenChart);
+  scope.addEventListener('change', tekenChart);
+
+  /* ---------- donut ---------- */
+  var bronnen = [
+    { k:'Directe link uit e-mail', v:46, c:'#14463E' },
+    { k:'LinkedIn', v:22, c:'#E8641E' },
+    { k:'reijn.nl', v:16, c:'#2A8C82' },
+    { k:'Doorgestuurd door klant', v:11, c:'#D9A521' },
+    { k:'Zoekmachine', v:5, c:'#7A3B57' }
+  ];
+  (function(){
+    var off = 25, svg = '';
+    bronnen.forEach(function(b){
+      svg += '<circle cx="21" cy="21" r="15.9" fill="transparent" stroke="'+b.c+'" stroke-width="6" data-anim="donut" '+
+             'stroke-dasharray="'+b.v+' '+(100-b.v)+'" stroke-dashoffset="'+off+'"><title>'+b.k+': '+b.v+'%</title></circle>';
+      off = (off - b.v + 100) % 100;
+    });
+    svg += '<text x="21" y="20.4" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="6" fill="#221E1A">2.148</text>'+
+           '<text x="21" y="25" text-anchor="middle" font-family="Space Mono, monospace" font-size="2.6" fill="#5A5249">WEERGAVEN</text>';
+    document.getElementById('donut').innerHTML = svg;
+    document.getElementById('donutKey').innerHTML = bronnen.map(function(b){
+      return '<div><i style="background:'+b.c+'"></i>'+b.k+'<b>'+b.v+'%</b></div>';
+    }).join('');
+  })();
+
+  /* ---------- top pagina's ---------- */
+  (function(){
+    var top = data.pages.filter(function(p){return p.status==='pub'}).sort(function(a,b){return b.views-a.views}).slice(0,7);
+    var maxV = top.length ? top[0].views : 1;
+    document.getElementById('topRows').innerHTML = top.map(function(p,i){
+      var trend = [12,-4,26,8,-9,15,3][i%7];
+      return '<div class="row row-top hoverable">'+
+        '<div class="p"><a class="avatar sm" style="background:'+p.kleur+'" href="pagina.html?id='+p.id+'">'+p.init+'</a>'+
+          '<div><a class="nm" href="pagina.html?id='+p.id+'">'+Reijn.esc(p.naam)+'</a><div class="fn">'+Reijn.esc(p.varianten.join(' · ')||'basis')+'</div></div></div>'+
+        '<div class="num">'+Reijn.nf(p.views)+'</div>'+
+        '<div class="num hide-m">'+p.tijd+'</div>'+
+        '<div class="num hide-m">'+p.leads+'</div>'+
+        '<div class="hide-m" style="display:flex;align-items:center;gap:9px">'+
+          '<span class="t" style="flex:1;height:8px;border-radius:999px;background:var(--paper-2);overflow:hidden;display:block">'+
+            '<i style="display:block;height:100%;width:'+Math.round(p.views/maxV*100)+'%;background:var(--petrol);border-radius:999px"></i></span>'+
+          '<span class="mono" style="font-size:11.5px;color:'+(trend>=0?'var(--teal)':'var(--clay)')+'">'+(trend>=0?'▲':'▼')+Math.abs(trend)+'%</span>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+  })();
+
+  /* ---------- video-retentie ---------- */
+  (function(){
+    var vals = [100,98,96,93,90,86,79,71,66,63,60,58,56,54,52,51,49,48,47,46,45,44,44,43,42,42,41,41,41,41];
+    document.getElementById('ret').innerHTML = vals.map(function(v,i){
+      return '<i style="height:'+v+'%'+(i>=26?';background:linear-gradient(var(--teal),rgba(42,140,130,.3))':'')+'" data-v="'+(i*2)+' sec · '+v+'%"></i>';
+    }).join('');
+  })();
+
+  /* ---------- gebeurtenissen ---------- */
+  (function(){
+    var ev = [
+      ['eye','var(--petrol)','<b>Radboudumc</b> bekeek Gijs Wassenberg · variant Ziekenhuis — 4:12','7 min'],
+      ['mail','var(--tangerine)','<b>Gemeente Arnhem</b> opende de link naar Fatima El Amrani','23 min'],
+      ['check','var(--teal)','Contactaanvraag via de pagina van <b>Pieter Hoogendijk</b>','48 min'],
+      ['eye','var(--petrol)','<b>ROC Rijnmond</b> bekeek Yara Bouzid · variant Onderwijs — 3:30','1 u'],
+      ['chart','var(--mustard)','Pagina van <b>Noor Jansen</b> passeerde 200 weergaven','2 u'],
+      ['eye','var(--petrol)','Onbekende bezoeker via LinkedIn op <b>Daan Mulder</b>','3 u'],
+      ['mail','var(--tangerine)','<b>Waterschap Rivierenland</b> stuurde de link door binnen de organisatie','5 u']
+    ];
+    document.getElementById('events').innerHTML = ev.map(function(e){
+      return '<div class="ev"><div class="ic" style="background:'+e[1]+'">'+Reijn.ICON[e[0]]+'</div>'+
+        '<div class="tx">'+e[2]+'</div><div class="tm">'+e[3]+'</div></div>';
+    }).join('');
+  })();
+
+  tekenChart();
+})();
+</script>
+</body>
+</html>
