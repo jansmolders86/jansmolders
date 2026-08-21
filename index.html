@@ -1,18 +1,13 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-        <title>Jan Smolders</title>
-        <meta name="theme-color" content="#2f2f31" />
-        <meta name="description" content="Jan Smolders, Senior designer Epic Games"/>
-        <meta name="keywords"
-              content="Jan Smolders,Smolders,NodeJS,Design,Freelance,media,html,game developer,javascript,html5,jquery,ffmpeg,Github, ReactJS, AngularJS, photoshop"/>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-        <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,900,700,600,300,200' rel='stylesheet'
-              type='text/css'>
-        <link rel="stylesheet" href="assets/stylesheets/css/base.css">
-        <script type="text/javascript">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Render-blocking so layout is correct before the runtime measures the
+     fingerprint canvases, which size themselves from getBoundingClientRect(). -->
+<link rel="stylesheet" href="./styles.css">
+<script src="./support.js"></script>
+<script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
         </script>
@@ -23,46 +18,892 @@
             }
             catch (err) {}
         </script>
-    </head>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..600;1,6..72,200..500&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<!-- Critical geometry, inlined on purpose: the runtime sizes these canvases from
+     getBoundingClientRect() as soon as their nodes exist. A <link> needs a fetch and
+     can lose that race (canvas falls back to its intrinsic 300x150 and the fingerprint
+     renders stretched); an inline <style> applies synchronously. Sole source for these
+     rules — styles.css deliberately does not repeat them. -->
+<style>
+.print-canvas {
+  position: absolute;
+  right: clamp(-90px, -4vw, 0px);
+  top: 2vw;
+  width: min(56vw, 680px);
+  height: min(56vw, 680px);
+  pointer-events: none;
+  opacity: 0.9;
+}
 
-    <body class="home">
+.cta-print {
+  position: absolute;
+  right: -8%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(58vw, 560px);
+  height: min(58vw, 560px);
+  pointer-events: none;
+  opacity: 0.85;
+}
+</style>
+<!-- Also here: the design canvas injects helmet content and does not use the <head> above. -->
+<link rel="stylesheet" href="./styles.css" />
+</helmet>
+<div data-site-root class="site-root">
 
-        <section id="logo">
-            <div class="logo-wrapper">
-                <span class="left"></span>
-                <span class="top"></span>
-                <i class="icon-logo"></i>
-                <span class="middle"></span>
-                <span class="text">Jan Smolders</span>
-                <span class="bottom"></span>
-                <span class="right"></span>
-            </div>
-        </section>
+  <div data-progress class="progress"></div>
 
-        <div class="contact">
-            <ul>
-                <li><a target="_blank" href="https://github.com/jansmolders86/">Github</a></li>
-                <li><a target="_blank" href="https://www.artstation.com/jansmolders86">Artstation</a></li>
-                <li><a target="_blank" href="https://www.linkedin.com/in/jan-smolders-0811a2377/">LinkedIn</a></li>
-                <li><a href="mailto:jansmolders86@gmail.com">Contact</a></li>
-            </ul>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <button data-brandmark onClick="{{ goHome }}" class="brand">
+        <img src="mark.png" alt="Jan Smolders" class="brand-mark" />
+        <span class="brand-name">Jan Smolders</span>
+      </button>
+      <nav data-nav class="nav">
+        <sc-for list="{{ nav }}" as="item" hint-placeholder-count="4">
+          <button onClick="{{ item.go }}" class="nav-link">
+            <span class="nav-dot" style="opacity: {{ item.dot }};"></span>
+            {{ item.label }}
+          </button>
+        </sc-for>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <section class="shell sec-hero">
+        <canvas data-print="1" class="print-canvas"></canvas>
+        <p data-reveal class="eyebrow hero-eyebrow">Independent studio · Netherlands · Est. 2011</p>
+        <h1 class="hero-title">
+          <span data-reveal class="hero-line">Jan Smolders is a</span>
+          <span data-reveal class="hero-line">multi-disciplinary</span>
+          <span data-reveal class="hero-line">designer and maker of</span>
+          <span data-reveal class="hero-line--accent">
+            <span data-rotate-shell="1" class="rotate-shell">
+              <span data-rotate="1" class="rotate-word">useful</span>
+            </span>
+            <span> things</span>
+          </span>
+        </h1>
+        <div data-reveal class="hero-lede-row">
+          <p class="hero-lede">Games, brands and the marketing around them — built by hand, from concept to launch. Fifteen years of it, ten of those inside Epic Games.</p>
+          <div class="hero-actions">
+            <button onClick="{{ scrollWork }}" class="btn btn--solid">See the work</button>
+            <button onClick="{{ scrollCta }}" class="btn btn--ghost">Start a project</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="shell sec-clients">
+        <div data-reveal class="sec-head sec-head--bare">
+          <p class="eyebrow">Worked with</p>
+          <p class="meta">2011 — 2026</p>
+        </div>
+        <div data-reveal class="clients-grid">
+          <sc-for list="{{ clients }}" as="c" hint-placeholder-count="12">
+            <div onMouseEnter="{{ c.enter }}" onMouseLeave="{{ c.leave }}" class="client-cell" style="opacity: {{ c.op }}; transform: {{ c.tf }};">{{ c.name }}</div>
+          </sc-for>
+        </div>
+      </section>
+
+      <div data-reveal class="ticker">
+        <div class="ticker-track">
+          <sc-for list="{{ ticker }}" as="t" hint-placeholder-count="12">
+            <span class="ticker-item">{{ t.label }}<span class="ticker-dot">·</span></span>
+          </sc-for>
+        </div>
+      </div>
+
+      <section data-gallery-anchor class="shell sec-gallery">
+        <div data-reveal class="sec-head">
+          <h2 class="h2">Gallery</h2>
+          <span class="meta">2026</span>
         </div>
 
-        <section id="epic" class="item-wrapper active">
-            <div class="header"><i class="icon-logo"></i></div>
-            <div id="hero" style="background-image: url(assets/images/fortnite.png)"></div>
-            <div class="content">
-                <div class="ribbon"><span>Employer</span><h2>Epic Games</h2></div>
-                <div class="work">
-                    <h3>Senior Designer</h3>
-                    <p>I have been working as a game and level designer for over a decade. Currently working on <a href="https://epicgames.com/fortnite" target="_blank">Fortnite</a>. <br/> Born and raised in the Netherlands, I have worked on Branding, UI/UX, Game Assets, Concept Art, Level design, Marketing and Web-Design & Development for various games and properties.</p>
-                </div>
-            </div>
-            <span class="credit">Image Courtesy of Epic Games</span>
-        </section>
+        <div class="gal-grid">
 
-        <script src='assets/javascript/vendor/jquery.min.js'></script>
-        <script src="assets/javascript/vendor/TweenMax.min.js"></script>
-        <script src="assets/javascript/bootstrap.js"></script>
-    </body>
+          <div data-gal-tile data-reveal class="tile span-7">
+            <div data-ripple-host="1" class="tile-media slate ar-4x3">
+              <div data-kb class="tile-img tile-img--epic"></div>
+              <canvas data-ripple="1" class="ripple-canvas"></canvas>
+            </div>
+            <div class="tile-meta">
+              <span class="grad-text">Epic Games</span>
+              <span class="tile-title">Fortnite Technical & Level designer</span>
+            </div>
+          </div>
+
+          <div data-gal-tile data-reveal class="tile span-5">
+            <div data-ripple-host="1" class="tile-media slate ar-3x4">
+              <div data-kb class="tile-img tile-img--cathuria"></div>
+              <canvas data-ripple="1" class="ripple-canvas"></canvas>
+            </div>
+            <div class="tile-meta">
+              <span class="grad-text">Cathuria Games</span>
+              <span class="tile-title">UI and art</span>
+            </div>
+          </div>
+
+          <div data-gal-tile data-reveal class="tile span-4">
+            <div data-ripple-host="1" class="tile-media slate ar-1x1">
+              <div data-kb class="tile-img tile-img--samsung"></div>
+              <canvas data-ripple="1" class="ripple-canvas"></canvas>
+            </div>
+            <div class="tile-meta">
+              <span class="grad-text">Samsung</span>
+              <span class="tile-title">Brand campaign</span>
+            </div>
+          </div>
+
+          <div data-gal-tile data-reveal class="tile span-8">
+            <div data-ripple-host="1" class="tile-media slate ar-16x10">
+              <div data-kb class="tile-img tile-img--disney"></div>
+              <canvas data-ripple="1" class="ripple-canvas"></canvas>
+            </div>
+            <div class="tile-meta">
+              <span class="grad-text">Disney</span>
+              <span class="tile-title">Level and Gameplay Design</span>
+            </div>
+          </div>
+
+          <div data-gal-tile data-reveal class="tile span-5">
+            <div data-ripple-host="1" class="tile-media ar-4x5">
+              <div data-kb class="tile-img tile-img--ernieball"></div>
+              <canvas data-ripple="1" class="ripple-canvas"></canvas>
+            </div>
+            <div class="tile-meta">
+              <span class="grad-text">Ernie Ball</span>
+              <span class="tile-title">Brand campaign</span>
+            </div>
+          </div>
+
+          <div data-gal-tile data-reveal class="tile span-7">
+            <div data-ripple-host="1" class="tile-media ar-16x9">
+              <div data-kb class="tile-img tile-img--meta"></div>
+              <canvas data-ripple="1" class="ripple-canvas"></canvas>
+            </div>
+            <div class="tile-meta">
+              <span class="grad-text">Meta</span>
+              <span class="tile-title">Mobile game</span>
+            </div>
+          </div>
+
+          <div data-gal-tile data-reveal class="tile span-5">
+            <div data-ripple-host="1" class="tile-media slate ar-4x5">
+              <div data-kb class="tile-img tile-img--playstation"></div>
+              <canvas data-ripple="1" class="ripple-canvas"></canvas>
+            </div>
+            <div class="tile-meta">
+              <span class="grad-text">PlayStation</span>
+              <span class="tile-title">Brand campaign</span>
+            </div>
+          </div>
+
+          <div data-gal-tile data-reveal class="tile span-7">
+            <div data-ripple-host="1" class="tile-media slate ar-16x10">
+              <div data-kb class="tile-img tile-img--lloyds"></div>
+              <canvas data-ripple="1" class="ripple-canvas"></canvas>
+            </div>
+            <div class="tile-meta">
+              <span class="grad-text">Lloyds Bank</span>
+              <span class="tile-title">Identity work</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="shell sec-block">
+        <div data-reveal class="svc-grid">
+          <div>
+            <h2 class="h2 svc-heading">What I make</h2>
+            <p class="svc-intro">One studio, one pair of hands on the work. Bring me in for a slice or for the whole arc.</p>
+          </div>
+          <div class="svc-list">
+            <sc-for list="{{ services }}" as="s" hint-placeholder-count="7">
+              <div data-reveal class="svc-row">
+                <span class="svc-num grad-text">{{ s.num }}</span>
+                <span class="svc-title">{{ s.title }}</span>
+                <span class="svc-note">{{ s.note }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+
+      <section class="shell sec-block">
+        <div data-reveal class="stats-grid">
+          <sc-for list="{{ stats }}" as="st" hint-placeholder-count="4">
+            <div>
+              <p class="stat-value">{{ st.value }}</p>
+              <p class="stat-label">{{ st.label }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section class="shell sec-wide">
+        <div data-reveal class="sec-head">
+          <h2 class="h2">Speaking engagements</h2>
+          <p class="meta">Oct 2026</p>
+        </div>
+        <div data-reveal class="talks-grid">
+          <div class="cal">
+            <div class="cal-grid">
+              <sc-for list="{{ calHead }}" as="h" hint-placeholder-count="7">
+                <div class="cal-head">{{ h.d }}</div>
+              </sc-for>
+              <sc-for list="{{ calCells }}" as="c" hint-placeholder-count="34">
+                <div class="cal-cell" style="color: {{ c.color }}; background-image: {{ c.bg }}; opacity: {{ c.op }};">{{ c.n }}</div>
+              </sc-for>
+            </div>
+          </div>
+          <div class="talks-col">
+            <sc-for list="{{ talks }}" as="t" hint-placeholder-count="1">
+              <div class="talk">
+                <div class="talk-meta">
+                  <span class="grad-text">{{ t.date }} {{ t.month }} {{ t.year }}</span>
+                  <span class="talk-kind">{{ t.kind }}</span>
+                  <span class="talk-status">{{ t.status }}</span>
+                </div>
+                <h3 class="talk-title">{{ t.title }}</h3>
+                <p class="talk-venue">{{ t.venue }} — {{ t.city }}</p>
+              </div>
+            </sc-for>
+            <div class="talks-aside">
+              <p class="label talks-aside-title">Talks I give</p>
+              <div class="pill-row">
+                <sc-for list="{{ talkTopics }}" as="tt" hint-placeholder-count="4">
+                  <span class="pill">{{ tt.label }}</span>
+                </sc-for>
+              </div>
+              <p class="talks-aside-note">Available for lectures, studio sessions and panels. Dutch or English.</p>
+              <div class="talks-aside-action">
+                <a href="mailto:hello@jansmolders.nl?subject=Speaking%20request" class="link-underline">Invite me to speak</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section data-cta-anchor class="shell sec-cta">
+        <div data-reveal class="cta-card">
+          <canvas data-print="1" data-ink="dark" class="cta-print"></canvas>
+          <div class="cta-body">
+            <p class="cta-eyebrow">Available for new projects</p>
+            <h2 class="cta-title">Tell me what you're building.</h2>
+            <a href="mailto:hello@jansmolders.nl" class="mail-link cta-mail">hello@jansmolders.nl</a>
+          </div>
+          <a href="mailto:hello@jansmolders.nl" class="cta-btn">Get in touch</a>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isWork }}" hint-placeholder-val="{{ false }}">
+      <section class="shell sec-page">
+        <p data-reveal class="eyebrow page-eyebrow">Work — 2026</p>
+        <h1 data-reveal class="page-title">Fifteen years of work, and the names it was made for.</h1>
+        <div class="work-grid">
+          <sc-for list="{{ gallery }}" as="g" hint-placeholder-count="12">
+            <div data-reveal class="tile">
+              <div data-ripple-host="1" class="tile-media slate ar-4x3">
+                <canvas data-ripple="1" class="ripple-canvas"></canvas>
+              </div>
+              <div class="tile-meta">
+                <span class="grad-text">{{ g.client }}</span>
+                <span class="tile-title">{{ g.title }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div data-reveal class="work-foot">
+          <p class="work-foot-note">Older work from the Epic Games years and agency projects is available on request.</p>
+          <button onClick="{{ goContact }}" class="link-underline">Ask for the full archive</button>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isCase }}" hint-placeholder-val="{{ false }}">
+      <article class="shell sec-case">
+        <button onClick="{{ goWork }}" class="case-back">← Back to work</button>
+        <p data-reveal class="case-eyebrow grad-text">Case study — 2026</p>
+        <h1 data-reveal class="case-title">UEFN Fortnite Music Island</h1>
+        <div data-reveal class="case-hero slate ar-21x9">
+          <span class="slot-label slot-label--lg">hero capture — island wide shot, 21:9</span>
+        </div>
+        <div data-reveal class="case-meta">
+          <sc-for list="{{ caseMeta }}" as="m" hint-placeholder-count="4">
+            <div>
+              <p class="case-meta-label">{{ m.label }}</p>
+              <p class="case-meta-value">{{ m.value }}</p>
+            </div>
+          </sc-for>
+        </div>
+        <sc-for list="{{ caseSections }}" as="c" hint-placeholder-count="3">
+          <div data-reveal class="case-sec">
+            <h2 class="case-sec-title">{{ c.heading }}</h2>
+            <div class="case-sec-col">
+              <p class="case-sec-body">{{ c.body }}</p>
+              <div class="case-figure slate ar-16x9">
+                <span class="slot-label">{{ c.slot }}</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+        <div data-reveal class="case-cta">
+          <button onClick="{{ goContact }}" class="btn btn--solid btn--lg">Build something like this</button>
+        </div>
+      </article>
+    </sc-if>
+
+    <sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}">
+      <section class="shell sec-page">
+        <p data-reveal class="eyebrow page-eyebrow">About</p>
+        <h1 data-reveal class="about-title">A designer who never left the workshop.</h1>
+        <div data-reveal class="about-grid">
+          <div class="about-portrait slate ar-3x4">
+            <span class="slot-label">portrait — 3:4</span>
+          </div>
+          <div class="about-body">
+            <p class="about-lede">I have been a designer for over 15 years.</p>
+            <p class="about-p">I've worked at Epic Games for more than a decade as well as for ad agencies across the world. Born and raised in the Netherlands, I have worked on Branding, UI/UX, Game Assets, Concept Art, Level design, Marketing and Web-Design &amp; Development for various games and properties.</p>
+            <p class="about-p">Today that runs through one studio: game development on one side, brand and marketing on the other, and the craft that connects them in the middle.</p>
+          </div>
+        </div>
+        <div class="about-timeline">
+          <h2 data-reveal class="about-timeline-title">The path so far</h2>
+          <sc-for list="{{ timeline }}" as="t" hint-placeholder-count="4">
+            <div data-reveal class="tl-row">
+              <p class="tl-years grad-text">{{ t.years }}</p>
+              <div>
+                <h3 class="tl-title">{{ t.title }}</h3>
+                <p class="tl-body">{{ t.body }}</p>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div data-reveal class="disciplines">
+          <p class="label disciplines-title">Disciplines</p>
+          <div class="pill-row">
+            <sc-for list="{{ disciplines }}" as="d" hint-placeholder-count="8">
+              <span class="pill pill--bright">{{ d.label }}</span>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isContact }}" hint-placeholder-val="{{ false }}">
+      <section class="shell sec-contact">
+        <p data-reveal class="eyebrow page-eyebrow">Contact</p>
+        <h1 data-reveal class="contact-title">Let's talk about the thing you want made.</h1>
+        <a data-reveal href="mailto:hello@jansmolders.nl" class="mail-link contact-mail">hello@jansmolders.nl</a>
+        <div data-reveal class="contact-grid">
+          <sc-for list="{{ contactBlocks }}" as="b" hint-placeholder-count="4">
+            <div>
+              <p class="contact-label grad-text">{{ b.label }}</p>
+              <p class="contact-body">{{ b.body }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </sc-if>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <div class="footer-brand">
+        <img src="mark.png" alt="" class="footer-mark" />
+        <span class="footer-text">Jan Smolders — Netherlands</span>
+      </div>
+      <span class="footer-text">© 2026 — Made by hand</span>
+    </div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;motion&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;showpiece&quot;,&quot;options&quot;:[&quot;showpiece&quot;,&quot;reduced&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  state = { page: 'home', logo: null };
+
+  componentDidMount() {
+    this.onScroll = () => {
+      const bar = document.querySelector('[data-progress]');
+      if (!bar) return;
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+    };
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    this.onResize = () => { this.startPrint(); this.startRipples(); };
+    window.addEventListener('resize', this.onResize);
+    this.kick();
+    window.addEventListener('load', () => this.boot());
+  }
+
+  // the template may still be streaming at mount — retry until its nodes exist
+  kick() {
+    let tries = 0;
+    const attempt = () => {
+      const ready = document.querySelector('[data-print]') && document.querySelector('[data-rotate]');
+      if (ready) { this.boot(); return; }
+      if (++tries < 300) this.kickRaf = requestAnimationFrame(attempt);
+    };
+    attempt();
+  }
+
+  boot() {
+    const run = (fn) => { try { fn.call(this); } catch (err) { console.warn('[jsm]', err); } };
+    run(this.setupReveals);
+    run(this.startPrint);
+    run(this.startRotator);
+    run(this.startRipples);
+  }
+
+  go(p) {
+    this.setState({ page: p });
+  }
+
+  scroller() {
+    let n = document.querySelector('[data-reveal]');
+    while (n && n !== document.documentElement) {
+      const c = getComputedStyle(n);
+      if (/auto|scroll/.test(c.overflowY) && n.scrollHeight > n.clientHeight + 40) return n;
+      n = n.parentElement;
+    }
+    return null;
+  }
+
+  scrollTo(sel) {
+    const jump = () => {
+      const el = document.querySelector(sel);
+      if (!el) return;
+      const sc = this.scroller();
+      if (sc) sc.scrollTo({ top: el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 80, behavior: 'smooth' });
+      else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+    };
+    if (this.state.page !== 'home') this.setState({ page: 'home' }, () => setTimeout(jump, 60));
+    else jump();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.page !== this.state.page || prevProps.motion !== this.props.motion) {
+      this.jumpTop();
+      this.boot();
+    }
+  }
+
+  componentWillUnmount() {
+    cancelAnimationFrame(this.kickRaf);
+    cancelAnimationFrame(this.raf);
+    cancelAnimationFrame(this.raf2);
+    clearInterval(this.rotTimer);
+    clearTimeout(this.rotSwap);
+    window.removeEventListener('scroll', this.onScroll);
+    window.removeEventListener('resize', this.onResize);
+    (this.printCleanup || []).forEach((fn) => fn());
+    (this.rippleCleanup || []).forEach((fn) => fn());
+    if (this.rotCleanup) this.rotCleanup();
+    if (this.io) { try { this.io.disconnect(); } catch (err) {} }
+  }
+
+  jumpTop() {
+    const sc = this.scroller();
+    if (sc) sc.scrollTo({ top: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }
+
+  sweepReveals() {
+    const vh = window.innerHeight || 0;
+    document.querySelectorAll('[data-reveal]').forEach((el) => {
+      if (el.style.opacity !== '0') return;
+      const r = el.getBoundingClientRect();
+      if (r.top < vh * 0.96 && r.bottom > -40) { el.style.opacity = '1'; el.style.transform = 'none'; }
+    });
+  }
+
+  setupReveals() {
+    if (this.io) { try { this.io.disconnect(); } catch (err) {} this.io = null; }
+    const reduced = (this.props.motion ?? 'showpiece') === 'reduced';
+    const els = Array.from(document.querySelectorAll('[data-reveal]'));
+    const show = (el) => { el.style.opacity = '1'; el.style.transform = 'none'; };
+
+    if (reduced || typeof IntersectionObserver !== 'function') {
+      els.forEach((el) => { el.style.transition = 'none'; show(el); });
+      return;
+    }
+
+    let io = null;
+    try {
+      io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (!en.isIntersecting) return;
+          show(en.target);
+          try { io.unobserve(en.target); } catch (err) {}
+        });
+      }, { rootMargin: '0px 0px -6% 0px', threshold: 0.04 });
+    } catch (err) { io = null; }
+    if (!io) { els.forEach(show); return; }
+    this.io = io;
+
+    const vh0 = window.innerHeight || 0;
+    els.forEach((el, i) => {
+      const r0 = el.getBoundingClientRect();
+      if (r0.top < vh0 && r0.bottom > -40) { el.style.transition = 'none'; show(el); return; }
+      const d = (i % 6) * 0.08;
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(30px)';
+      el.style.transition = 'opacity 1.1s cubic-bezier(.16,1,.3,1) ' + d + 's, transform 1.2s cubic-bezier(.16,1,.3,1) ' + d + 's';
+      try { io.observe(el); } catch (err) { show(el); }
+    });
+
+    if (!window.__jsRevealGuard) {
+      const sweep = () => this.sweepReveals();
+      document.addEventListener('scroll', sweep, { capture: true, passive: true });
+      window.addEventListener('resize', sweep, { passive: true });
+      window.__jsRevealGuard = setInterval(sweep, 250);
+    }
+    requestAnimationFrame(() => requestAnimationFrame(() => this.sweepReveals()));
+  }
+
+  startRotator() {
+    const el = document.querySelector('[data-rotate]');
+    if (!el) return;
+    if (el.dataset.rotBound === '1') return; // already running on this node — leave its timer alone
+    clearInterval(this.rotTimer);
+    const words = ['useful', 'curious', 'beautiful', 'helpful', 'creative'];
+    el.style.transition = 'none';
+    el.style.animation = 'none';
+    el.style.opacity = '1';
+    el.style.transform = 'none';
+    if ((this.props.motion ?? 'showpiece') === 'reduced') return;
+    el.dataset.rotBound = '1';
+    let i = Math.max(0, words.indexOf((el.textContent || '').trim()));
+
+    // swap is driven by animationend, not a second timer that another mount can clear
+    el.addEventListener('animationend', (ev) => {
+      if (ev.animationName !== 'jswordout') return;
+      i = (i + 1) % words.length;
+      el.textContent = words[i];
+      el.style.animation = 'none';
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+      void el.offsetWidth;
+      el.style.animation = 'jswordin .42s cubic-bezier(.16,1,.3,1) forwards';
+    });
+
+    this.rotTimer = setInterval(() => {
+      el.style.animation = 'none';
+      el.style.opacity = '1';
+      void el.offsetWidth;
+      el.style.animation = 'jswordout .34s cubic-bezier(.16,1,.3,1) forwards';
+    }, 1700);
+  }
+
+  startPrint() {
+    cancelAnimationFrame(this.raf);
+    (this.printCleanup || []).forEach((fn) => fn());
+    this.printCleanup = [];
+    const canvases = Array.from(document.querySelectorAll('[data-print]'));
+    if (!canvases.length) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const reduced = (this.props.motion ?? 'showpiece') === 'reduced';
+    const rings = 30;
+
+    const units = canvases.map((cv) => {
+      const rect = cv.getBoundingClientRect();
+      const w = Math.max(1, rect.width), h = Math.max(1, rect.height);
+      cv.width = w * dpr; cv.height = h * dpr;
+      const ctx = cv.getContext('2d');
+      ctx.scale(dpr, dpr);
+      const dark = cv.getAttribute('data-ink') === 'dark';
+      const accent = ctx.createLinearGradient(0, h, w, 0);
+      accent.addColorStop(0, 'rgb(163,25,91)');
+      accent.addColorStop(1, 'rgb(233,78,27)');
+      const P = { x: 0, y: 0, tx: 0, ty: 0, s: 0, ts: 0 };
+      const onPointer = (e) => {
+        const r = cv.getBoundingClientRect();
+        const inside = e.clientX > r.left - 40 && e.clientX < r.right + 40 && e.clientY > r.top - 40 && e.clientY < r.bottom + 40;
+        P.tx = e.clientX - r.left;
+        P.ty = e.clientY - r.top;
+        P.ts = inside ? 1 : 0;
+      };
+      window.addEventListener('mousemove', onPointer, { passive: true });
+      this.printCleanup.push(() => window.removeEventListener('mousemove', onPointer));
+      return { ctx, w, h, dark, P, accent };
+    });
+
+    const drawUnit = (u, t) => {
+      const { ctx, w, h, dark, P, accent } = u;
+      P.x += (P.tx - P.x) * 0.1;
+      P.y += (P.ty - P.y) * 0.1;
+      P.s += (P.ts - P.s) * 0.06;
+      const R = Math.min(w, h) * 0.34;
+      ctx.clearRect(0, 0, w, h);
+      const cx = w * 0.5, cy = h * 0.52, unit = Math.min(w, h) / 2;
+      for (let i = 0; i < rings; i++) {
+        const p = i / rings;
+        const r0 = unit * (0.07 + p * 0.9);
+        const open = i % 4 === 1 ? 0.55 : (i % 7 === 3 ? 0.3 : 0);
+        const a0 = -Math.PI * 0.5 + open * (i % 2 ? 1 : -1);
+        const a1 = a0 + Math.PI * 2 - open * 2.1;
+        ctx.beginPath();
+        for (let a = a0; a <= a1 + 0.01; a += 0.035) {
+          const wob =
+            0.115 * Math.sin(3 * a + t * 0.20 + i * 0.19) +
+            0.058 * Math.sin(5 * a - t * 0.14 + i * 0.11) +
+            0.040 * Math.sin(2 * a + i * 0.47) +
+            0.026 * Math.sin(7 * a + t * 0.09);
+          const r = r0 * (1 + wob);
+          let x = cx + Math.cos(a) * r;
+          let y = cy + Math.sin(a) * r * 1.16 - unit * 0.06 * Math.sin(a);
+          if (P.s > 0.01) {
+            const dx = P.x - x, dy = P.y - y;
+            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+            if (dist < R) {
+              const sway = Math.sin((1 - dist / R) * 3.1) * R * 0.05 * P.s;
+              x += (-dy / dist) * sway;
+              y += (dx / dist) * sway;
+            }
+          }
+          a === a0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        const fade = (dark ? 0.42 : 0.5) * (1 - p * 0.72);
+        const isAccent = i % 9 === 4;
+        ctx.strokeStyle = isAccent ? accent : (dark ? 'rgba(20,18,16,1)' : 'rgba(237,231,218,1)');
+        ctx.globalAlpha = isAccent ? fade + 0.18 : fade;
+        ctx.lineWidth = isAccent ? 1.5 : 1.1;
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    };
+
+    if (reduced) { units.forEach((u) => drawUnit(u, 0)); return; }
+    const loop = () => {
+      const t = performance.now() / 1000;
+      units.forEach((u) => drawUnit(u, t));
+      this.raf = requestAnimationFrame(loop);
+    };
+    loop();
+  }
+
+  startRipples() {
+    cancelAnimationFrame(this.raf2);
+    (this.rippleCleanup || []).forEach((fn) => fn());
+    this.rippleCleanup = [];
+    const reduced = (this.props.motion ?? 'showpiece') === 'reduced';
+    if (reduced) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const items = Array.from(document.querySelectorAll('[data-ripple]')).map((cv) => {
+      const host = cv.parentElement;
+      const r = cv.getBoundingClientRect();
+      const w = Math.max(1, r.width), h = Math.max(1, r.height);
+      cv.width = w * dpr; cv.height = h * dpr;
+      const ctx = cv.getContext('2d');
+      ctx.scale(dpr, dpr);
+      const grad = ctx.createLinearGradient(0, h, w, 0);
+      grad.addColorStop(0, 'rgb(163,25,91)');
+      grad.addColorStop(1, 'rgb(233,78,27)');
+      const st = { ctx, w, h, x: w / 2, y: h / 2, tx: w / 2, ty: h / 2, a: 0, ta: 0, grad };
+      const move = (e) => {
+        const b = cv.getBoundingClientRect();
+        st.tx = e.clientX - b.left;
+        st.ty = e.clientY - b.top;
+      };
+      const enter = () => { st.ta = 1; };
+      const leave = () => { st.ta = 0; };
+      host.addEventListener('mousemove', move, { passive: true });
+      host.addEventListener('mouseenter', enter);
+      host.addEventListener('mouseleave', leave);
+      this.rippleCleanup.push(() => {
+        host.removeEventListener('mousemove', move);
+        host.removeEventListener('mouseenter', enter);
+        host.removeEventListener('mouseleave', leave);
+      });
+      return st;
+    });
+    if (!items.length) return;
+
+    const draw = (st, t) => {
+      const { ctx, w, h } = st;
+      st.x += (st.tx - st.x) * 0.12;
+      st.y += (st.ty - st.y) * 0.12;
+      st.a += (st.ta - st.a) * 0.07;
+      ctx.clearRect(0, 0, w, h);
+      if (st.a < 0.01) return;
+      const unit = Math.max(w, h) * 0.62;
+      for (let i = 0; i < 22; i++) {
+        const p = i / 22;
+        const r0 = unit * (0.05 + p * 0.95);
+        ctx.beginPath();
+        for (let a = 0; a <= Math.PI * 2 + 0.01; a += 0.05) {
+          const wob =
+            0.10 * Math.sin(3 * a + t * 0.5 + i * 0.2) +
+            0.05 * Math.sin(5 * a - t * 0.35 + i * 0.13);
+          const r = r0 * (1 + wob);
+          const x = st.x + Math.cos(a) * r;
+          const y = st.y + Math.sin(a) * r * 1.1;
+          a === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = i % 6 === 2 ? st.grad : 'rgba(237,231,218,1)';
+        ctx.globalAlpha = st.a * 0.5 * (1 - p * 0.75);
+        ctx.lineWidth = i % 6 === 2 ? 1.4 : 1;
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    };
+
+    const loop = () => {
+      const t = performance.now() / 1000;
+      items.forEach((st) => draw(st, t));
+      this.raf2 = requestAnimationFrame(loop);
+    };
+    loop();
+  }
+
+  renderVals() {
+    const page = this.state.page;
+    const go = (p) => () => this.go(p);
+    const nav = [
+      { key: 'work', label: 'Work' },
+      { key: 'about', label: 'About' },
+      { key: 'contact', label: 'Contact' }
+    ].map((n) => ({ label: n.label, go: go(n.key), dot: page === n.key || (n.key === 'work' && page === 'case') ? '1' : '0' }));
+
+    const raw = [
+      { title: 'UEFN Fortnite Music Island', client: 'Epic Games ecosystem', year: '2026', role: 'Technical implementation and design for a music-led island experience built in Unreal Editor for Fortnite.', slot: 'island capture — 4:3', tags: ['UEFN', 'Level design', 'Verse'], cased: true },
+      { title: 'UEFN Candy Escape', client: 'Own IP', year: '2026', role: 'Full development. Level design, systems, art direction and launch art for a UEFN escape game.', slot: 'gameplay still — 4:3', tags: ['Full development', 'Art direction', 'Systems'], cased: false },
+      { title: 'PlayStation', client: 'PlayStation', year: '2026', role: 'Brand campaign work.', slot: 'campaign frame — 4:3', tags: ['Product design', 'Front-end', 'Tooling'], cased: false },
+      { title: 'Hogeschool Zuyd — Marketing video', client: 'Hogeschool Zuyd', year: '2026', role: 'Concept, production and edit of a marketing film for the university of applied sciences.', slot: 'video frame — 4:3', tags: ['Concept', 'Production', 'Edit'], cased: false },
+      { title: 'Visueel CV — Reijn', client: 'Reijn HRM', year: '2026', role: 'Design and build of an interactive visual CV: a scrolling web experience in place of a paper resume.', slot: 'web screens — 4:3', tags: ['Web design', 'Build', 'Motion'], cased: false }
+    ].map((p, i) => ({
+      ...p,
+      index: String(i + 1).padStart(2, '0'),
+      tags: p.tags.map((label) => ({ label })),
+      cta: p.cased ? 'Read the case study →' : 'Case study in progress',
+      open: p.cased ? go('case') : go('work')
+    }));
+
+    const disciplineNames = ['Game development', 'Marketing strategy', 'Brand identity', 'Video & trailers', 'Content & social', 'Web design', 'Publishing & consulting', 'UI/UX', 'Concept art', 'Level design', 'AI tools', 'Workflow tooling'];
+    const disciplines = disciplineNames.map((label) => ({ label }));
+    const ticker = disciplineNames.concat(disciplineNames).map((label, i) => ({ label, key: label + i }));
+
+    const names = ['Cathuria Games', 'Disney', 'Drop Circuit', 'Epic Games', 'Ernie Ball', 'Hogeschool Zuyd', 'Lloyds Bank', 'Lusion World', 'Meta', 'PlayStation', 'Samsung', 'University of Toronto'];
+    const hv = this.state.logo;
+    const clients = names.map((name, i) => ({
+      name,
+      op: hv === null ? 0.6 : (hv === i ? 1 : 0.18),
+      tf: hv === i ? 'scale(1.06)' : 'scale(1)',
+      enter: () => this.setState({ logo: i }),
+      leave: () => this.setState({ logo: null })
+    }));
+
+    return {
+      clients,
+      scrollWork: () => this.scrollTo('[data-gallery-anchor]'),
+      scrollCta: () => this.scrollTo('[data-cta-anchor]'),
+      isHome: page === 'home',
+      isWork: page === 'work',
+      isCase: page === 'case',
+      isAbout: page === 'about',
+      isContact: page === 'contact',
+      nav,
+      goHome: go('home'),
+      goWork: go('work'),
+      openCase: go('case'),
+      noCase: go('work'),
+      goContact: go('contact'),
+      projects: raw,
+      featured: raw.slice(0, 3).map((p) => ({ ...p, slot: p.slot.replace('4:3', '16:10') })),
+      gallery: [
+        { key: 'island', client: 'Epic Games', title: 'UEFN Music Island' },
+        { key: 'candy', client: 'Cathuria Games', title: 'UEFN Candy Escape' },
+        { key: 'samsung', client: 'Samsung', title: 'Campaign key art' },
+        { key: 'disney', client: 'Disney', title: 'Character art' },
+        { key: 'ernieball', client: 'Ernie Ball', title: 'Brand campaign' },
+        { key: 'playstation', client: 'PlayStation', title: 'Trailer frame' },
+        { key: 'meta', client: 'Meta', title: 'Social campaign' },
+        { key: 'lloyds', client: 'Lloyds Bank', title: 'Identity work' },
+        { key: 'island', client: 'Epic Games', title: 'Level blockout' }
+      ],
+      disciplines,
+      ticker,
+      calHead: ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => ({ d, key: d + i })),
+      calCells: (() => {
+        const cells = [];
+        for (let i = 0; i < 3; i++) cells.push({ n: '', op: 0, color: '#6E675B', bg: 'none', key: 'b' + i });
+        for (let d = 1; d <= 31; d++) {
+          const on = d === 15;
+          cells.push({
+            n: String(d),
+            op: on ? 1 : (d < 15 ? 0.32 : 0.6),
+            color: on ? '#141210' : '#B7AF9F',
+            bg: on ? 'var(--accent-grad)' : 'none',
+            key: 'd' + d
+          });
+        }
+        return cells;
+      })(),
+      talkTopics: [
+        { label: 'AI in game production' },
+        { label: 'Small teams, full pipelines' },
+        { label: 'UEFN and Fortnite' },
+        { label: 'Building a studio of one' }
+      ],
+      talks: [
+        { date: '15', month: 'Oct', year: '2026', title: 'Building games with small teams and AI tools', venue: 'Hogeschool Zuyd', city: 'Heerlen, NL', kind: 'Guest lecture', status: 'Confirmed' }
+      ],
+      services: [
+        { num: '01', title: 'Game development', note: 'UEFN and Unreal, built end to end' },
+        { num: '02', title: 'Brand identity', note: 'Marks, systems, tone of voice' },
+        { num: '03', title: 'Marketing strategy', note: 'Positioning and launch planning' },
+        { num: '04', title: 'Video & trailers', note: 'Concept, production, edit' },
+        { num: '05', title: 'Content & social', note: 'Campaigns that keep running' },
+        { num: '06', title: 'Web design & build', note: 'Design and code, one hand' },
+        { num: '07', title: 'Publishing & consulting', note: 'Advice from inside the industry' }
+      ],
+      stats: [
+        { value: '15+', label: 'Years designing' },
+        { value: '10+', label: 'Years at Epic Games' },
+        { value: '7', label: 'Disciplines under one roof' },
+        { value: '12', label: 'Brands and studios worked with' }
+      ],
+      caseMeta: [
+        { label: 'Client', value: 'Epic Games ecosystem' },
+        { label: 'Year', value: '2026' },
+        { label: 'Role', value: 'Design & technical implementation' },
+        { label: 'Platform', value: 'Unreal Editor for Fortnite' }
+      ],
+      caseSections: [
+        { heading: 'The brief', body: 'Build a music-led island inside Fortnite that reads as a place rather than a level: somewhere players arrive, wander, and stay for the sound. The work covered both sides of the line — the design of the space and the technical implementation that makes it behave.', slot: 'concept boards — 16:9' },
+        { heading: 'Design', body: 'The island was laid out around sightlines and sound zones. Each area has its own audio identity, and the routes between them are timed so the transitions land musically. Wayfinding is built into the architecture instead of the UI.', slot: 'layout diagram — 16:9' },
+        { heading: 'Implementation', body: 'Verse and UEFN devices drive the sequencing, triggers and state. Systems were kept modular so new tracks and set pieces can be dropped in without rebuilding the island, and performance budgets were held from the first blockout onward.', slot: 'editor screenshot — 16:9' },
+        { heading: 'Result', body: 'A shipped island where design and code came from the same desk, which is what kept the loop tight: an idea could be sketched, built and playtested inside a day.', slot: 'launch key art — 16:9' }
+      ],
+      timeline: [
+        { years: '2024 — now', title: 'Independent studio', body: 'Games, brand and marketing work for studios, publishers and brands outside games. Everything made in-house.' },
+        { years: '2013 — 2024', title: 'Epic Games', body: 'More than a decade across branding, UI/UX, game assets, concept art, level design and marketing for various games and properties.' },
+        { years: '2011 — 2013', title: 'Ad agencies, worldwide', body: 'Campaign and brand work for agencies across the world — where the marketing half of the practice comes from.' },
+        { years: 'Netherlands', title: 'Born and raised', body: 'Still based here, working with clients wherever they are.' }
+      ],
+      contactBlocks: [
+        { label: 'For studios', body: 'Project partnerships in game development, art direction and technical implementation.' },
+        { label: 'For publishers', body: 'Consulting, launch strategy and marketing production from someone who has shipped inside the industry.' },
+        { label: 'For brands', body: 'Identity, campaign and web work — with games literacy built in.' },
+        { label: 'For talent', body: 'If you want to work on something together, say what you make and send a link.' }
+      ]
+    };
+  }
+}
+
+</script>
+</body>
 </html>
