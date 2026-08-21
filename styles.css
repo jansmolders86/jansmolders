@@ -524,6 +524,7 @@ a:hover {
 .tile-img--disney { background-image: url('img-disney.png'); }
 .tile-img--cathuria      { background-image: url('img-cathuria.png'); }
 .tile-img--lloyds      { background-image: url('img-lloyds.png'); }
+.tile-img--me      { background-image: url('img-me.jpg'); }
 
 .ripple-canvas {
   position: absolute;
@@ -994,9 +995,8 @@ a:hover {
 }
 
 .about-portrait {
-  display: flex;
-  align-items: flex-end;
-  padding: 16px;
+  position: relative;
+  overflow: hidden;
 }
 
 .about-body {

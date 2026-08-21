@@ -370,7 +370,7 @@
         <h1 data-reveal class="about-title">A designer who never left the workshop.</h1>
         <div data-reveal class="about-grid">
           <div class="about-portrait slate ar-3x4">
-            <span class="slot-label">portrait — 3:4</span>
+            <div data-kb class="tile-img tile-img--me"></div>
           </div>
           <div class="about-body">
             <p class="about-lede">I have been a designer for over 15 years.</p>
@@ -772,11 +772,17 @@ class Component extends DCLogic {
   renderVals() {
     const page = this.state.page;
     const go = (p) => () => this.go(p);
+    const scrollWork = () => this.scrollTo('[data-gallery-anchor]');
     const nav = [
       { key: 'work', label: 'Work' },
       { key: 'about', label: 'About' },
       { key: 'contact', label: 'Contact' }
-    ].map((n) => ({ label: n.label, go: go(n.key), dot: page === n.key || (n.key === 'work' && page === 'case') ? '1' : '0' }));
+    ].map((n) => ({
+      label: n.label,
+      // Work is an anchor, not a route: it scrolls to the home gallery.
+      go: n.key === 'work' ? scrollWork : go(n.key),
+      dot: page === n.key || (n.key === 'work' && page === 'case') ? '1' : '0'
+    }));
 
     const raw = [
       { title: 'UEFN Fortnite Music Island', client: 'Epic Games ecosystem', year: '2026', role: 'Technical implementation and design for a music-led island experience built in Unreal Editor for Fortnite.', slot: 'island capture — 4:3', tags: ['UEFN', 'Level design', 'Verse'], cased: true },
@@ -808,7 +814,7 @@ class Component extends DCLogic {
 
     return {
       clients,
-      scrollWork: () => this.scrollTo('[data-gallery-anchor]'),
+      scrollWork,
       scrollCta: () => this.scrollTo('[data-cta-anchor]'),
       isHome: page === 'home',
       isWork: page === 'work',
