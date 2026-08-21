@@ -156,7 +156,7 @@ a:hover {
   background-size: 100% 100%;
   -webkit-background-clip: text;
   background-clip: text;
-  color: transparent;
+  color: var(--ink);
 }
 
 .btn {
