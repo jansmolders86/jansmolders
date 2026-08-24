@@ -444,6 +444,8 @@ class Component extends DCLogic {
   state = { page: 'home', logo: null };
 
   componentDidMount() {
+    this.lastPage = this.state.page;
+    this.lastMotion = this.props.motion;
     this.onScroll = () => {
       const bar = document.querySelector('[data-progress]');
       if (!bar) return;
@@ -459,6 +461,7 @@ class Component extends DCLogic {
 
   // the template may still be streaming at mount — retry until its nodes exist
   kick() {
+    cancelAnimationFrame(this.kickRaf);
     let tries = 0;
     const attempt = () => {
       const ready = document.querySelector('[data-print]') && document.querySelector('[data-rotate]');
@@ -502,11 +505,19 @@ class Component extends DCLogic {
     else jump();
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.page !== this.state.page || prevProps.motion !== this.props.motion) {
-      this.jumpTop();
-      this.boot();
-    }
+  componentDidUpdate() {
+    // The runtime calls this with (prevProps) only — there is no prevState — so
+    // reading prevState.page threw here and silently killed the whole hook.
+    // Track the previous values ourselves instead.
+    const page = this.state.page;
+    const motion = this.props.motion;
+    if (page === this.lastPage && motion === this.lastMotion) return;
+    this.lastPage = page;
+    this.lastMotion = motion;
+    this.jumpTop();
+    // The template can render a beat after this hook, so retry until the new
+    // page's nodes exist, same as on mount.
+    this.kick();
   }
 
   componentWillUnmount() {
