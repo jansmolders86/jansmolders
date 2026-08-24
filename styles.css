@@ -487,6 +487,28 @@ a:hover {
   color: transparent;
 }
 
+/* Clients marquee: replaces the grid on mobile. Runs the other way and a touch
+   faster than the disciplines ticker, so the two bands read as a pair. */
+.ticker--clients {
+  display: none;
+  margin-top: 0;
+}
+
+.ticker-track--rev {
+  animation-duration: 38s;
+  animation-direction: reverse;
+}
+
+.ticker-item--client {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: clamp(17px, 4.4vw, 24px);
+  letter-spacing: -0.01em;
+  padding: 0 18px;
+}
+
+.ticker-item--client .ticker-dot { padding-left: 18px; }
+
 /* 9. Gallery --------------------------------------------------------------- */
 
 .gal-grid {
@@ -1189,6 +1211,10 @@ a:hover {
   .span-8 { grid-column: span 12; }
 
   .work-grid { grid-template-columns: 1fr; }
+
+  /* The 12-row list of client names gets long on a phone — scroll it instead. */
+  .clients-grid { display: none; }
+  .ticker--clients { display: block; }
 }
 
 @media (max-width: 520px) {
