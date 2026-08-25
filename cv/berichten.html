@@ -17,6 +17,8 @@
   .tmpl button:hover{border-color:var(--tangerine)}
   .tmpl button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 </style>
+<link rel="stylesheet" href="brand.css">
+<script src="brand.js"></script>
 </head>
 <body>
 
@@ -50,7 +52,8 @@
     </div>
     <div class="grow"></div>
     <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg><input id="q" placeholder="Zoek in berichten…"></div>
-    <button class="btn accent" data-open="mCompose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nieuw bericht</button>
+    <a class="btn line" href="paginas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Consultant mailen</a>
+    <button class="btn accent" data-open="mCompose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg>Profiel naar klant sturen</button>
   </div>
 
   <section class="kpis" style="margin-bottom:22px">
@@ -63,8 +66,9 @@
   <div class="inbox">
     <div class="inbox-list">
       <div class="ihead">
-        <button class="tab active" data-map="inbox">Postvak IN</button>
-        <button class="tab" data-map="verzonden">Verzonden</button>
+        <button class="tab active" data-map="inbox">Klanten <span class="n" data-tel="inbox"></span></button>
+        <button class="tab" data-map="consultant">Consultants <span class="n" data-tel="consultant"></span></button>
+        <button class="tab" data-map="verzonden">Verzonden <span class="n" data-tel="verzonden"></span></button>
         <div class="grow" style="flex:1"></div>
         <button class="iconbtn" data-toast="Alles gemarkeerd als gelezen" title="Alles gelezen">✓</button>
       </div>
@@ -178,6 +182,10 @@
   }
 
   function renderThreads(){
+    ['inbox','consultant','verzonden'].forEach(function(m){
+      var n = data.mails.filter(function(x){ return x.map === m; }).length;
+      document.querySelectorAll('[data-tel="'+m+'"]').forEach(function(el){ el.textContent = n; });
+    });
     var items = lijst();
     if (!actief || items.indexOf(actief) === -1) actief = items[0] || null;
     document.getElementById('threads').innerHTML = items.map(function(m){
@@ -222,6 +230,7 @@
         '<span class="avatar md" style="background:'+m.kleur+'">'+Reijn.esc(m.init)+'</span>'+
         '<div style="flex:1;min-width:0"><h3>'+Reijn.esc(m.onderwerp)+'</h3>'+
           '<div class="meta">'+Reijn.esc(m.klant)+' · '+Reijn.esc(m.org)+' · '+Reijn.esc(m.email)+'</div></div>'+
+        (m.intern ? '<span class="pill info">Aan de consultant</span>' : '')+
         (pagina ? '<a class="btn line sm" href="pagina.html?id='+pagina.id+'">Pagina van '+Reijn.esc(pagina.naam.split(' ')[0])+'</a>' : '')+
         '<span class="menu-wrap"><button class="iconbtn" data-menu>⋯</button><div class="menu">'+
           '<button data-toast="Gemarkeerd als ongelezen">Markeer als ongelezen</button>'+

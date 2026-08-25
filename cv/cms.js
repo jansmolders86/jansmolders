@@ -7,7 +7,17 @@
 (function (global) {
   'use strict';
 
-  var KEY = 'reijn-cms-demo-v1';
+  var KEY = 'reijn-cms-demo-v2';
+
+  /* Vangnet: normaal zet brand.js dit in de <head>. Mocht dat bestand
+     ontbreken, dan valt alles terug op white label in plaats van te breken. */
+  if (!global.Merk) {
+    global.Merk = {
+      actief: 'whitelabel', naam: 'Visueel CV',
+      url: function (u) { return u; },
+      MERKEN: { whitelabel: { naam: 'Visueel CV', logo: null, logoLight: null } }
+    };
+  }
 
   /* ---------------- seed-data ---------------- */
   var COLORS = ['var(--petrol)', 'var(--teal)', 'var(--mustard)', 'var(--tangerine)', 'var(--clay)', 'var(--plum)'];
@@ -111,6 +121,31 @@
     ];
   }
 
+  function seedConsultantMails() {
+    return [
+      { id: 'c1', klant: 'Thomas Bakker', org: 'Consultant · IT-projectleider', email: 'thomas@reijn.nl',
+        init: 'TB', kleur: 'var(--mustard)', onderwerp: 'Werk je profiel even bij?', tijd: 'di', datum: '2 dagen geleden',
+        ongelezen: false, map: 'consultant', pagina: 'thomas-bakker', variant: 'Basis', intern: true,
+        tracking: { verzonden: true, geopend: true, geklikt: true, tijd: 'pagina geopend' },
+        berichten: [
+          { van: 'out', naam: 'Lieve van der Weijde', tijd: 'di 08:15',
+            tekst: ['Hoi Thomas,', 'Je pagina staat nog op concept. Wil je de introtekst en twee foto\u2019s aanvullen? Dan kan hij deze week live.', 'Je hoeft alleen op de link te klikken \u2014 alles staat al klaar.'],
+            link: { titel: 'Vul je visuele CV aan', url: 'reijn.nl/cms/bewerk/thomas-bakker' } },
+          { van: 'in', naam: 'Thomas Bakker', tijd: 'gisteren 17:40',
+            tekst: ['Duidelijk, ik pak het morgenochtend op. De foto\u2019s van het project in Zwolle mag ik gebruiken.'] }
+        ] },
+      { id: 'c2', klant: 'Milan de Groot', org: 'Consultant · Projectleider Zorg', email: 'milan@reijn.nl',
+        init: 'MG', kleur: 'var(--ink-soft)', onderwerp: 'Je visuele CV staat klaar', tijd: 'ma', datum: '3 dagen geleden',
+        ongelezen: false, map: 'consultant', pagina: 'milan-de-groot', variant: 'Basis', intern: true,
+        tracking: { verzonden: true, geopend: false, geklikt: false, tijd: '\u2014' },
+        berichten: [
+          { van: 'out', naam: 'Lieve van der Weijde', tijd: 'ma 09:05',
+            tekst: ['Hoi Milan,', 'Welkom bij Reijn! We hebben een visueel CV voor je klaargezet. Vul het in je eigen woorden aan \u2014 een video van 40 seconden werkt het beste.'],
+            link: { titel: 'Vul je visuele CV aan', url: 'reijn.nl/cms/bewerk/milan-de-groot' } }
+        ] }
+    ];
+  }
+
   function seedActivity() {
     return [
       { ic: 'check', kleur: 'var(--teal)', tekst: '<b>Noor Jansen</b> — variant Gemeente gepubliceerd', tijd: '2 u' },
@@ -123,7 +158,7 @@
 
   /* ---------------- store ---------------- */
   function fresh() {
-    return { pages: seedPages(), mails: seedMails(), activity: seedActivity(), v: 1 };
+    return { pages: seedPages(), mails: seedMails().concat(seedConsultantMails()), activity: seedActivity(), v: 2 };
   }
 
   function load() {
@@ -188,6 +223,52 @@
     var m = new RegExp('[?&]' + name + '=([^&]*)').exec(global.location.search);
     return m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : null;
   }
+
+  /* ---------------- mails aan de consultant ----------------
+     Deze kant van het beheer is net zo belangrijk als mailen naar klanten:
+     consultants moeten hun eigen pagina vullen en bijhouden. */
+  var CONSULTANT_MAILS = {
+    bijwerken: {
+      label: 'Vraag om bij te werken',
+      omschrijving: 'Je pagina is al even niet aangeraakt',
+      onderwerp: function (p) { return 'Werk je profiel even bij, ' + p.naam.split(' ')[0] + '?'; },
+      tekst: function (p) {
+        return ['Hoi ' + p.naam.split(' ')[0] + ',',
+          'Je visuele CV is voor het laatst bijgewerkt ' + p.bijgewerkt + '. Klanten zien graag recente opdrachten \u2014 wil je je tijdlijn en introtekst een keer nalopen?',
+          'Klik op de knop hieronder, dan open je meteen de editor. Vijf minuten werk.'];
+      }
+    },
+    uitnodiging: {
+      label: 'Uitnodiging versturen',
+      omschrijving: 'Eerste kennismaking met de editor',
+      onderwerp: function (p) { return 'Je visuele CV staat klaar'; },
+      tekst: function (p) {
+        return ['Hoi ' + p.naam.split(' ')[0] + ',',
+          'We hebben een visueel CV voor je klaargezet. In plaats van een pdf krijgen opdrachtgevers zo een beeld van wie je bent: een korte video, je opdrachten en wat klanten over je zeggen.',
+          'Vul het in je eigen woorden aan. Loop je vast? Bel me gerust.'];
+      }
+    },
+    fotos: {
+      label: 'Vraag om foto\u2019s',
+      omschrijving: 'De fotogalerij is nog leeg',
+      onderwerp: function (p) { return 'We missen nog een paar foto\u2019s'; },
+      tekst: function (p) {
+        return ['Hoi ' + p.naam.split(' ')[0] + ',',
+          'Je pagina staat er goed op, maar de fotogalerij is nog leeg. Vier foto\u2019s van buiten het werk maken het verhaal compleet \u2014 denk aan een hobby, een reis of je werkplek.',
+          'Je kunt ze zelf uploaden via de knop hieronder.'];
+      }
+    },
+    feedback: {
+      label: 'Feedback op review',
+      omschrijving: 'Wijzigingen nog niet goedgekeurd',
+      onderwerp: function (p) { return 'Kleine aanpassing op je pagina'; },
+      tekst: function (p) {
+        return ['Hoi ' + p.naam.split(' ')[0] + ',',
+          'Dank voor je wijzigingen. Voordat ik publiceer nog \u00e9\u00e9n ding: de introtekst mag wat korter en concreter \u2014 waar bellen klanten je precies voor?',
+          'Pas je het aan? Dan zet ik hem daarna direct live.'];
+      }
+    }
+  };
 
   /* ---------------- toast ---------------- */
   var toastEl, toastT;
@@ -381,7 +462,7 @@
     document.querySelectorAll('[data-badge="pages"]').forEach(function (el) {
       el.textContent = data.pages.filter(function (p) { return p.status !== 'arch'; }).length;
     });
-    var unread = data.mails.filter(function (m) { return m.ongelezen && m.map === 'inbox'; }).length;
+    var unread = data.mails.filter(function (m) { return m.ongelezen && m.map !== 'verzonden'; }).length;
     document.querySelectorAll('[data-badge="mail"]').forEach(function (el) {
       if (unread) { el.textContent = unread; el.style.display = ''; }
       else { el.style.display = 'none'; }
@@ -441,7 +522,7 @@
 
   global.Reijn = {
     load: load, save: save, reset: reset, fresh: fresh,
-    STATUS: STATUS, ICON: ICON, COLORS: COLORS,
+    STATUS: STATUS, ICON: ICON, COLORS: COLORS, CONSULTANT_MAILS: CONSULTANT_MAILS,
     esc: esc, slug: slug, initials: initials, kleurVoor: kleurVoor, nf: nf, param: param,
     editorUrl: editorUrl,
     toast: toast, openModal: openModal, closeModal: closeModal, init: init,

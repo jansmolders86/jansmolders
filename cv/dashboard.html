@@ -119,6 +119,12 @@ a{color:inherit;text-decoration:none}
 .iconbtn svg{width:16px;height:16px}
 .row .acts .edit{display:inline-flex;align-items:center;height:34px;width:auto;padding:0 13px;gap:7px;font-weight:600;font-size:13px;background:var(--ink);color:var(--paper);border-color:var(--ink);white-space:nowrap}
 .row .acts .edit:hover{filter:brightness(1.1)}
+.row.klikbaar{cursor:pointer;border-radius:12px;transition:background .12s}
+.row.klikbaar:hover{background:var(--paper)}
+.row .chev{color:var(--ink-soft);font-family:var(--mono);font-size:16px;opacity:0;transition:.15s;align-self:center}
+.row.klikbaar:hover .chev{opacity:1;transform:translateX(2px);color:var(--tangerine)}
+.row .acts .mail{color:var(--tangerine);border-color:var(--line)}
+.row .acts .mail:hover{background:rgba(232,100,30,.12);border-color:var(--tangerine)}
 
 /* analytics side */
 .spark{display:flex;align-items:flex-end;gap:6px;height:88px;margin:6px 0 4px}
@@ -196,6 +202,8 @@ a{color:inherit;text-decoration:none}
   .review-item .btn{flex:1 1 100%}
 }
 </style>
+<link rel="stylesheet" href="brand.css">
+<script src="brand.js"></script>
 </head>
 <body>
 
@@ -244,7 +252,8 @@ a{color:inherit;text-decoration:none}
     <div class="grow"></div>
     <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg><input placeholder="Zoek een consultant of pagina…"></div>
     <button class="bell" aria-label="Meldingen"><span class="dot"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
-    <a class="btn accent" href="nieuwe-pagina.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nieuwe pagina</a>
+    <a class="btn" href="nieuwe-pagina.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nieuwe pagina</a>
+    <a class="btn accent" href="berichten.html?compose=1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg>Profiel versturen</a>
   </div>
 
   <!-- KPIs -->
@@ -315,10 +324,10 @@ a{color:inherit;text-decoration:none}
         <div class="quick">
           <a href="berichten.html?compose=1">
             <span class="ic" style="background:var(--tangerine)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg></span>
-          <span class="tx"><strong>Verstuur naar klant</strong><span>Deel een variant-link per e-mail</span></span></a>
-          <button data-toast="Herinnering ingepland voor 4 consultants">
+          <span class="tx"><strong>Profiel naar een klant sturen</strong><span>Kies een consultant, variant en ontvanger</span></span></a>
+          <a href="paginas.html">
             <span class="ic" style="background:var(--teal)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
-          <span class="tx"><strong>Check-in herinneringen</strong><span>Vraag consultants hun pagina bij te werken</span></span></button>
+          <span class="tx"><strong>Consultants om een update vragen</strong><span>Kies een consultant en stuur een verzoek</span></span></a>
           <a href="analytics.html">
             <span class="ic" style="background:var(--petrol)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg></span>
           <span class="tx"><strong>Maandrapport</strong><span>Bekijk cijfers per pagina en variant</span></span></a>
@@ -369,6 +378,7 @@ a{color:inherit;text-decoration:none}
         '<div class="who"><strong>'+Reijn.esc(p.naam)+' <span class="var">\u00b7 variant '+Reijn.esc(p.varianten[0]||'Basis')+'</span></strong>'+
         '<span>Ingediend '+wanneer+' \u2014 '+reden+'</span></div>'+
         '<a class="btn ghost sm" href="pagina.html?id='+p.id+'">Bekijk</a>'+
+        '<a class="btn ghost sm" href="berichten.html?compose=1&page='+p.id+'" title="Profiel naar een klant sturen">✉</a>'+
         '<button class="btn sm" data-pub="'+p.id+'">Publiceer</button>'+
       '</div>';
     }).join('');
@@ -386,19 +396,26 @@ a{color:inherit;text-decoration:none}
       var vars = p.varianten.length
         ? '<b>'+p.varianten.length+(p.varianten.length===1?' variant':' varianten')+'</b><br>'+Reijn.esc(p.varianten.join(' \u00b7 '))
         : 'nog geen varianten';
-      return '<div class="row">'+
+      return '<div class="row klikbaar" data-ga="'+p.id+'">'+
         '<div class="p"><a class="avatar" style="background:'+p.kleur+';width:38px;height:38px;font-size:14px" href="pagina.html?id='+p.id+'">'+Reijn.esc(p.init)+'</a>'+
           '<div><a class="nm" href="pagina.html?id='+p.id+'">'+Reijn.esc(p.naam)+'</a><div class="fn">'+Reijn.esc(p.functie)+'</div></div></div>'+
         '<span class="pill '+st.cls+'">'+st.label+'</span>'+
         '<div class="variants">'+vars+'</div>'+
         '<div class="views">'+(p.views?Reijn.nf(p.views):'\u2014')+' <span>weergaven</span></div>'+
         '<div class="acts">'+
-          '<a class="iconbtn" href="index.html" target="_blank" title="Live bekijken">'+Reijn.ICON.eye+'</a>'+
+          '<a class="iconbtn mail" href="berichten.html?compose=1&page='+p.id+'" title="Profiel naar een klant sturen">'+Reijn.ICON.mail+'</a>'+
           '<a class="iconbtn edit" href="'+Reijn.editorUrl(p)+'">'+Reijn.ICON.edit+'Bewerken</a>'+
+          '<span class="chev" aria-hidden="true">›</span>'+
         '</div>'+
       '</div>';
     }).join('') || '<div style="padding:26px 10px;text-align:center;color:var(--ink-soft)">Geen pagina\u2019s in dit filter.</div>';
   }
+
+  document.getElementById('rows').addEventListener('click', function(e){
+    if (e.target.closest('a,button')) return;
+    var rij = e.target.closest('[data-ga]');
+    if (rij) window.location.href = Merk.url('pagina.html?id=' + rij.getAttribute('data-ga'));
+  });
 
   document.querySelectorAll('.tab').forEach(function(t){
     t.addEventListener('click', function(){

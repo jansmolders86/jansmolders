@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="cms.css">
+<link rel="stylesheet" href="brand.css">
+<script src="brand.js"></script>
 </head>
 <body>
 
@@ -56,7 +58,8 @@
     <div class="grow"></div>
     <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg><input id="q" placeholder="Zoek op naam, functie of variant…"></div>
     <button class="bell" aria-label="Meldingen"><span class="dot"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
-    <a class="btn accent" href="nieuwe-pagina.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nieuwe pagina</a>
+    <a class="btn" href="nieuwe-pagina.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nieuwe pagina</a>
+    <a class="btn accent" href="berichten.html?compose=1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg>Profiel versturen</a>
   </div>
 
   <section class="kpis">
@@ -89,7 +92,7 @@
 
     <div class="rows">
       <div class="row row-pages rhead">
-        <div>Consultant</div><div>Status</div><div>Varianten</div><div>Weergaven</div><div>Bijgewerkt</div><div></div>
+        <div>Consultant</div><div>Status</div><div>Varianten</div><div>Weergaven</div><div>Bijgewerkt</div><div>Acties</div><div></div>
       </div>
     </div>
     <div class="rows" id="rows"></div>
@@ -176,7 +179,7 @@
       var vars = p.varianten.length
         ? '<b>'+p.varianten.length+(p.varianten.length===1?' variant':' varianten')+'</b><br>'+Reijn.esc(p.varianten.join(' · '))
         : '<span class="muted">nog geen varianten</span>';
-      return '<div class="row row-pages hoverable">'+
+      return '<div class="row row-pages klikbaar" data-ga="'+p.id+'">'+
         '<div class="p"><a class="avatar md" style="background:'+p.kleur+'" href="pagina.html?id='+p.id+'">'+Reijn.esc(p.init)+'</a>'+
           '<div><a class="nm" href="pagina.html?id='+p.id+'">'+Reijn.esc(p.naam)+'</a><div class="fn">'+Reijn.esc(p.functie)+'</div></div></div>'+
         '<span class="pill '+s.cls+'">'+s.label+'</span>'+
@@ -185,6 +188,7 @@
         '<div class="hide-m" style="font-size:12.5px;color:var(--ink-soft)">'+Reijn.esc(p.bijgewerkt)+'</div>'+
         '<div class="acts">'+
           '<a class="iconbtn" href="index.html" target="_blank" title="Live bekijken">'+Reijn.ICON.eye+'</a>'+
+          '<a class="iconbtn actbtn mail" href="berichten.html?compose=1&page='+p.id+'" title="Profiel naar een klant sturen">'+Reijn.ICON.mail+'Mailen</a>'+
           '<a class="iconbtn edit" href="'+Reijn.editorUrl(p)+'">'+Reijn.ICON.edit+'Bewerken</a>'+
           '<span class="menu-wrap">'+
             '<button class="iconbtn" data-menu aria-label="Meer acties">'+Reijn.ICON.dots+'</button>'+
@@ -202,6 +206,7 @@
             '</div>'+
           '</span>'+
         '</div>'+
+        '<span class="chev" aria-hidden="true">›</span>'+
       '</div>';
     }).join('') || '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg><strong>Geen pagina’s gevonden</strong>Pas je zoekterm of filter aan.</div>';
 
@@ -217,6 +222,13 @@
   });
   document.getElementById('q').addEventListener('input', function(e){ q = e.target.value.toLowerCase().trim(); render(); });
   document.getElementById('sort').addEventListener('change', function(e){ sort = e.target.value; render(); });
+
+  // klik ergens op de rij -> beheerscherm (knoppen en links doen hun eigen ding)
+  rowsEl.addEventListener('click', function(e){
+    if (e.target.closest('a,button')) return;
+    var rij = e.target.closest('[data-ga]');
+    if (rij) window.location.href = Merk.url('pagina.html?id=' + rij.getAttribute('data-ga'));
+  });
 
   // rij-acties
   rowsEl.addEventListener('click', function(e){

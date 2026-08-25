@@ -166,10 +166,17 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 .row .num{font-family:var(--mono);font-size:13px}
 .row .num span{color:var(--ink-soft);font-size:11px}
 .row .acts{display:flex;gap:7px;justify-content:flex-end;align-items:center}
-.row .acts .edit{display:inline-flex;align-items:center;height:34px;width:auto;padding:0 13px;gap:7px;font-weight:600;font-size:13px;background:var(--ink);color:var(--paper);border-color:var(--ink);white-space:nowrap}
-.row .acts .edit:hover{filter:brightness(1.1)}
+.row .acts .edit,.row .acts .actbtn{display:inline-flex;align-items:center;height:34px;width:auto;padding:0 13px;gap:7px;font-weight:600;font-size:13px;background:var(--ink);color:var(--paper);border-color:var(--ink);white-space:nowrap}
+.row .acts .edit:hover,.row .acts .actbtn:hover{filter:brightness(1.1)}
 .row.hoverable:hover{background:var(--paper)}
-.row-pages{grid-template-columns:2.1fr 1fr 1.5fr .8fr .9fr auto}
+/* hele rij is een ingang naar het beheerscherm */
+.row.klikbaar{cursor:pointer;border-radius:12px;transition:background .12s}
+.row.klikbaar:hover{background:var(--paper)}
+.row .chev{color:var(--ink-soft);font-family:var(--mono);font-size:16px;opacity:0;transition:.15s;padding-left:2px}
+.row.klikbaar:hover .chev{opacity:1;transform:translateX(2px);color:var(--tangerine)}
+.row .acts .mail{background:var(--surface);border-color:var(--line);color:var(--tangerine)}
+.row .acts .mail:hover{background:rgba(232,100,30,.12);border-color:var(--tangerine)}
+.row-pages{grid-template-columns:2.1fr 1fr 1.5fr .8fr .9fr auto auto}
 .row-top{grid-template-columns:2fr 1fr 1fr 1fr 1.4fr}
 .row-mail{grid-template-columns:1.6fr 2fr 1.3fr 1fr auto}
 

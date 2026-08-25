@@ -34,7 +34,22 @@
   .blk .gr{color:var(--ink-soft);cursor:grab;font-size:15px;letter-spacing:-2px}
   .blk .bn{flex:1;min-width:0;font-size:14px}
   .blk .bn span{display:block;font-size:12px;color:var(--ink-soft)}
+  .contact-blok{border:1px solid var(--line);border-radius:16px;background:var(--paper);padding:15px 16px;margin-bottom:12px}
+  .contact-blok:last-child{margin-bottom:0}
+  .cb-kop{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+  .cb-kop strong{display:block;font-size:14.5px}
+  .cb-kop span{font-size:12.5px;color:var(--ink-soft);line-height:1.45}
+  .cb-ic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;color:#fff;flex:0 0 auto;
+    font-family:var(--display);font-weight:700;font-size:15px}
+  .cb-acties{display:flex;flex-direction:column;gap:7px}
+  .cb-acties button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--surface);
+    border:1px solid var(--line);border-radius:11px;padding:11px 13px;cursor:pointer;font-family:var(--body);font-size:13.5px;font-weight:600}
+  .cb-acties button:hover{border-color:var(--tangerine);background:#fff}
+  .cb-acties button small{display:block;font-weight:400;font-size:12px;color:var(--ink-soft);margin-top:2px}
+  .cb-laatst{margin-top:11px;font-size:12.5px;color:var(--ink-soft);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 </style>
+<link rel="stylesheet" href="brand.css">
+<script src="brand.js"></script>
 </head>
 <body>
 
@@ -70,14 +85,15 @@
     </div>
     <div class="pacts">
       <a class="btn line" href="index.html" target="_blank">👁 Voorbeeld</a>
-      <a class="btn line" id="mailBtn" href="berichten.html?compose=1">✉ Verstuur naar klant</a>
-      <a class="btn accent" id="editBtn" href="gijs-wassenberg-edit.html">✎ Pagina bewerken</a>
+      <a class="btn line" id="editBtn" href="gijs-wassenberg-edit.html">✎ Pagina bewerken</a>
+      <button class="btn" id="consultantBtn">✉ Mail de consultant</button>
+      <a class="btn accent" id="mailBtn" href="berichten.html?compose=1">✉ Stuur profiel naar klant</a>
       <span class="menu-wrap">
         <button class="iconbtn" data-menu aria-label="Meer">⋯</button>
         <div class="menu">
           <button data-copy="" id="copyItem">Link kopiëren</button>
           <button data-toast="PDF-export gestart — visueel CV wordt gegenereerd">PDF exporteren</button>
-          <button data-toast="Consultant heeft een herinnering ontvangen">Herinnering sturen</button>
+          <button data-soort="bijwerken">Herinnering sturen</button>
           <button data-toast="Pagina gedupliceerd als concept">Dupliceren</button>
           <div class="sep"></div>
           <button class="danger" id="archBtn">Archiveren</button>
@@ -115,6 +131,23 @@
 
     <!-- RECHTS -->
     <div>
+      <section class="card" style="margin-bottom:22px">
+        <div class="card-head"><div><h2>Contact</h2><p class="card-sub">Het profiel delen, of de consultant om input vragen.</p></div></div>
+
+        <div class="contact-blok">
+          <div class="cb-kop"><span class="cb-ic" style="background:var(--tangerine)">✉</span>
+            <div><strong>Naar de opdrachtgever</strong><span>Deel een variant met een klant en volg wat ermee gebeurt.</span></div></div>
+          <a class="btn accent sm" id="mailBtn2" href="berichten.html?compose=1" style="width:100%;justify-content:center">Stuur dit profiel naar een klant</a>
+        </div>
+
+        <div class="contact-blok">
+          <div class="cb-kop"><span class="cb-ic" id="cbAvatar" style="background:var(--petrol)">—</span>
+            <div><strong id="cbNaam">De consultant</strong><span id="cbMail">—</span></div></div>
+          <div class="cb-acties" id="cbActies"></div>
+          <div class="cb-laatst" id="cbLaatst"></div>
+        </div>
+      </section>
+
       <section class="card" style="margin-bottom:22px">
         <div class="card-head"><div><h2>Prestaties</h2><p class="card-sub">Laatste 8 weken</p></div><a class="btn line xs" href="analytics.html">Details</a></div>
         <div class="spark" id="spark"></div>
@@ -197,6 +230,46 @@
   </div>
 </div>
 
+<!-- mail aan de consultant -->
+<div class="ov" id="mConsultant">
+  <div class="modal wide">
+    <div class="modal-head">
+      <div><h3>Mail de consultant</h3><p id="cmSub">—</p></div>
+      <button class="iconbtn x" data-close aria-label="Sluiten">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="row2" style="align-items:start">
+        <div>
+          <div class="field"><label>Aanleiding</label></div>
+          <div class="picks" id="cmSoort"></div>
+          <div class="field" style="margin-top:16px"><label for="cmOnderwerp">Onderwerp</label><input type="text" id="cmOnderwerp"></div>
+          <div class="field"><label for="cmTekst">Bericht</label><textarea id="cmTekst" style="min-height:150px"></textarea></div>
+          <div class="setrow" style="border-top:1px solid var(--line)">
+            <div class="tx"><strong>Directe bewerklink meesturen</strong><span>De consultant komt met één klik in zijn eigen editor.</span></div>
+            <label class="switch"><input type="checkbox" id="cmLink" checked><span class="tr"></span></label>
+          </div>
+          <div class="setrow">
+            <div class="tx"><strong>Herinnering na 5 dagen</strong><span>Alleen als er nog niets is aangepast.</span></div>
+            <label class="switch"><input type="checkbox" id="cmHerinner" checked><span class="tr"></span></label>
+          </div>
+        </div>
+        <div>
+          <div class="mono" style="font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px">Voorbeeld</div>
+          <div class="mailprev">
+            <div class="mp-top"><img src="reijn-logo-light.png" alt=""><span class="wm">Reijn</span></div>
+            <div class="mp-body" id="cmPrev"></div>
+            <div class="mp-foot">Reijn · intern bericht aan een collega<br>Je ontvangt dit omdat je een visueel CV bij Reijn hebt.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn ghost" data-close>Annuleer</button>
+      <button class="btn accent" id="cmSend">Versturen</button>
+    </div>
+  </div>
+</div>
+
 <div class="demo-flag">Demo — nepdata</div>
 
 <script src="cms.js"></script>
@@ -233,6 +306,8 @@
       Reijn.esc(p.functie) + ' · aangemaakt ' + Reijn.esc(p.aangemaakt) +
       ' · bijgewerkt ' + Reijn.esc(p.bijgewerkt) + ' · beheerder ' + Reijn.esc(p.beheerder);
     document.getElementById('mailBtn').href = 'berichten.html?compose=1&page=' + p.id;
+    document.getElementById('mailBtn2').href = 'berichten.html?compose=1&page=' + p.id;
+    vulContactblok();
     document.getElementById('editBtn').href = Reijn.editorUrl(p);
     document.getElementById('editorLink').href = Reijn.editorUrl(p);
     document.getElementById('copyItem').setAttribute('data-copy', 'reijn.nl/cv/' + p.id);
@@ -249,18 +324,18 @@
       b.innerHTML = '<div class="banner draft"><div class="bt"><strong>Concept aangemaakt 🎉</strong>'+
         'De uitnodiging is onderweg naar '+Reijn.esc(p.naam)+'. Zodra de pagina is gevuld verschijnt hij in je reviewwachtrij.</div>'+
         '<a class="btn line sm" href="'+Reijn.editorUrl(p)+'">Zelf invullen</a>'+
-        '<button class="btn ghost sm" data-toast="Herinnering verstuurd naar '+Reijn.esc(p.naam)+'">Herinnering sturen</button>'+
+        '<button class="btn ghost sm" data-soort="uitnodiging">Uitnodiging opnieuw sturen</button>'+
         '<button class="btn accent sm" id="publish">Publiceren</button></div>';
     } else if (p.status==='rev'){
       b.innerHTML = '<div class="banner rev"><div class="bt"><strong>Wacht op jouw review</strong>'+
         Reijn.esc(p.naam)+' diende wijzigingen in — introtekst en twee tijdlijnitems.</div>'+
         '<a class="btn line sm" href="'+Reijn.editorUrl(p)+'">Wijzigingen bekijken</a>'+
-        '<button class="btn ghost sm" id="askChanges">Wijziging vragen</button>'+
+        '<button class="btn ghost sm" data-soort="feedback">Wijziging vragen</button>'+
         '<button class="btn accent sm" id="approve">Goedkeuren &amp; publiceren</button></div>';
     } else if (p.status==='draft'){
       b.innerHTML = '<div class="banner draft"><div class="bt"><strong>Deze pagina staat op concept</strong>'+
         'Nog niet zichtbaar voor klanten. Publiceer zodra de inhoud klopt.</div>'+
-        '<button class="btn ghost sm" data-toast="Consultant gevraagd om aan te vullen">Consultant vragen</button>'+
+        '<button class="btn ghost sm" data-soort="bijwerken">Consultant vragen</button>'+
         '<button class="btn accent sm" id="publish">Publiceren</button></div>';
     } else if (p.status==='arch'){
       b.innerHTML = '<div class="banner draft"><div class="bt"><strong>Gearchiveerd</strong>'+
@@ -334,6 +409,122 @@
     Reijn.animeer();
   }
 
+  /* ---------- contact met de consultant ---------- */
+  function mailAdres(){ return Reijn.slug(p.naam.split(' ')[0]) + '@reijn.nl'; }
+
+  // welke aanleidingen liggen voor de hand bij deze pagina?
+  // de meest relevante eerst, daarna aanvullen zodat er altijd drie staan
+  function suggesties(){
+    var uit = [];
+    if (p.status === 'draft' && !p.views) uit.push('uitnodiging');
+    if (p.status === 'rev') uit.push('feedback');
+    if (!p.varianten.length || p.status === 'draft') uit.push('fotos');
+    uit.push('bijwerken');
+    Object.keys(Reijn.CONSULTANT_MAILS).forEach(function(k){ uit.push(k); });
+    return uit.filter(function(x, i, a){ return a.indexOf(x) === i; }).slice(0, 3);
+  }
+
+  function vulContactblok(){
+    document.getElementById('cbNaam').textContent = p.naam;
+    document.getElementById('cbMail').textContent = mailAdres();
+    var av = document.getElementById('cbAvatar');
+    av.textContent = p.init; av.style.background = p.kleur;
+
+    document.getElementById('cbActies').innerHTML = suggesties().map(function(k){
+      var t = Reijn.CONSULTANT_MAILS[k];
+      return '<button data-soort="' + k + '">' + Reijn.ICON.mail +
+        '<span>' + t.label + '<small>' + t.omschrijving + '</small></span></button>';
+    }).join('');
+
+    // laatste contactmoment uit de berichten halen
+    var laatste = data.mails.filter(function(m){ return m.map === 'consultant' && m.pagina === p.id; })[0];
+    document.getElementById('cbLaatst').innerHTML = laatste
+      ? '<span class="tag">laatst gemaild: ' + Reijn.esc(laatste.datum) + '</span>' +
+        (laatste.tracking.geopend ? '<span class="tag on">geopend</span>' : '<span class="tag">nog niet geopend</span>') +
+        '<a href="berichten.html" style="margin-left:auto;font-weight:600;color:var(--tangerine)">Gesprek \u2192</a>'
+      : '<span class="tag">nog niet gemaild</span>';
+  }
+
+  /* ---------- modal ---------- */
+  var cmSoort = 'bijwerken';
+
+  function vulModal(){
+    var t = Reijn.CONSULTANT_MAILS[cmSoort];
+    document.getElementById('cmOnderwerp').value = t.onderwerp(p);
+    document.getElementById('cmTekst').value = t.tekst(p).join('\n\n');
+    cmPreview();
+  }
+
+  function cmPreview(){
+    var alinea = document.getElementById('cmTekst').value.split(/\n{2,}/).map(function(x){
+      return '<p>' + Reijn.esc(x).replace(/\n/g, '<br>') + '</p>';
+    }).join('');
+    var link = document.getElementById('cmLink').checked
+      ? '<a class="mp-cta" href="' + Reijn.editorUrl(p) + '">Open je eigen pagina</a>' +
+        '<p class="muted" style="font-size:12.5px">reijn.nl/cms/bewerk/' + p.id + '</p>'
+      : '';
+    document.getElementById('cmPrev').innerHTML = alinea + link +
+      '<p>Hartelijke groet,<br>Lieve van der Weijde<br><span class="muted" style="font-size:13px">Relatiebeheerder \u00b7 Reijn</span></p>';
+  }
+
+  function openConsultantMail(soort){
+    cmSoort = soort || suggesties()[0];
+    document.getElementById('cmSub').innerHTML =
+      'Aan <b>' + Reijn.esc(p.naam) + '</b> \u00b7 ' + Reijn.esc(mailAdres());
+    document.getElementById('cmSoort').innerHTML = Object.keys(Reijn.CONSULTANT_MAILS).map(function(k){
+      var t = Reijn.CONSULTANT_MAILS[k];
+      return '<button class="pick' + (k === cmSoort ? ' on' : '') + '" data-soort="' + k + '">' +
+        '<span class="ic" style="background:var(--petrol)">' + Reijn.ICON.mail + '</span>' +
+        '<span class="pt"><strong>' + t.label + '</strong><span>' + t.omschrijving + '</span></span>' +
+        '<span class="chk"></span></button>';
+    }).join('');
+    vulModal();
+    Reijn.openModal('mConsultant');
+  }
+
+  document.getElementById('cmSoort').addEventListener('click', function(e){
+    var b = e.target.closest('.pick'); if(!b) return;
+    document.querySelectorAll('#cmSoort .pick').forEach(function(x){ x.classList.remove('on'); });
+    b.classList.add('on'); cmSoort = b.getAttribute('data-soort'); vulModal();
+  });
+  document.getElementById('cmTekst').addEventListener('input', cmPreview);
+  document.getElementById('cmLink').addEventListener('change', cmPreview);
+  document.getElementById('consultantBtn').addEventListener('click', function(){ openConsultantMail(); });
+  document.getElementById('cbActies').addEventListener('click', function(e){
+    var b = e.target.closest('[data-soort]'); if(!b) return;
+    openConsultantMail(b.getAttribute('data-soort'));
+  });
+
+  document.getElementById('cmSend').addEventListener('click', function(){
+    var nieuw = {
+      id: 'c' + Date.now(), klant: p.naam, org: 'Consultant \u00b7 ' + p.functie, email: mailAdres(),
+      init: p.init, kleur: p.kleur, onderwerp: document.getElementById('cmOnderwerp').value,
+      tijd: 'zojuist', datum: 'vandaag', ongelezen: false, map: 'consultant',
+      pagina: p.id, variant: p.varianten[0] || 'Basis', intern: true,
+      tracking: { verzonden: true, geopend: false, geklikt: false, tijd: '\u2014' },
+      berichten: [{
+        van: 'out', naam: 'Lieve van der Weijde', tijd: 'zojuist',
+        tekst: document.getElementById('cmTekst').value.split(/\n{2,}/),
+        link: document.getElementById('cmLink').checked
+          ? { titel: 'Vul je visuele CV aan', url: 'reijn.nl/cms/bewerk/' + p.id } : null
+      }]
+    };
+    data.mails.unshift(nieuw);
+    data.activity.unshift({ ic:'mail', kleur:'var(--tangerine)',
+      tekst:'Verzoek verstuurd aan <b>' + Reijn.esc(p.naam) + '</b>', tijd:'nu' });
+    bewaar();
+    Reijn.closeModal('mConsultant');
+    Reijn.toast('Verstuurd naar ' + mailAdres() + ' \u2713');
+    vulContactblok();
+
+    // de consultant opent de mail even later — houdt de demo levend
+    setTimeout(function(){
+      nieuw.tracking.geopend = true; bewaar();
+      Reijn.toast(p.naam.split(' ')[0] + ' opende je bericht');
+      vulContactblok();
+    }, 6000);
+  });
+
   // acties in de banner / lijst
   document.addEventListener('click', function(e){
     var t = e.target;
@@ -341,7 +532,8 @@
     if (t.closest('#publish')){ p.status='pub'; p.bijgewerkt='zojuist'; bewaar(); Reijn.toast(p.naam+' staat live'); isNieuw=false; render(); }
     if (t.closest('#unpublish')){ p.status='draft'; p.bijgewerkt='zojuist'; bewaar(); Reijn.toast('Terug naar concept — links zijn offline'); render(); }
     if (t.closest('#restore')){ p.status='draft'; bewaar(); Reijn.toast('Pagina hersteld als concept'); render(); }
-    if (t.closest('#askChanges')){ p.status='draft'; bewaar(); Reijn.toast('Feedback verstuurd naar '+p.naam); render(); }
+    var soortKnop = t.closest('.banner [data-soort]') || t.closest('.menu [data-soort]');
+    if (soortKnop){ openConsultantMail(soortKnop.getAttribute('data-soort')); }
     if (t.closest('#archBtn')){
       p.status = p.status==='arch' ? 'draft' : 'arch'; bewaar();
       Reijn.toast(p.status==='arch' ? 'Pagina gearchiveerd' : 'Pagina hersteld'); render();

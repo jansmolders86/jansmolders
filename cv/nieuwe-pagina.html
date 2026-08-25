@@ -24,6 +24,8 @@
   .summary .sr .v{flex:1;min-width:0}
   @media(max-width:620px){.summary .sr{flex-direction:column;align-items:flex-start;gap:4px}.summary .sr .k{width:auto}}
 </style>
+<link rel="stylesheet" href="brand.css">
+<script src="brand.js"></script>
 </head>
 <body>
 
@@ -279,7 +281,7 @@
     }
     Reijn.save(data);
     Reijn.toast('Pagina aangemaakt — concept staat klaar');
-    setTimeout(function(){ window.location.href = 'pagina.html?id='+id+'&new=1'; }, 800);
+    setTimeout(function(){ window.location.href = Merk.url('pagina.html?id='+id+'&new=1'); }, 800);
   });
 
   toon();

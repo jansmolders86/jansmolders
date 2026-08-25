@@ -30,6 +30,8 @@
   .integr .tx span{font-size:12.5px;color:var(--ink-soft)}
   @media(max-width:900px){.setgrid{grid-template-columns:1fr}.setnav{position:static;display:flex;gap:6px;overflow-x:auto}.setnav button{white-space:nowrap}}
 </style>
+<link rel="stylesheet" href="brand.css">
+<script src="brand.js"></script>
 </head>
 <body>
 
@@ -94,11 +96,28 @@
         </section>
 
         <section class="card" style="margin-bottom:22px">
+          <div class="card-head"><div><h2>Merk</h2><p class="card-sub">Het CMS is white label: kleuren en logo volgen de organisatie die het gebruikt.</p></div>
+            <span class="pill info" id="huidigMerk">—</span></div>
+          <div class="brandkiezer">
+            <a href="?" data-brandkeuze="whitelabel"><span class="stip" style="background:#E6E9EE;border:1px solid #DCE1E7"></span>
+              <span><strong>White label</strong><span>Neutraal, zonder logo</span></span></a>
+            <a href="?brand=reijn" data-brandkeuze="reijn"><span class="stip" style="background:#E8641E"></span>
+              <span><strong>Reijn</strong><span>Petrol en tangerine</span></span></a>
+            <a href="?brand=aag" data-brandkeuze="aag"><span class="stip" style="background:#F8AF5F"></span>
+              <span><strong>AAG</strong><span>Amber en leisteengrijs</span></span></a>
+          </div>
+          <div class="note" style="margin-top:16px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+            <span>In deze demo wissel je van merk via de adresbalk: <b>?brand=reijn</b> of <b>?brand=aag</b>. Zonder parameter zie je de white-labelversie.</span>
+          </div>
+        </section>
+
+        <section class="card" style="margin-bottom:22px">
           <div class="card-head"><div><h2>Huisstijl</h2><p class="card-sub">Kleuren en logo worden op alle visuele CV's toegepast.</p></div></div>
           <div class="field"><label>Logo</label>
             <div class="logo-box">
-              <img src="reijn-logo.png" alt="Reijn logo">
-              <div style="flex:1;min-width:0"><strong style="display:block;font-size:14.5px">reijn-logo.png</strong><span class="hint">SVG of PNG, transparante achtergrond</span></div>
+              <img src="reijn-logo.png" alt="logo" class="brand-logo">
+              <div style="flex:1;min-width:0"><strong style="display:block;font-size:14.5px" id="logoNaam">reijn-logo.png</strong><span class="hint">SVG of PNG, transparante achtergrond</span></div>
               <button class="btn line sm" data-toast="Bestandskiezer geopend (demo)">Vervangen</button>
             </div>
           </div>
@@ -348,6 +367,11 @@
 <script>
 (function(){
   var data = Reijn.load();
+
+  var namen = { whitelabel:'White label', reijn:'Reijn', aag:'AAG' };
+  document.getElementById('huidigMerk').textContent = 'Actief: ' + namen[Merk.actief];
+  document.getElementById('logoNaam').textContent =
+    Merk.actief === 'whitelabel' ? 'geen logo ingesteld' : Merk.MERKEN[Merk.actief].logo;
 
   document.getElementById('setnav').addEventListener('click', function(e){
     var b = e.target.closest('button'); if(!b) return;

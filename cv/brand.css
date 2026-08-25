@@ -1,0 +1,177 @@
+/* =========================================================
+   Merkthema's — geladen ná de eigen stijl van elke pagina,
+   zodat deze variabelen die van :root overschrijven.
+
+   Geen parameter      -> whitelabel (neutraal, zonder logo)
+   ?brand=reijn        -> huisstijl Reijn
+   ?brand=aag          -> huisstijl AAG
+
+   AAG-kleuren zijn afgeleid uit hun logo: amber #F8AF5F en
+   leisteengrijs #3D4543.
+   ========================================================= */
+
+/* ---------- gedeelde haakjes ----------
+   --on-accent : tekstkleur op een accentvlak (bij AAG is het accent
+                 licht, daar hoort donkere tekst op)
+   --sb-*      : de donkere zijbalk                                   */
+:root{
+  --on-accent:#fff;
+  --accent-ink:var(--tangerine);   /* accent als tekst/icoon op een licht vlak */
+  --sb-bg:var(--petrol-deep);
+  --sb-ink:#F6F2EC;
+  --sb-dim:rgba(246,242,236,.75);
+  --sb-faint:rgba(246,242,236,.5);
+  --sb-hover:rgba(246,242,236,.08);
+  --sb-border:rgba(246,242,236,.12);
+  --sb-badge:rgba(246,242,236,.16);
+}
+
+/* ============================================================
+   WHITELABEL — de standaard: neutraal, koel, zonder merkbeeld
+   ============================================================ */
+html[data-brand="whitelabel"]{
+  --ed-accent:#3B6FD4; --ed-lock:#2C3540;
+  /* het karakteristieke Bricolage hoort bij Reijn; hier een neutrale kop */
+  --display:"Hanken Grotesk",system-ui,sans-serif;
+  --paper:#F4F5F7; --paper-2:#E6E9EE; --surface:#FFFFFF;
+  --ink:#1B1F24; --ink-soft:#5B6672; --line:#DCE1E7;
+  --petrol:#2C3540; --petrol-deep:#1B2129;
+  --tangerine:#3B6FD4;
+  --teal:#2E9E7E; --mustard:#C99A2E; --clay:#CF4F3A; --plum:#6E5AA8;
+
+  --c-petrol:#2C3540; --c-teal:#2E9E7E; --c-mustard:#C99A2E;
+  --c-tangerine:#3B6FD4; --c-clay:#CF4F3A; --c-plum:#6E5AA8;
+
+  --on-accent:#FFFFFF;
+  --accent-ink:#2F5DBD;
+  --sb-bg:#1B2129;
+  --sb-ink:#EDEFF2;
+  --sb-dim:rgba(237,239,242,.72);
+  --sb-faint:rgba(237,239,242,.5);
+  --sb-hover:rgba(237,239,242,.08);
+  --sb-border:rgba(237,239,242,.12);
+  --sb-badge:rgba(237,239,242,.14);
+}
+
+/* ============================================================
+   REIJN — warm papier, petrol en tangerine
+   ============================================================ */
+html[data-brand="reijn"]{
+  --ed-accent:#E8641E; --ed-lock:#14463E;
+  --display:"Bricolage Grotesque",system-ui,sans-serif;
+  --paper:#F6F2EC; --paper-2:#EDE4D3; --surface:#FBF8F2;
+  --ink:#221E1A; --ink-soft:#5A5249; --line:#E0D6C4;
+  --petrol:#14463E; --petrol-deep:#0E332D;
+  --tangerine:#E8641E;
+  --teal:#2A8C82; --mustard:#D9A521; --clay:#C2452D; --plum:#7A3B57;
+
+  --c-petrol:#14463E; --c-teal:#2A8C82; --c-mustard:#D9A521;
+  --c-tangerine:#E8641E; --c-clay:#C2452D; --c-plum:#7A3B57;
+
+  --on-accent:#FFFFFF;
+  --accent-ink:#E8641E;
+  --sb-bg:#0E332D;
+  --sb-ink:#F6F2EC;
+  --sb-dim:rgba(246,242,236,.75);
+  --sb-faint:rgba(246,242,236,.5);
+  --sb-hover:rgba(246,242,236,.08);
+  --sb-border:rgba(246,242,236,.12);
+  --sb-badge:rgba(246,242,236,.16);
+}
+
+/* ============================================================
+   AAG — amber spotlight op leisteengrijs
+   ============================================================ */
+html[data-brand="aag"]{
+  --ed-accent:#F8AF5F; --ed-lock:#3D4543;
+  --display:"Hanken Grotesk",system-ui,sans-serif;
+  --paper:#F7F4EF; --paper-2:#EDE7DE; --surface:#FFFFFF;
+  --ink:#232826; --ink-soft:#5D6663; --line:#DED8CF;
+  --petrol:#4E5A57; --petrol-deep:#3D4543;
+  --tangerine:#F8AF5F;
+  --teal:#4F6F62; --mustard:#B98A31; --clay:#C4694A; --plum:#7C6A78;
+
+  --c-petrol:#3D4543; --c-teal:#6E8B7E; --c-mustard:#E0B96A;
+  --c-tangerine:#F8AF5F; --c-clay:#C4694A; --c-plum:#7C6A78;
+
+  /* het accent is licht: daar hoort de donkere merkkleur op */
+  --on-accent:#3D4543;
+  /* het amber van AAG is te licht als tekst; hiervoor een verdiepte tint */
+  --accent-ink:#8F5D14;
+  --sb-bg:#3D4543;
+  --sb-ink:#F7F4EF;
+  --sb-dim:rgba(247,244,239,.75);
+  --sb-faint:rgba(247,244,239,.5);
+  --sb-hover:rgba(247,244,239,.09);
+  --sb-border:rgba(247,244,239,.14);
+  --sb-badge:rgba(247,244,239,.16);
+}
+
+/* ============================================================
+   Onderdelen die een vaste kleur hadden en nu meebewegen
+   ============================================================ */
+.sidebar{background:var(--sb-bg);color:var(--sb-ink)}
+.sb-brand{border-bottom-color:var(--sb-border)}
+.sb-brand .tag{background:var(--paper-2);color:var(--sb-bg)}
+.sb-nav a{color:var(--sb-dim)}
+.sb-nav a:hover{background:var(--sb-hover);color:var(--sb-ink)}
+.sb-nav a.active{background:var(--tangerine);color:var(--on-accent)}
+.sb-nav .badge{background:var(--sb-badge)}
+.sb-nav a.active .badge{background:rgba(255,255,255,.28);color:var(--on-accent)}
+.sb-user{border-top-color:var(--sb-border)}
+.sb-user .rl{color:var(--sb-faint)}
+
+.mobile-top{background:var(--sb-bg);color:var(--sb-ink)}
+.mobile-top .tag{background:var(--paper-2);color:var(--sb-bg)}
+.mobile-nav{background:var(--sb-bg)}
+.mobile-nav a{color:var(--sb-dim);background:var(--sb-hover)}
+.mobile-nav a.active{background:var(--tangerine);color:var(--on-accent)}
+
+.btn.accent{background:var(--tangerine);border-color:var(--tangerine);color:var(--on-accent)}
+.step.active .n{background:var(--tangerine);color:var(--on-accent)}
+.pick .ic,.quick .ic,.feed .ic,.cb-ic{color:#fff}
+.pick.on .chk{background:var(--tangerine);border-color:var(--tangerine)}
+.mailprev .mp-top{background:var(--sb-bg);color:var(--sb-ink)}
+.mailprev .mp-cta{background:var(--tangerine);color:var(--on-accent)}
+.toast{background:var(--sb-bg);color:var(--sb-ink)}
+.demo-flag{background:var(--sb-bg);color:var(--sb-dim)}
+.ov{background:color-mix(in srgb,var(--sb-bg) 78%,transparent)}
+
+/* editor (de bewerkschermen gebruiken dezelfde variabelen) */
+.editor-bar{background:var(--sb-bg)}
+.eb-btn.primary{background:var(--ed-accent);color:var(--on-accent)}
+.editor-bar .eb-back{color:var(--sb-ink);border-color:var(--sb-border)}
+.editor-bar .eb-title{color:var(--sb-ink)}
+.eb-btn.ghost{color:var(--sb-ink);border-color:var(--sb-border)}
+.ed-controls button.ed-edit-btn,.ed-item-controls button.on{background:var(--tangerine);color:var(--on-accent)}
+.ed-add-exp{background:var(--petrol);color:#fff}
+.ed-voortgang .balk i{background:var(--tangerine)}
+
+/* accent als tekst of icoon: de verdiepte tint, anders valt het weg */
+.pill.hot{color:var(--accent-ink);background:color-mix(in srgb,var(--tangerine) 20%,transparent)}
+.tag.on{color:var(--accent-ink);background:color-mix(in srgb,var(--tangerine) 20%,transparent)}
+.crumbs a:hover,.row.klikbaar:hover .chev,.row .acts .mail{color:var(--accent-ink)}
+.quick a:hover,.quick button:hover,.pick:hover,.brandkiezer a:hover{border-color:var(--accent-ink)}
+.ed-plus{color:var(--accent-ink);border-color:var(--accent-ink)}
+.cb-laatst a{color:var(--accent-ink)!important}
+.tmpl button.on{background:var(--ink);color:var(--paper)}
+:focus-visible{outline-color:var(--accent-ink)}
+
+/* het merk zonder logo laat alleen het woordmerk zien */
+html[data-brand="whitelabel"] .brand-logo{display:none}
+
+/* het AAG-logo is een breed woordbeeld en mag wat groter staan */
+html[data-brand="aag"] .sb-brand img{height:38px}
+html[data-brand="aag"] .mobile-top img.lg{height:32px}
+html[data-brand="aag"] .mailprev .mp-top img{height:30px}
+html[data-brand="aag"] .brand img.logo-mark{height:34px;width:auto}
+
+/* de merkwissel in Instellingen */
+.brandkiezer{display:flex;gap:10px;flex-wrap:wrap}
+.brandkiezer a{display:flex;align-items:center;gap:11px;border:1.5px solid var(--line);background:var(--paper);
+  border-radius:14px;padding:12px 15px;min-width:170px;flex:1}
+.brandkiezer a:hover{border-color:var(--tangerine)}
+.brandkiezer a.on{border-color:var(--tangerine);background:var(--surface);box-shadow:0 0 0 3px rgba(0,0,0,.05)}
+.brandkiezer .stip{width:30px;height:30px;border-radius:9px;flex:0 0 auto;display:grid;place-items:center}
+.brandkiezer strong{display:block;font-size:14px}
+.brandkiezer span{font-size:12px;color:var(--ink-soft)}
