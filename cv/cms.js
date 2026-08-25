@@ -13,8 +13,9 @@
      ontbreken, dan valt alles terug op white label in plaats van te breken. */
   if (!global.Merk) {
     global.Merk = {
-      actief: 'whitelabel', naam: 'Visueel CV',
+      actief: 'whitelabel', naam: 'Visueel CV', org: 'Voorbeeld', domein: 'voorbeeld.nl',
       url: function (u) { return u; },
+      tekst: function (t) { return t; },
       MERKEN: { whitelabel: { naam: 'Visueel CV', logo: null, logoLight: null } }
     };
   }
@@ -495,7 +496,8 @@
       // kopieer-link
       var cp = e.target.closest('[data-copy]');
       if (cp) {
-        var txt = cp.getAttribute('data-copy');
+        // het domein in het attribuut hoort ook bij het gekozen merk
+        var txt = global.Merk.tekst(cp.getAttribute('data-copy'));
         if (global.navigator.clipboard) { global.navigator.clipboard.writeText(txt).catch(function () {}); }
         toast('Link gekopieerd — ' + txt);
       }
