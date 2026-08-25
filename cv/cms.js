@@ -14,6 +14,7 @@
   if (!global.Merk) {
     global.Merk = {
       actief: 'whitelabel', naam: 'Visueel CV', org: 'Voorbeeld', domein: 'voorbeeld.nl',
+      product: 'Visueel CV', productMv: "Visuele CV's",
       url: function (u) { return u; },
       tekst: function (t) { return t; },
       MERKEN: { whitelabel: { naam: 'Visueel CV', logo: null, logoLight: null } }

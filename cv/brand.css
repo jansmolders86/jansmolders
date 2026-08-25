@@ -160,11 +160,14 @@ html[data-brand="aag"]{
 /* het merk zonder logo laat alleen het woordmerk zien */
 html[data-brand="whitelabel"] .brand-logo{display:none}
 
-/* het AAG-logo is een breed woordbeeld en mag wat groter staan */
-html[data-brand="aag"] .sb-brand img{height:38px}
-html[data-brand="aag"] .mobile-top img.lg{height:32px}
-html[data-brand="aag"] .mailprev .mp-top img{height:30px}
-html[data-brand="aag"] .brand img.logo-mark{height:34px;width:auto}
+/* Het AAG-logo is vierkant (spotlight met woordmerk) waar dat van Reijn
+   breed is; op dezelfde hoogte oogt het daardoor kleiner. Vandaar meer maat. */
+html[data-brand="aag"] .sb-brand img{height:42px}
+html[data-brand="aag"] .mobile-top img.lg{height:34px}
+html[data-brand="aag"] .mailprev .mp-top img{height:34px}
+html[data-brand="aag"] .brand img.logo-mark{height:40px;width:auto}
+html[data-brand="aag"] .hero-merk{height:72px}
+@media(max-width:700px){html[data-brand="aag"] .hero-merk{height:56px}}
 
 /* de merkwissel in Instellingen */
 .brandkiezer{display:flex;gap:10px;flex-wrap:wrap}

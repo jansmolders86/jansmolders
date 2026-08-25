@@ -15,17 +15,21 @@
     whitelabel: {
       naam: 'Visueel CV',            // productnaam in de zijbalk
       org: 'Voorbeeld',              // organisatienaam in teksten en e-mails
+      product: 'Visueel CV', productMv: "Visuele CV's",
       domein: 'voorbeeld.nl',
       adres: 'Voorbeeldstraat 1, Amsterdam',
       logo: null, logoLight: null, kleur: '#3B6FD4'
     },
     reijn: {
       naam: 'Reijn', org: 'Reijn', domein: 'reijn.nl',
+      product: 'Visueel CV', productMv: "Visuele CV's",
       adres: 'Van Schaeck Mathonsingel 4, Nijmegen',
       logo: 'reijn-logo.png', logoLight: 'reijn-logo-light.png', kleur: '#E8641E'
     },
     aag: {
       naam: 'AAG', org: 'AAG', domein: 'aag.nl',
+      // hoe AAG het product noemt; één regel om aan te passen
+      product: 'AAG-profiel', productMv: 'AAG-profielen',
       adres: 'Wijchen',              // geen straat: die kennen we niet van AAG
       // het AAG-logo bevat de naam al, dus het losse woordmerk gaat uit
       logo: 'aag-logo.svg', logoLight: 'aag-logo-light.svg', kleur: '#F8AF5F', naamInLogo: true
@@ -59,6 +63,15 @@
 
   function herschrijf(tekst) {
     if (tekst.indexOf(REIJN_ADRES) > -1) tekst = tekst.split(REIJN_ADRES).join(merk.adres);
+
+    // hoe heet het product bij dit merk? Alleen vervangen als het afwijkt,
+    // anders zouden we correcte zinnen ('het visuele CV van...') verbouwen.
+    if (merk.product && merk.product !== 'Visueel CV') {
+      tekst = tekst
+        .replace(/\bvisue(?:el|le) cv['\u2019]s\b/gi, merk.productMv)
+        .replace(/\bvisue(?:el|le) cv\b/gi, merk.product);
+    }
+
     return tekst
       .replace(/reijnhrm\.nl/gi, merk.domein)
       .replace(/reijn\.nl/gi, merk.domein)
@@ -164,6 +177,7 @@
   }
 
   global.Merk = { actief: actief, naam: merk.naam, org: merk.org, domein: merk.domein,
+                  product: merk.product, productMv: merk.productMv,
                   adres: merk.adres, url: merkUrl, tekst: herschrijf, MERKEN: MERKEN };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', toepassen);
