@@ -157,6 +157,13 @@ html[data-brand="aag"]{
 .tmpl button.on{background:var(--ink);color:var(--paper)}
 :focus-visible{outline-color:var(--accent-ink)}
 
+/* een adres van meerdere regels tonen zonder extra opmaak in de html */
+.foot-col a,.print-contact li{white-space:pre-line}
+
+/* De uitsnede 'center 18%' is afgestemd op het portret van Reijn; een
+   vierkante pasfoto komt beter uit met een gecentreerde uitsnede. */
+html:not([data-brand="reijn"]) .contact-foto{object-position:center}
+
 /* het merk zonder logo laat alleen het woordmerk zien */
 html[data-brand="whitelabel"] .brand-logo{display:none}
 

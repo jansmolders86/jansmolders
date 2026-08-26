@@ -45,7 +45,7 @@
       // hoe AAG het product noemt; één regel om aan te passen
       product: 'AAG-profiel', productMv: 'AAG-profielen',
       adres: "Pettelaarpark 130k, 5216 PV 's-Hertogenbosch",
-      adresCv: "Pettelaarpark 130k, 5216 PV 's-Hertogenbosch",
+      adresCv: "Pettelaarpark 130k,\n5216 PV\n's-Hertogenbosch",
       voettekst: 'Een AAG-profiel van AAG — maakt de zorg beter',
       contact: {
         naam: 'Shaling Stuiver', voornaam: 'Shaling', rol: 'Relatiebeheerder',
