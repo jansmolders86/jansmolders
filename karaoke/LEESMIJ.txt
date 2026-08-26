@@ -1,0 +1,30 @@
+STUDENT KARAOKE 2026 — STATISCHE WEBVERSIE
+
+UPLOAD
+1. Open config.js.
+2. Vul jouw Spotify Client ID in.
+3. Vul de URL of URI van de karaokeplaylist in.
+4. Upload index.html, app.js en config.js naar dezelfde map op je statische webserver.
+
+SPOTIFY DEVELOPER DASHBOARD
+Voeg EXACT de uiteindelijke URL van index.html als Redirect URI toe.
+Als de pagina bijvoorbeeld staat op:
+  https://jansmolders.nl/karaoke/
+dan moet diezelfde URL als redirect URI geregistreerd zijn.
+
+SILVIE
+- Open de karaoke-URL.
+- Eerste keer: Spotify opent automatisch voor toestemming/login.
+- Daarna keert de browser automatisch terug.
+- Volgende bezoeken gebruiken het opgeslagen refresh token zolang dat geldig is.
+- Zodra de ingestelde karaokeplaylist speelt, verschijnen automatisch lyrics.
+- Speelt iets anders, dan toont de site dat de karaokeplaylist gestart moet worden.
+
+TECHNIEK
+- Geen lokale server, Python, Node of Electron.
+- Spotify Authorization Code + PKCE, volledig browser-side.
+- Alleen read-only playback scopes.
+- Lyrics worden live opgezocht bij LRCLIB; niet ieder nummer heeft synced lyrics.
+
+BRANDING
+De interface bevat subtiele Zuyd-branding: compact woordmerk, rode accentlijn en rode playback-progressie. De lyrics blijven bewust neutraal en maximaal leesbaar.
