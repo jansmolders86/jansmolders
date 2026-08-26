@@ -17,20 +17,42 @@
       org: 'Voorbeeld',              // organisatienaam in teksten en e-mails
       product: 'Visueel CV', productMv: "Visuele CV's",
       domein: 'voorbeeld.nl',
-      adres: 'Voorbeeldstraat 1, Amsterdam',
+      adres: null, adresCv: null,    // null = het bestaande adres laten staan
+      voettekst: 'Een profiel van Visueel CV',
+      contact: {
+        naam: 'Robin de Vries', voornaam: 'Robin', rol: 'Relatiebeheerder',
+        tel: '010 - 123 45 67', telHref: '0101234567',
+        mail: 'robin.devries@voorbeeld.nl', mailKort: 'robin@voorbeeld.nl',
+        foto: null                   // geen portret: dan initialen
+      },
       logo: null, logoLight: null, kleur: '#3B6FD4'
     },
     reijn: {
       naam: 'Reijn', org: 'Reijn', domein: 'reijn.nl',
       product: 'Visueel CV', productMv: "Visuele CV's",
-      adres: 'Van Schaeck Mathonsingel 4, Nijmegen',
+      adres: 'Van Schaeck Mathonsingel 4, Nijmegen', adresCv: null,
+      voettekst: 'Een visueel CV van Reijn — meesters in HRM. Verbinding, aandacht en karakter.',
+      contact: {
+        naam: 'Lieve van der Weijde', voornaam: 'Lieve', rol: 'Relatiebeheerder',
+        tel: '06 - 50 01 87 51', telHref: '06-50018751',
+        mail: 'lieve.vanderweijde@reijnhrm.nl', mailKort: 'lieve@reijn.nl',
+        foto: 'lieve.jpg'
+      },
       logo: 'reijn-logo.png', logoLight: 'reijn-logo-light.png', kleur: '#E8641E'
     },
     aag: {
       naam: 'AAG', org: 'AAG', domein: 'aag.nl',
       // hoe AAG het product noemt; één regel om aan te passen
       product: 'AAG-profiel', productMv: 'AAG-profielen',
-      adres: 'Wijchen',              // geen straat: die kennen we niet van AAG
+      adres: "Pettelaarpark 130k, 5216 PV 's-Hertogenbosch",
+      adresCv: "Pettelaarpark 130k, 5216 PV 's-Hertogenbosch",
+      voettekst: 'Een AAG-profiel van AAG — maakt de zorg beter',
+      contact: {
+        naam: 'Shaling Stuiver', voornaam: 'Shaling', rol: 'Relatiebeheerder',
+        tel: '06-1233456789', telHref: '061233456789',
+        mail: 'shaling.stuiver@aag.nl', mailKort: 'shaling@aag.nl',
+        foto: 'shaling-stuiver.jpg'
+      },
       // het AAG-logo bevat de naam al, dus het losse woordmerk gaat uit
       logo: 'aag-logo.svg', logoLight: 'aag-logo-light.svg', kleur: '#F8AF5F', naamInLogo: true
     }
@@ -60,9 +82,28 @@
      we naam, domein en adres — ook in schermen die het CMS pas tijdens het
      gebruik opbouwt (daarvoor kijkt een MutationObserver mee). */
   var REIJN_ADRES = 'Van Schaeck Mathonsingel 4, Nijmegen';
+  var REIJN_ADRES_CV = 'Het Atelier, Helmond';
+  var C = merk.contact || {};
+
+  /* welke tekst kan iets bevatten dat vervangen moet worden? */
+  var RAAKT = /reijn|lieve|visue(?:el|le)\s*cv|helmond|schaeck|06\s*-?\s*50\s*01|06-50018751/i;
 
   function herschrijf(tekst) {
-    if (tekst.indexOf(REIJN_ADRES) > -1) tekst = tekst.split(REIJN_ADRES).join(merk.adres);
+    if (actief === 'reijn') return tekst;          // Reijn is de brontekst
+    if (merk.adres && tekst.indexOf(REIJN_ADRES) > -1) tekst = tekst.split(REIJN_ADRES).join(merk.adres);
+    if (merk.adresCv && tekst.indexOf(REIJN_ADRES_CV) > -1) tekst = tekst.split(REIJN_ADRES_CV).join(merk.adresCv);
+
+    // De contactpersoon. Eerst de e-mailadressen en het nummer, daarna pas de
+    // naam: anders is 'lieve@' al veranderd voordat het adres aan de beurt is.
+    if (C.naam) {
+      tekst = tekst
+        .replace(/lieve\.vanderweijde@reijnhrm\.nl/gi, C.mail)
+        .replace(/lieve@reijn\.nl/gi, C.mailKort)
+        .replace(/06\s*-\s*50\s*01\s*87\s*51/g, C.tel)
+        .replace(/06-50018751/g, C.telHref)
+        .replace(/Lieve van der Weijde/g, C.naam)
+        .replace(/\bLieve\b/g, C.voornaam);
+    }
 
     // hoe heet het product bij dit merk? Alleen vervangen als het afwijkt,
     // anders zouden we correcte zinnen ('het visuele CV van...') verbouwen.
@@ -97,7 +138,7 @@
     Array.prototype.forEach.call(velden, function (el) {
       ['value', 'placeholder'].forEach(function (attr) {
         var v = el[attr];
-        if (v && /reijn/i.test(v)) el[attr] = herschrijf(v);
+        if (v && RAAKT.test(v)) el[attr] = herschrijf(v);
       });
     });
 
@@ -106,7 +147,7 @@
     Array.prototype.forEach.call(gelabeld, function (el) {
       ['title', 'aria-label', 'alt', 'data-copy'].forEach(function (attr) {
         var v = el.getAttribute(attr);
-        if (v && /reijn/i.test(v)) el.setAttribute(attr, herschrijf(v));
+        if (v && RAAKT.test(v)) el.setAttribute(attr, herschrijf(v));
       });
     });
   }
@@ -115,7 +156,7 @@
     var ouder = t.parentNode;
     if (!ouder || OVERSLAAN[ouder.nodeName]) return;
     var v = t.nodeValue;
-    if (!v || !/reijn/i.test(v)) return;
+    if (!v || !RAAKT.test(v)) return;
     var nieuw = herschrijf(v);
     if (nieuw !== v) t.nodeValue = nieuw;
   }
@@ -127,6 +168,19 @@
         Array.prototype.forEach.call(m.addedNodes, herschrijfBoom);
       });
     }).observe(document.body, { childList: true, subtree: true });
+  }
+
+  /* Geen portret bij dit merk? Dan een cirkel met initialen, zodat de opmaak
+     hetzelfde blijft en er geen gebroken afbeelding in beeld komt. */
+  function initialenBeeld(naam) {
+    var delen = naam.split(' ');
+    var letters = (delen[0][0] + delen[delen.length - 1][0]).toUpperCase();
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">' +
+      '<rect width="200" height="200" fill="' + (merk.kleur || '#2C3540') + '"/>' +
+      '<text x="100" y="100" text-anchor="middle" dominant-baseline="central" ' +
+      'font-family="Hanken Grotesk, sans-serif" font-size="78" font-weight="700" fill="#fff">' +
+      letters + '</text></svg>';
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
   }
 
   function toepassen() {
@@ -148,6 +202,31 @@
       img.src = bron;
       img.alt = merk.naam + ' logo';
     });
+
+    /* portret van de contactpersoon */
+    if (C.naam) {
+      Array.prototype.forEach.call(document.querySelectorAll('img[src*="lieve.jpg"],img.contact-foto'), function (img) {
+        img.classList.add('contact-foto');
+        // ontbreekt het portretbestand, dan tonen we initialen in plaats van
+        // een gebroken afbeelding
+        img.onerror = function () { img.onerror = null; img.src = initialenBeeld(C.naam); };
+        img.src = C.foto || initialenBeeld(C.naam);
+        img.alt = C.naam;
+      });
+    }
+
+    /* telefoon- en mailkoppelingen */
+    Array.prototype.forEach.call(document.querySelectorAll('a[href^="tel:"],a[href^="mailto:"]'), function (a) {
+      var h = a.getAttribute('href');
+      if (RAAKT.test(h)) a.setAttribute('href', herschrijf(h));
+    });
+
+    /* de zin onder het logo in de voettekst */
+    if (merk.voettekst) {
+      Array.prototype.forEach.call(document.querySelectorAll('.foot-tag'), function (el) {
+        el.textContent = merk.voettekst;
+      });
+    }
 
     /* woordmerk — weglaten als het logo de naam al toont */
     Array.prototype.forEach.call(document.querySelectorAll('.wm'), function (el) {
@@ -177,7 +256,7 @@
   }
 
   global.Merk = { actief: actief, naam: merk.naam, org: merk.org, domein: merk.domein,
-                  product: merk.product, productMv: merk.productMv,
+                  product: merk.product, productMv: merk.productMv, contact: merk.contact,
                   adres: merk.adres, url: merkUrl, tekst: herschrijf, MERKEN: MERKEN };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', toepassen);
