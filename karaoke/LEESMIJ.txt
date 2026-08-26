@@ -28,3 +28,9 @@ TECHNIEK
 
 BRANDING
 De interface bevat subtiele Zuyd-branding: compact woordmerk, rode accentlijn en rode playback-progressie. De lyrics blijven bewust neutraal en maximaal leesbaar.
+
+DEZE BUILD IS VOORAF INGESTELD VOOR:
+https://jansmolders.nl/karaoke/
+
+Spotify Redirect URI die je exact moet registreren:
+https://jansmolders.nl/karaoke/
