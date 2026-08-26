@@ -36,15 +36,41 @@ async function access(){
 async function api(path){const a=await access();if(!a)return null;const r=await fetch('https://api.spotify.com/v1'+path,{headers:{Authorization:'Bearer '+a}});if(r.status===204)return null;if(r.status===401){localStorage.removeItem(S+'access');return api(path)}if(!r.ok)throw new Error('Spotify API '+r.status);return r.json()}
 function norm(s){return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()}
 function cleanTitle(s){return (s||'').replace(/\s*[-–—(]\s*(karaoke|instrumental|backing track|originally performed|in the style).*$/i,'').replace(/\b(karaoke version|instrumental version)\b/ig,'').trim()}
-async function lyrics(title,artist,durationMs){
- const q=new URLSearchParams({track_name:cleanTitle(title),artist_name:artist});
- const r=await fetch('https://lrclib.net/api/search?'+q,{headers:{'Lrclib-Client':'StudentKaraokeDisplay/2.0'}});
- if(!r.ok)return [];const arr=await r.json();let best=null,score=-1;
- for(const x of arr){if(!x.syncedLyrics)continue;let s=0;if(norm(x.trackName)===norm(cleanTitle(title)))s+=100;
- const tw=norm(cleanTitle(title)).split(' ').filter(w=>w.length>2);s+=10*tw.filter(w=>norm(x.trackName).includes(w)).length;
- if(x.duration&&durationMs)s+=Math.max(0,25-Math.abs(x.duration-durationMs/1000));if(s>score){score=s;best=x}}
- if(!best)return [];return best.syncedLyrics.split('\n').map(l=>{const m=l.match(/^\[(\d+):(\d+(?:\.\d+)?)\]\s*(.*)$/);return m?{ms:(+m[1]*60 + +m[2])*1000,text:m[3]}:null}).filter(Boolean)
+function resolveOriginal(title,artists){
+ const hay=norm(title+' '+artists);
+ let best=null,score=0;
+ for(const pair of (C.originals||[])){
+   const t=pair[0],a=pair[1],tw=norm(t).split(' ').filter(w=>w.length>2);
+   let s=tw.filter(w=>hay.includes(w)).length/Math.max(1,tw.length);
+   if(norm(t)&&hay.includes(norm(t)))s+=1.2;
+   const aw=norm(a).split(' ').filter(w=>w.length>2);
+   s+=.18*aw.filter(w=>hay.includes(w)).length;
+   if(s>score){score=s;best={title:t,artist:a}}
+ }
+ return score>=.62?best:{title:cleanTitle(title),artist:artists};
 }
+async function lyrics(title,artist,durationMs){
+ const q=new URLSearchParams({track_name:title,artist_name:artist});
+ const r=await fetch('https://lrclib.net/api/search?'+q,{headers:{'Lrclib-Client':'StudentKaraokeDisplay/2.1'}});
+ if(!r.ok)return {lines:[],plain:''};
+ const arr=await r.json();let best=null,score=-1;
+ for(const x of arr){
+   let s=0;
+   if(norm(x.trackName)===norm(title))s+=120;
+   else if(norm(x.trackName).includes(norm(title))||norm(title).includes(norm(x.trackName)))s+=70;
+   const tw=norm(title).split(' ').filter(w=>w.length>2);s+=10*tw.filter(w=>norm(x.trackName).includes(w)).length;
+   const aw=norm(artist).split(' ').filter(w=>w.length>2);s+=8*aw.filter(w=>norm(x.artistName).includes(w)).length;
+   if(x.duration&&durationMs)s+=Math.max(0,25-Math.abs(x.duration-durationMs/1000));
+   if(s>score){score=s;best=x}
+ }
+ if(!best)return {lines:[],plain:''};
+ const parsed=(best.syncedLyrics||'').split('\n').map(l=>{
+   const m=l.match(/^\[(\d+):(\d+(?:\.\d+)?)\]\s*(.*)$/);
+   return m?{ms:(+m[1]*60 + +m[2])*1000,text:m[3]}:null
+ }).filter(Boolean);
+ return {lines:parsed,plain:best.plainLyrics||'',matched:best.trackName};
+}
+
 function status(main,sub=''){lines=[];$('lyrics').innerHTML='<div><div class="status"></div><div class="sub"></div></div>';$('lyrics').querySelector('.status').textContent=main;$('lyrics').querySelector('.sub').textContent=sub}
 function render(p){if(!lines.length)return;let i=-1;for(let k=0;k<lines.length;k++){if(lines[k].ms<=p)i=k;else break}if(i===lastLine)return;lastLine=i;
  $('lyrics').innerHTML='<div class="line prev"></div><div class="line current"></div><div class="line next"></div>';
@@ -58,8 +84,20 @@ async function poll(){
   base=p.progress_ms||0;baseAt=Date.now();dur=p.item.duration_ms||0;isPlaying=!!p.is_playing;
   $('cover').src=p.item.album?.images?.[0]?.url||'';$('song').textContent=p.item.name||'';$('artist').textContent=(p.item.artists||[]).map(a=>a.name).join(', ');
   if(targetPlaylist && contextId!==targetPlaylist){trackKey='';status('Dit is niet de karaokeplaylist','Start “'+(C.playlistName||'Student Karaoke 2026 🎤')+'” in Spotify.');return}
-  const key=p.item.id||p.item.uri;if(key!==trackKey){trackKey=key;lastLine=-2;status('Tekst zoeken…');const artist=(p.item.artists||[])[0]?.name||'';lines=await lyrics(p.item.name,artist,dur);
-    if(!lines.length)status('Geen gesynchroniseerde tekst gevonden',p.item.name);else render(base)}
+  const key=p.item.id||p.item.uri;if(key!==trackKey){
+    trackKey=key;lastLine=-2;status('Tekst zoeken…');
+    const spotifyArtists=(p.item.artists||[]).map(a=>a.name).join(', ');
+    const original=resolveOriginal(p.item.name,spotifyArtists);
+    $('song').textContent=original.title;$('artist').textContent=original.artist;
+    const result=await lyrics(original.title,original.artist,dur);
+    lines=result.lines||[];
+    if(lines.length){render(base)}
+    else if(result.plain){
+      const rows=result.plain.split(/\n+/).map(x=>x.trim()).filter(Boolean).slice(0,18);
+      $('lyrics').innerHTML='<div style="max-width:1050px;font-size:clamp(20px,2.3vw,34px);line-height:1.45;color:#d8dbe2;white-space:pre-line"></div>';
+      $('lyrics').firstChild.textContent=rows.join('\n');
+    } else status('Geen tekst gevonden',original.title+' — '+original.artist);
+  }
  }catch(e){console.error(e);showError(e.message)}
 }
 function tick(){const p=Math.min(dur,base+(isPlaying?Date.now()-baseAt:0));$('t1').textContent=fmt(p);$('t2').textContent=fmt(dur);$('fill').style.width=(dur?100*p/dur:0)+'%';render(p);requestAnimationFrame(tick)}

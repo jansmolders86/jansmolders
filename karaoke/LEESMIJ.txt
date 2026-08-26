@@ -34,3 +34,6 @@ https://jansmolders.nl/karaoke/
 
 Spotify Redirect URI die je exact moet registreren:
 https://jansmolders.nl/karaoke/
+
+FIX v2.1
+Karaoke-tracks worden nu via de vaste 48-track mapping teruggekoppeld aan titel + originele artiest. LRCLIB zoekt dus niet meer op de karaoke-artiest. Als alleen niet-gesynchroniseerde lyrics beschikbaar zijn, worden die als statische tekst getoond.
