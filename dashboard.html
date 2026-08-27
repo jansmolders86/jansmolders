@@ -227,7 +227,7 @@ async function loadWeather(){
  }
 }
 tick(); setInterval(tick,30000);
-showFact(); setInterval(showFact,90*1000);
+showFact(); setInterval(showFact,20*1000);
 loadWeather(); setInterval(loadWeather,10*60*1000);
 
 document.getElementById("fsBtn").onclick=()=>document.documentElement.requestFullscreen?.();
