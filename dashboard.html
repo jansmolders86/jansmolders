@@ -47,6 +47,10 @@ h1{font:400 clamp(25px,2.25vw,43px)/.95 "Archivo Black";margin:0;letter-spacing:
 .fact .card-label{color:var(--orange)}
 .fact-text{font:400 clamp(21px,2.2vw,42px)/1.06 "Archivo Black";letter-spacing:-.025em;max-width:22ch}
 .fact-cat{font:600 clamp(9px,.68vw,12px) "IBM Plex Mono";text-transform:uppercase;letter-spacing:.12em;color:var(--orange);margin-top:1.4vh}
+.cycle-progress{position:absolute;left:2.2vw;right:2.2vw;bottom:2vh;height:6px;background:rgba(17,17,17,.13);overflow:hidden}
+.cycle-progress-fill{height:100%;width:0;background:var(--orange)}
+.fact.map-mode .cycle-progress{left:1vw;right:1vw;bottom:1.2vh;background:rgba(255,255,255,.5);z-index:4}
+.fact.map-mode .cycle-progress-fill{background:var(--blue)}
 .fact.flash{animation:swap .55s ease}@keyframes swap{from{opacity:.2;transform:translateY(8px)}to{opacity:1;transform:none}}
 .offline{opacity:.65}
 .controls{position:fixed;right:12px;bottom:12px;display:flex;gap:8px;opacity:0;transition:.2s;z-index:10}
@@ -83,7 +87,7 @@ button{font:600 10px "IBM Plex Mono";border:2px solid #000;background:#fff;paddi
       <div class="card-label">Did you know?</div>
       <div class="fact-text" id="factText"></div>
       <div class="fact-cat" id="factCat"></div>
-      <div class="map-slide"><img src="landgoed-leudal-map.jpg" alt="Map of Landgoed Leudal"><div class="map-badge">Landgoed Leudal · Map</div></div>
+      <div class="map-slide"><img src="landgoed-leudal-map.jpg" alt="Map of Landgoed Leudal"><div class="map-badge">Landgoed Leudal · Map</div></div><div class="cycle-progress"><div class="cycle-progress-fill" id="cycleProgress"></div></div>
     </section>
   </aside>
 </div>
@@ -227,7 +231,21 @@ async function loadWeather(){
  }
 }
 tick(); setInterval(tick,30000);
-showFact(); setInterval(showFact,20*1000);
+const SLIDE_MS=20000;
+let slideStarted=performance.now();
+showFact();
+function cycleFrame(now){
+ const elapsed=now-slideStarted;
+ const pct=Math.min(100,(elapsed/SLIDE_MS)*100);
+ document.getElementById("cycleProgress").style.width=pct+"%";
+ if(elapsed>=SLIDE_MS){
+   showFact();
+   slideStarted=now;
+   document.getElementById("cycleProgress").style.width="0%";
+ }
+ requestAnimationFrame(cycleFrame);
+}
+requestAnimationFrame(cycleFrame);
 loadWeather(); setInterval(loadWeather,10*60*1000);
 
 document.getElementById("fsBtn").onclick=()=>document.documentElement.requestFullscreen?.();
