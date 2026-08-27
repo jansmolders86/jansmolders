@@ -40,6 +40,10 @@ h1{font:400 clamp(25px,2.25vw,43px)/.95 "Archivo Black";margin:0;letter-spacing:
 .weather-meta{font:500 clamp(9px,.68vw,13px)/1.55 "IBM Plex Mono";opacity:.82}
 .weather-icon{font-size:clamp(58px,5.4vw,103px);line-height:1}
 .fact{display:flex;flex-direction:column;justify-content:center;padding:3vh 2.2vw}
+.fact.map-mode{padding:0;background:#fff}.fact.map-mode>.card-label,.fact.map-mode>.fact-text,.fact.map-mode>.fact-cat{display:none}
+.map-slide{display:none;width:100%;height:100%;position:relative}.fact.map-mode .map-slide{display:block}
+.map-slide img{width:100%;height:100%;object-fit:contain;display:block}
+.map-badge{position:absolute;left:1vw;top:1.3vh;background:#080808;color:#fff;padding:.55em .8em;font:600 11px "IBM Plex Mono";text-transform:uppercase;letter-spacing:.1em}
 .fact .card-label{color:var(--orange)}
 .fact-text{font:400 clamp(21px,2.2vw,42px)/1.06 "Archivo Black";letter-spacing:-.025em;max-width:22ch}
 .fact-cat{font:600 clamp(9px,.68vw,12px) "IBM Plex Mono";text-transform:uppercase;letter-spacing:.12em;color:var(--orange);margin-top:1.4vh}
@@ -79,10 +83,11 @@ button{font:600 10px "IBM Plex Mono";border:2px solid #000;background:#fff;paddi
       <div class="card-label">Did you know?</div>
       <div class="fact-text" id="factText"></div>
       <div class="fact-cat" id="factCat"></div>
+      <div class="map-slide"><img src="landgoed-leudal-map.jpg" alt="Map of Landgoed Leudal"><div class="map-badge">Landgoed Leudal · Map</div></div>
     </section>
   </aside>
 </div>
-<div class="controls"><button id="factBtn">New fact</button><button id="fsBtn">Fullscreen</button></div>
+<div class="controls"><button id="fsBtn">Fullscreen</button></div>
 <script>
 const programme = [
  {start:"08:30",end:"09:30",activity:"Pilates or Forest Hike",note:"Optional — pick one",location:"Activity Area"},
@@ -176,11 +181,22 @@ function tick(){
  renderSchedule();
 }
 let factIndex=Math.floor(Math.random()*facts.length);
-function showFact(force=false){
- const f=facts[factIndex%facts.length]; const card=document.getElementById("factCard");
- card.classList.remove("flash"); void card.offsetWidth; card.classList.add("flash");
- document.getElementById("factText").textContent=f.text; document.getElementById("factCat").textContent=f.cat;
+let cycleStep=0;
+function showFact(){
+ const card=document.getElementById("factCard");
+ card.classList.remove("flash","map-mode");
+ void card.offsetWidth;
+ if(cycleStep===5){
+   card.classList.add("map-mode","flash");
+   cycleStep=0;
+   return;
+ }
+ const f=facts[factIndex%facts.length];
+ card.classList.add("flash");
+ document.getElementById("factText").textContent=f.text;
+ document.getElementById("factCat").textContent=f.cat;
  factIndex=(factIndex+1)%facts.length;
+ cycleStep++;
 }
 function weatherText(code){
  if(code===0)return["Clear sky","☀"];
@@ -211,9 +227,9 @@ async function loadWeather(){
  }
 }
 tick(); setInterval(tick,30000);
-showFact(); setInterval(showFact,5*60*1000);
+showFact(); setInterval(showFact,90*1000);
 loadWeather(); setInterval(loadWeather,10*60*1000);
-document.getElementById("factBtn").onclick=showFact;
+
 document.getElementById("fsBtn").onclick=()=>document.documentElement.requestFullscreen?.();
 </script>
 </body>
