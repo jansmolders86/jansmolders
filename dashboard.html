@@ -18,7 +18,7 @@ body{padding:6px}
 .kicker{font:600 clamp(10px,.72vw,14px) "IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.12em;color:var(--red);margin-bottom:.25vh}
 h1{font:400 clamp(25px,2.25vw,43px)/.95 "Archivo Black";margin:0;letter-spacing:-.035em}
 .place{display:inline;margin-left:.7em;font:600 clamp(10px,.75vw,14px) "IBM Plex Mono";opacity:.55}
-.clock{text-align:right;font:400 clamp(31px,3.1vw,59px)/.82 "Archivo Black";letter-spacing:-.04em}
+.header-right{display:flex;align-items:center;gap:1.4vw;justify-content:flex-end}.header-weather{display:flex;align-items:center;gap:.45vw;font:500 clamp(10px,.72vw,14px) "IBM Plex Mono";white-space:nowrap}.header-weather strong{font:400 clamp(21px,2vw,38px)/1 "Archivo Black"}#headerWeatherIcon{font-size:clamp(19px,1.7vw,32px)}#headerCondition{opacity:.62;max-width:9em;overflow:hidden;text-overflow:ellipsis}.clock{text-align:right;font:400 clamp(31px,3.1vw,59px)/.82 "Archivo Black";letter-spacing:-.04em}
 .clock small{display:block;font:500 clamp(8px,.62vw,12px)/1.1 "IBM Plex Mono";letter-spacing:.07em;margin-top:.8vh}
 .schedule{padding:1vh 1.7vw 1.3vh;display:grid;grid-template-rows:repeat(7,1fr);gap:.45vh;min-height:0;overflow:hidden}
 .row{position:relative;display:grid;grid-template-columns:7.4em 1fr minmax(8em,12.5em);gap:1vw;align-items:center;padding:.45vh .8vw;border-bottom:1px solid #ddd;min-height:0;overflow:hidden}
@@ -30,9 +30,9 @@ h1{font:400 clamp(25px,2.25vw,43px)/.95 "Archivo Black";margin:0;letter-spacing:
 .row.now:before{content:"NOW";position:absolute;left:.35vw;top:.35vh;font:700 8px "IBM Plex Mono";letter-spacing:.08em}
 .row.next{background:#f4f4f4}
 .row.next .activity:after{content:" NEXT";font:600 8px "IBM Plex Mono";letter-spacing:.08em;background:var(--pink);padding:.25em .45em;margin-left:.5em;vertical-align:.2em}
-.side{display:grid;grid-template-rows:42% 58%;gap:6px;background:var(--ink);overflow:hidden}
+.side{display:grid;grid-template-rows:52% 48%;gap:6px;background:var(--ink);overflow:hidden}
 .card{background:var(--paper);position:relative;overflow:hidden;padding:2.4vh 2vw}
-.card-label{font:600 clamp(9px,.72vw,13px) "IBM Plex Mono";text-transform:uppercase;letter-spacing:.13em;margin-bottom:1vh}
+.map-panel{padding:0;background:#f5f7e8;position:relative}.map-panel img{width:100%;height:100%;object-fit:contain;display:block}.map-panel-label{position:absolute;left:1vw;top:1.2vh;background:#080808;color:#fff;padding:.5em .75em;font:600 11px "IBM Plex Mono";text-transform:uppercase}.card-label{font:600 clamp(9px,.72vw,13px) "IBM Plex Mono";text-transform:uppercase;letter-spacing:.13em;margin-bottom:1vh}
 .weather{background:var(--blue);color:white;display:grid;grid-template-columns:1fr auto;align-items:center}
 .weather .card-label{position:absolute;top:2.2vh;left:2vw;opacity:.72}
 .temp{font:400 clamp(62px,6.1vw,116px)/.78 "Archivo Black";letter-spacing:-.06em}
@@ -65,42 +65,33 @@ button{font:600 10px "IBM Plex Mono";border:2px solid #000;background:#fff;paddi
     <header class="hero">
       <div>
         <div class="kicker">Introduction week · Day 2</div>
-        <h1>Wednesday 2 September <span class="place">Landgoed Leudal</span></h1>
+        <h1>Wednesday 2 September <span class="place">External location · Landgoed Leudal Camp</span></h1>
       </div>
-      <div class="clock"><span id="clock">--:--</span><small id="date">LOCAL TIME</small></div>
+      <div class="header-right"><div class="header-weather"><span id="headerWeatherIcon">◌</span><strong id="headerTemp">--°</strong><span id="headerCondition">Loading…</span></div><div class="clock"><span id="clock">--:--</span><small id="date">LOCAL TIME</small></div></div>
     </header>
     <section class="schedule" id="schedule"></section>
   </main>
 
   <aside class="side">
-    <section class="card weather">
-      <div class="card-label">Weather · Landgoed Leudal</div>
-      <div>
-        <div class="temp" id="temp">--°</div>
-        <div class="condition" id="condition">Loading weather…</div>
-        <div class="weather-meta" id="weatherMeta"></div>
-      </div>
-      <div class="weather-icon" id="weatherIcon">◌</div>
-    </section>
+    <section class="card map-panel"><img src="landgoed-leudal-map.jpg" alt="Map of Landgoed Leudal Camp"><div class="map-panel-label">Landgoed Leudal Camp · Map</div></section>
 
     <section class="card fact" id="factCard">
       <div class="card-label">Did you know?</div>
       <div class="fact-text" id="factText"></div>
-      <div class="fact-cat" id="factCat"></div>
-      <div class="map-slide"><img src="landgoed-leudal-map.jpg" alt="Map of Landgoed Leudal"><div class="map-badge">Landgoed Leudal · Map</div></div><div class="cycle-progress"><div class="cycle-progress-fill" id="cycleProgress"></div></div>
+      <div class="fact-cat" id="factCat"></div><div class="cycle-progress"><div class="cycle-progress-fill" id="cycleProgress"></div></div>
     </section>
   </aside>
 </div>
 <div class="controls"><button id="fsBtn">Fullscreen</button></div>
 <script>
 const programme = [
- {start:"08:30",end:"09:30",activity:"Pilates or Forest Hike",note:"Optional — pick one",location:"Activity Area"},
+ {start:"08:30",end:"09:30",activity:"Pilates or Forest Hike",note:"Optional — pick one",location:"Activity Area/Forest"},
  {start:"09:30",end:"10:30",activity:"Breakfast",note:"",location:"Recreation Area 1"},
- {start:"11:00",end:"12:00",activity:"Speeddate activity",note:"Depending on the weather",location:"Activity Area / Recreation Area 2"},
+ {start:"11:00",end:"12:00",activity:"Speeddate activity",note:"In case of rain, we move to Recreation Area 1.",location:"Activity Area"},
  {start:"13:00",end:"14:00",activity:"Lunch buffet",note:"",location:"Recreation Area 1"},
- {start:"15:00",end:"17:00",activity:"Afternoon workshops — Funfactory",note:"Bring old clothes!",location:"Activity Area / Recreation Area 1"},
- {start:"18:00",end:"20:00",activity:"BBQ",note:"",location:"Outside Recreation Area 1"},
- {start:"20:00",end:"23:59",activity:"Pub quiz, karaoke, gaming & boardgames",note:"",location:"Recreation Area 2"}
+ {start:"15:00",end:"17:00",activity:"Afternoon workshops — Funfactory",note:"Bring old clothes!",location:"Activity Area/Recreation Area 1"},
+ {start:"18:00",end:"20:00",activity:"BBQ",note:"",location:"Recreation Area 1"},
+ {start:"20:00",end:"23:59",activity:"Evening: pub quiz, karaoke, gaming & boardgames",note:"",location:"Recreation Area 2"}
 ];
 const facts = [
       {"cat":"Dutch Culture","text":'The Netherlands has more bikes than people — over 23 million bikes for 17.9 million residents.'},
@@ -185,23 +176,7 @@ function tick(){
  renderSchedule();
 }
 let factIndex=Math.floor(Math.random()*facts.length);
-let cycleStep=0;
-function showFact(){
- const card=document.getElementById("factCard");
- card.classList.remove("flash","map-mode");
- void card.offsetWidth;
- if(cycleStep===5){
-   card.classList.add("map-mode","flash");
-   cycleStep=0;
-   return;
- }
- const f=facts[factIndex%facts.length];
- card.classList.add("flash");
- document.getElementById("factText").textContent=f.text;
- document.getElementById("factCat").textContent=f.cat;
- factIndex=(factIndex+1)%facts.length;
- cycleStep++;
-}
+function showFact(){const card=document.getElementById("factCard");card.classList.remove("flash","map-mode");void card.offsetWidth;const f=facts[factIndex%facts.length];card.classList.add("flash");document.getElementById("factText").textContent=f.text;document.getElementById("factCat").textContent=f.cat;factIndex=(factIndex+1)%facts.length;}
 function weatherText(code){
  if(code===0)return["Clear sky","☀"];
  if(code<=2)return["Partly cloudy","🌤"];
@@ -220,18 +195,17 @@ async function loadWeather(){
  try{
   const r=await fetch(url); if(!r.ok)throw new Error("weather");
   const j=await r.json(), c=j.current, d=j.daily, wt=weatherText(c.weather_code);
-  document.getElementById("temp").textContent=Math.round(c.temperature_2m)+"°";
-  document.getElementById("condition").textContent=wt[0];
-  document.getElementById("weatherIcon").textContent=wt[1];
-  document.getElementById("weatherMeta").innerHTML=`Feels like ${Math.round(c.apparent_temperature)}°<br>High ${Math.round(d.temperature_2m_max[0])}° · Low ${Math.round(d.temperature_2m_min[0])}°<br>Rain chance ${d.precipitation_probability_max[0]??0}%`;
+  document.getElementById("headerTemp").textContent=Math.round(c.temperature_2m)+"°";
+  document.getElementById("headerCondition").textContent=wt[0];
+  document.getElementById("headerWeatherIcon").textContent=wt[1];
  }catch(e){
-  document.getElementById("condition").textContent="Weather unavailable";
-  document.getElementById("weatherMeta").textContent="Internet connection required";
-  document.querySelector(".weather").classList.add("offline");
+  document.getElementById("headerCondition").textContent="Weather unavailable";
+  
+  
  }
 }
 tick(); setInterval(tick,30000);
-const SLIDE_MS=20000;
+const SLIDE_MS=15000;
 let slideStarted=performance.now();
 showFact();
 function cycleFrame(now){
