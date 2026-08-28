@@ -65,7 +65,7 @@ button{font:600 10px "IBM Plex Mono";border:2px solid #000;background:#fff;paddi
     <header class="hero">
       <div>
         <div class="kicker">Introduction week · Day 2</div>
-        <h1>Wednesday 2 September <span class="place">Landgoed Leudal</span></h1>
+        <h1>Wednesday 2 September <span class="place">Landgoed Leudal Camp</span></h1>
       </div>
       <div class="header-right"><div class="header-weather"><span id="headerWeatherIcon">◌</span><strong id="headerTemp">--°</strong><span id="headerCondition">Loading…</span></div><div class="clock"><span id="clock">--:--</span><small id="date">LOCAL TIME</small></div></div>
     </header>
@@ -175,8 +175,27 @@ function tick(){
  document.getElementById("date").textContent=d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
  renderSchedule();
 }
-let factIndex=Math.floor(Math.random()*facts.length);
-function showFact(){const card=document.getElementById("factCard");card.classList.remove("flash","map-mode");void card.offsetWidth;const f=facts[factIndex%facts.length];card.classList.add("flash");document.getElementById("factText").textContent=f.text;document.getElementById("factCat").textContent=f.cat;factIndex=(factIndex+1)%facts.length;}
+let shuffledFacts=[];
+let factIndex=0;
+function shuffleFacts(){
+ shuffledFacts=[...facts];
+ for(let i=shuffledFacts.length-1;i>0;i--){
+   const j=Math.floor(Math.random()*(i+1));
+   [shuffledFacts[i],shuffledFacts[j]]=[shuffledFacts[j],shuffledFacts[i]];
+ }
+ factIndex=0;
+}
+function showFact(){
+ if(factIndex>=shuffledFacts.length) shuffleFacts();
+ const card=document.getElementById("factCard");
+ card.classList.remove("flash","map-mode");
+ void card.offsetWidth;
+ const f=shuffledFacts[factIndex++];
+ card.classList.add("flash");
+ document.getElementById("factText").textContent=f.text;
+ document.getElementById("factCat").textContent=f.cat;
+}
+shuffleFacts();
 function weatherText(code){
  if(code===0)return["Clear sky","☀"];
  if(code<=2)return["Partly cloudy","🌤"];
