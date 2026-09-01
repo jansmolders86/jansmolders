@@ -4,7 +4,7 @@ const $=id=>document.getElementById(id);
 let lines=[],trackKey='',base=0,baseAt=Date.now(),dur=0,isPlaying=false,lastLine=-2;
 const redirectUri=location.origin+location.pathname;
 function playlistId(v){const m=(v||'').match(/(?:playlist[/:])([A-Za-z0-9]+)/);return m?m[1]:(/^[A-Za-z0-9]+$/.test(v||'')?v:'')}
-const targetPlaylist=playlistId(C.playlist);
+const targetPlaylists=["4uUtwJuGRcZ2nFFDfSOn14"];
 function b64(bytes){return btoa(String.fromCharCode(...bytes)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 async function sha(s){return new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))}
 function rnd(n=64){const a=new Uint8Array(n);crypto.getRandomValues(a);return b64(a)}
@@ -83,7 +83,7 @@ async function poll(){
   const contextId=p.context?.type==='playlist'?playlistId(p.context.uri):'';
   base=p.progress_ms||0;baseAt=Date.now();dur=p.item.duration_ms||0;isPlaying=!!p.is_playing;
   $('cover').src=p.item.album?.images?.[0]?.url||'';$('song').textContent=p.item.name||'';$('artist').textContent=(p.item.artists||[]).map(a=>a.name).join(', ');
-  if(targetPlaylist && contextId!==targetPlaylist){trackKey='';status('Dit is niet de karaokeplaylist','Start “'+(C.playlistName||'Student Karaoke 2026 🎤')+'” in Spotify.');return}
+  if(targetPlaylists.length && !targetPlaylists.includes(contextId)){trackKey='';status('Dit is niet een van de karaokeplaylists','Start een van de ingestelde Zuyd Karaoke-playlists in Spotify.');return}
   const key=p.item.id||p.item.uri;if(key!==trackKey){
     trackKey=key;lastLine=-2;status('Tekst zoeken…');
     const spotifyArtists=(p.item.artists||[]).map(a=>a.name).join(', ');
@@ -103,7 +103,7 @@ async function poll(){
 function tick(){const p=Math.min(dur,base+(isPlaying?Date.now()-baseAt:0));$('t1').textContent=fmt(p);$('t2').textContent=fmt(dur);$('fill').style.width=(dur?100*p/dur:0)+'%';render(p);requestAnimationFrame(tick)}
 async function init(){
  if(!C.spotifyClientId||C.spotifyClientId.includes('PLAK_HIER')){showError('config.js: vul eerst je Spotify Client ID in.');return}
- if(!targetPlaylist){showError('config.js: vul eerst de Spotify playlist-URL of URI in.');return}
+ if(!targetPlaylists.length){showError('config.js: vul eerst minimaal één Spotify playlist-URL of URI in.');return}
  const q=new URLSearchParams(location.search),code=q.get('code'),err=q.get('error');
  if(err){showError('Spotify toestemming geweigerd: '+err);return}
  if(code){if(q.get('state')!==localStorage.getItem(S+'state')){showError('Spotify login state mismatch.');return}await exchange(code)}
