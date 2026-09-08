@@ -7,7 +7,7 @@
 (function (global) {
   'use strict';
 
-  var KEY = 'reijn-cms-demo-v2';
+  var KEY = 'reijn-cms-demo-v3';
 
   /* Vangnet: normaal zet brand.js dit in de <head>. Mocht dat bestand
      ontbreken, dan valt alles terug op white label in plaats van te breken. */
@@ -28,43 +28,70 @@
     return [
       { id: 'gijs-wassenberg', naam: 'Gijs Wassenberg', functie: 'HRM-consultant', init: 'GW', kleur: 'var(--petrol)',
         status: 'pub', varianten: ['Ziekenhuis', 'Gemeente'], views: 342, leads: 7, tijd: '3:12', bijgewerkt: '2 dagen geleden',
-        beheerder: 'Lieve van der Weijde', aangemaakt: '14 apr 2025' },
+        beheerder: 'Lieve van der Weijde', aangemaakt: '14 apr 2025', sjabloon: 'Visueel CV — compleet', inzet: { status:'ingezet', klant:'Radboudumc', rol:'Projectleider HR-transitie',
+        start:'2026-02-01', eind:'2026-11-30', uren:32, tarief:118, verlenging:'optie tot 1 mrt 2027',
+        contact:'Marieke Doornbos',
+        eerder:[{klant:'Gemeente Nijmegen', rol:'Adviseur duurzame inzetbaarheid', start:'2025-03-01', eind:'2026-01-31'}] } },
       { id: 'sanne-de-vries', naam: 'Sanne de Vries', functie: 'Financieel adviseur', init: 'SdV', kleur: 'var(--plum)',
         status: 'rev', varianten: ['Ziekenhuis'], views: 88, leads: 2, tijd: '2:41', bijgewerkt: '5 uur geleden',
-        beheerder: 'Lieve van der Weijde', aangemaakt: '2 jun 2025' },
+        beheerder: 'Lieve van der Weijde', aangemaakt: '2 jun 2025', inzet: { status:'binnenkort', klant:'Zorggroep Helmond', rol:'Interim financieel adviseur',
+        start:'2026-01-15', eind:'2026-09-30', uren:24, tarief:105, verlenging:'nog niet besproken',
+        contact:'Marc de Wit',
+        eerder:[{klant:'Amphia', rol:'Business control', start:'2024-09-01', eind:'2025-12-31'}] } },
       { id: 'fatima-el-amrani', naam: 'Fatima El Amrani', functie: 'Beleidsadviseur', init: 'FE', kleur: 'var(--clay)',
         status: 'pub', varianten: ['Ziekenhuis', 'Gemeente', 'Onderwijs'], views: 511, leads: 12, tijd: '3:48', bijgewerkt: '6 dagen geleden',
-        beheerder: 'Lieve van der Weijde', aangemaakt: '9 feb 2025' },
+        beheerder: 'Lieve van der Weijde', aangemaakt: '9 feb 2025', inzet: { status:'ingezet', klant:'Gemeente Arnhem', rol:'Projectleider omgevingsplan',
+        start:'2026-04-01', eind:'2027-03-31', uren:36, tarief:112, verlenging:'optie 6 maanden',
+        contact:'Joris Kleijn',
+        eerder:[{klant:'Gemeente Nijmegen', rol:'Beleidsadviseur', start:'2025-01-06', eind:'2026-03-27'}] } },
       { id: 'thomas-bakker', naam: 'Thomas Bakker', functie: 'IT-projectleider', init: 'TB', kleur: 'var(--mustard)',
         status: 'rev', varianten: ['Basis'], views: 21, leads: 0, tijd: '1:52', bijgewerkt: '2 dagen geleden',
-        beheerder: 'Joost Reijnders', aangemaakt: '17 jun 2025' },
+        beheerder: 'Joost Reijnders', aangemaakt: '17 jun 2025', inzet: { status:'beschikbaar', klant:null, rol:null, start:null, eind:null, uren:36,
+        tarief:98, verlenging:null, contact:null, beschikbaarVanaf:'2026-08-01',
+        eerder:[{klant:'ROC Rijnmond', rol:'Projectleider ICT', start:'2025-05-01', eind:'2026-07-31'}] } },
       { id: 'isa-verhoeven', naam: 'Isa Verhoeven', functie: 'Adviseur digitalisering', init: 'IV', kleur: 'var(--ink-soft)',
         status: 'draft', varianten: [], views: 0, leads: 0, tijd: '—', bijgewerkt: '3 dagen geleden',
-        beheerder: 'Lieve van der Weijde', aangemaakt: '15 jun 2025' },
+        beheerder: 'Lieve van der Weijde', aangemaakt: '15 jun 2025', inzet: { status:'beschikbaar', klant:null, rol:null, start:null, eind:null, uren:32,
+        tarief:95, verlenging:null, contact:null, beschikbaarVanaf:'2026-09-15', eerder:[] } },
       { id: 'daan-mulder', naam: 'Daan Mulder', functie: 'Recruiter', init: 'DM', kleur: 'var(--teal)',
         status: 'pub', varianten: ['Basis'], views: 176, leads: 4, tijd: '2:05', bijgewerkt: '1 week geleden',
-        beheerder: 'Joost Reijnders', aangemaakt: '3 mrt 2025' },
+        beheerder: 'Joost Reijnders', aangemaakt: '3 mrt 2025', sjabloon: 'Compact profiel', inzet: { status:'ingezet', klant:'Waterschap Rivierenland', rol:'Recruiter techniek',
+        start:'2026-06-01', eind:'2027-05-31', uren:32, tarief:92, verlenging:'optie tot 2028',
+        contact:'Hugo Bergsma', eerder:[] } },
       { id: 'emma-visser', naam: 'Emma Visser', functie: 'Communicatieadviseur', init: 'EV', kleur: 'var(--mustard)',
         status: 'rev', varianten: ['Gemeente', 'Zorg'], views: 63, leads: 1, tijd: '2:58', bijgewerkt: '1 dag geleden',
-        beheerder: 'Lieve van der Weijde', aangemaakt: '21 mei 2025' },
+        beheerder: 'Lieve van der Weijde', aangemaakt: '21 mei 2025', inzet: { status:'binnenkort', klant:'Gemeente Arnhem', rol:'Communicatieadviseur participatie',
+        start:'2025-11-01', eind:'2026-10-15', uren:28, tarief:96, verlenging:'klant beslist in september',
+        contact:'Joris Kleijn', eerder:[] } },
       { id: 'noor-jansen', naam: 'Noor Jansen', functie: 'Organisatieadviseur', init: 'NJ', kleur: 'var(--teal)',
         status: 'pub', varianten: ['Gemeente'], views: 204, leads: 5, tijd: '3:01', bijgewerkt: '4 dagen geleden',
-        beheerder: 'Lieve van der Weijde', aangemaakt: '28 jan 2025' },
+        beheerder: 'Lieve van der Weijde', aangemaakt: '28 jan 2025', sjabloon: 'Visueel CV — compleet', inzet: { status:'ingezet', klant:'ROC Rijnmond', rol:'Organisatieadviseur onderwijsteams',
+        start:'2026-03-01', eind:'2027-02-28', uren:24, tarief:104, verlenging:'optie 12 maanden',
+        contact:'Sandra Beek', eerder:[] } },
       { id: 'pieter-hoogendijk', naam: 'Pieter Hoogendijk', functie: 'Interim-manager', init: 'PH', kleur: 'var(--petrol)',
         status: 'pub', varianten: ['Ziekenhuis', 'Basis'], views: 289, leads: 9, tijd: '4:07', bijgewerkt: '3 dagen geleden',
-        beheerder: 'Joost Reijnders', aangemaakt: '11 dec 2024' },
+        beheerder: 'Joost Reijnders', aangemaakt: '11 dec 2024', inzet: { status:'binnenkort', klant:'Waterschap Rivierenland', rol:'Interim-manager bedrijfsvoering',
+        start:'2025-09-01', eind:'2026-09-15', uren:36, tarief:135, verlenging:'gesprek gepland 3 sep',
+        contact:'Hugo Bergsma',
+        eerder:[{klant:'Radboudumc', rol:'Interim afdelingshoofd', start:'2024-04-01', eind:'2025-08-29'}] } },
       { id: 'yara-bouzid', naam: 'Yara Bouzid', functie: 'Data-analist', init: 'YB', kleur: 'var(--plum)',
         status: 'pub', varianten: ['Onderwijs'], views: 132, leads: 3, tijd: '2:22', bijgewerkt: '5 dagen geleden',
-        beheerder: 'Lieve van der Weijde', aangemaakt: '7 mrt 2025' },
+        beheerder: 'Lieve van der Weijde', aangemaakt: '7 mrt 2025', sjabloon: 'Compact profiel', inzet: { status:'ingezet', klant:'ROC Rijnmond', rol:'Data-analist studentsucces',
+        start:'2026-05-01', eind:'2026-12-31', uren:32, tarief:99, verlenging:'optie tot juni 2027',
+        contact:'Sandra Beek', eerder:[] } },
       { id: 'milan-de-groot', naam: 'Milan de Groot', functie: 'Projectleider Zorg', init: 'MG', kleur: 'var(--ink-soft)',
         status: 'draft', varianten: [], views: 0, leads: 0, tijd: '—', bijgewerkt: '9 uur geleden',
-        beheerder: 'Joost Reijnders', aangemaakt: '18 jun 2025' },
+        beheerder: 'Joost Reijnders', aangemaakt: '18 jun 2025', inzet: { status:'beschikbaar', klant:null, rol:null, start:null, eind:null, uren:36,
+        tarief:101, verlenging:null, contact:null, beschikbaarVanaf:'2026-08-26', eerder:[] } },
       { id: 'kim-vermeer', naam: 'Kim Vermeer', functie: 'Trainer & coach', init: 'KV', kleur: 'var(--mustard)',
         status: 'pub', varianten: ['Basis', 'Onderwijs'], views: 97, leads: 2, tijd: '2:36', bijgewerkt: '1 week geleden',
-        beheerder: 'Lieve van der Weijde', aangemaakt: '2 apr 2025' },
+        beheerder: 'Lieve van der Weijde', aangemaakt: '2 apr 2025', inzet: { status:'ingezet', klant:'Onderwijsgroep Brabant', rol:'Trainer leiderschap',
+        start:'2026-01-08', eind:'2026-10-31', uren:20, tarief:110, verlenging:'optie tot maart 2027',
+        contact:'Sanne Jansen', eerder:[] } },
       { id: 'ruben-aarts', naam: 'Ruben Aarts', functie: 'Financieel adviseur', init: 'RA', kleur: 'var(--ink-soft)',
         status: 'arch', varianten: ['Basis'], views: 44, leads: 0, tijd: '1:48', bijgewerkt: '2 maanden geleden',
-        beheerder: 'Joost Reijnders', aangemaakt: '19 sep 2024' }
+        beheerder: 'Joost Reijnders', aangemaakt: '19 sep 2024', inzet: { status:'beschikbaar', klant:null, rol:null, start:null, eind:null, uren:0,
+        tarief:0, verlenging:null, contact:null, beschikbaarVanaf:null, eerder:[] } }
     ];
   }
 
@@ -214,6 +241,14 @@
 
   /* Welke editor hoort bij deze pagina? Gijs is als enige helemaal ingevuld;
      elke andere consultant opent de lege template. */
+  /* Welke presentatielayout hoort bij deze pagina? */
+  function cvUrl(pagina) {
+    var p = typeof pagina === 'string' ? { id: pagina } : (pagina || {});
+    return /compact/i.test(p.sjabloon || '')
+      ? 'compact.html?id=' + encodeURIComponent(p.id || '')
+      : 'index.html';
+  }
+
   function editorUrl(pagina) {
     var id = typeof pagina === 'string' ? pagina : (pagina && pagina.id);
     return id === 'gijs-wassenberg'
@@ -225,6 +260,73 @@
     var m = new RegExp('[?&]' + name + '=([^&]*)').exec(global.location.search);
     return m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : null;
   }
+
+  /* ---------------- inzet: hoe lang loopt een opdracht nog? ----------------
+     De demo rekent met een vast 'vandaag', zodat de cijfers niet verschuiven
+     als je de demo over een half jaar nog eens laat zien. */
+  var VANDAAG = new Date(2026, 7, 26);          // 26 augustus 2026
+  var DAG = 24 * 60 * 60 * 1000;
+
+  var MAANDEN = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+
+  function datum(txt) {
+    if (!txt) return null;
+    var d = String(txt).split('-');
+    return new Date(+d[0], +d[1] - 1, +d[2]);
+  }
+  function datumKort(txt) {
+    var d = datum(txt);
+    return d ? d.getDate() + ' ' + MAANDEN[d.getMonth()] + ' ' + d.getFullYear() : '\u2014';
+  }
+  function dagenTot(txt) {
+    var d = datum(txt);
+    return d ? Math.round((d - VANDAAG) / DAG) : null;
+  }
+
+  /* '3 maanden en 1 week' leest prettiger dan '97 dagen' */
+  function looptijd(dagen) {
+    if (dagen === null) return '\u2014';
+    if (dagen < 0) return 'afgelopen';
+    if (dagen === 0) return 'loopt vandaag af';
+    if (dagen < 14) return dagen + (dagen === 1 ? ' dag' : ' dagen');
+    if (dagen < 60) {
+      var w = Math.round(dagen / 7);
+      return w + ' weken';
+    }
+    var m = Math.floor(dagen / 30.44);
+    var rest = Math.round((dagen - m * 30.44) / 7);
+    return m + (m === 1 ? ' maand' : ' maanden') + (rest > 0 ? ' en ' + rest + ' wk' : '');
+  }
+
+  /* alles wat een scherm over een inzet wil weten, op één plek */
+  function inzetInfo(p) {
+    var i = p.inzet || { status: 'beschikbaar', eerder: [] };
+    var dagen = i.eind ? dagenTot(i.eind) : null;
+    var totaal = (i.start && i.eind) ? Math.round((datum(i.eind) - datum(i.start)) / DAG) : null;
+    var verstreken = totaal !== null ? Math.max(0, Math.min(totaal, totaal - dagen)) : null;
+    return {
+      ruw: i,
+      status: i.status,
+      klant: i.klant,
+      rol: i.rol,
+      uren: i.uren,
+      dagenRest: dagen,
+      resterend: looptijd(dagen),
+      voortgang: totaal ? Math.round(verstreken / totaal * 100) : 0,
+      startKort: datumKort(i.start),
+      eindKort: datumKort(i.eind),
+      beschikbaarVanaf: i.beschikbaarVanaf ? datumKort(i.beschikbaarVanaf) : null,
+      beschikbaarNu: i.status === 'beschikbaar' && (!i.beschikbaarVanaf || dagenTot(i.beschikbaarVanaf) <= 0),
+      loopAf: dagen !== null && dagen >= 0 && dagen <= 60,
+      eerder: i.eerder || []
+    };
+  }
+
+  var INZET_STATUS = {
+    ingezet:     { label: 'Ingezet',        cls: 'pub' },
+    binnenkort:  { label: 'Loopt af',       cls: 'rev' },
+    beschikbaar: { label: 'Beschikbaar',    cls: 'hot' }
+  };
 
   /* ---------------- mails aan de consultant ----------------
      Deze kant van het beheer is net zo belangrijk als mailen naar klanten:
@@ -526,8 +628,10 @@
   global.Reijn = {
     load: load, save: save, reset: reset, fresh: fresh,
     STATUS: STATUS, ICON: ICON, COLORS: COLORS, CONSULTANT_MAILS: CONSULTANT_MAILS,
+    INZET_STATUS: INZET_STATUS, inzetInfo: inzetInfo, datumKort: datumKort,
+    dagenTot: dagenTot, looptijd: looptijd, VANDAAG: VANDAAG,
     esc: esc, slug: slug, initials: initials, kleurVoor: kleurVoor, nf: nf, param: param,
-    editorUrl: editorUrl,
+    editorUrl: editorUrl, cvUrl: cvUrl,
     toast: toast, openModal: openModal, closeModal: closeModal, init: init,
     animeer: animeer
   };

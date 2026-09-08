@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reijn CMS — Inzet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="cms.css">
+<style>
+  /* ---------- tijdlijn ---------- */
+  .tl-wrap{overflow-x:auto}
+  .tl-grid{min-width:760px}
+  .tl-kop{display:grid;grid-template-columns:220px 1fr;gap:14px;align-items:end;margin-bottom:8px}
+  .tl-maanden{position:relative;display:grid;height:22px}
+  .tl-maanden span{font-family:var(--mono);font-size:10px;color:var(--ink-soft);text-align:center;
+    border-left:1px solid var(--line);padding-left:5px;text-align:left}
+  .tl-rij{display:grid;grid-template-columns:220px 1fr;gap:14px;align-items:center;padding:7px 0}
+  .tl-rij:hover{background:var(--paper)}
+  .tl-wie{display:flex;align-items:center;gap:10px;min-width:0}
+  .tl-wie .nm{font-weight:700;font-size:13.5px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tl-wie .fn{font-size:11.5px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tl-baan{position:relative;height:34px;border-radius:9px;background:var(--paper-2);overflow:hidden}
+  .tl-raster{position:absolute;inset:0;display:grid}
+  .tl-raster i{border-left:1px solid var(--line)}
+  .tl-balk{position:absolute;top:4px;bottom:4px;border-radius:7px;display:flex;align-items:center;
+    padding:0 10px;color:#fff;font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;
+    box-shadow:0 3px 10px -6px rgba(0,0,0,.5);cursor:pointer}
+  .tl-balk.af{background:repeating-linear-gradient(135deg,var(--mustard),var(--mustard) 7px,color-mix(in srgb,var(--mustard) 70%,#000) 7px,color-mix(in srgb,var(--mustard) 70%,#000) 14px)}
+  .tl-vrij{position:absolute;top:4px;bottom:4px;border-radius:7px;border:1.5px dashed var(--tangerine);
+    background:color-mix(in srgb,var(--tangerine) 10%,transparent);color:var(--accent-ink);
+    display:flex;align-items:center;padding:0 10px;font-size:11.5px;font-weight:600;white-space:nowrap}
+  .tl-nu{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--clay);z-index:3}
+  .tl-nu::after{content:"vandaag";position:absolute;top:-17px;left:50%;transform:translateX(-50%);
+    font-family:var(--mono);font-size:9px;color:var(--clay);white-space:nowrap}
+  .tl-legenda{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-soft);margin-top:14px}
+  .tl-legenda i{width:12px;height:12px;border-radius:3px;display:inline-block;margin-right:6px;vertical-align:-2px}
+
+  /* ---------- rijen ---------- */
+  .row-inzet{grid-template-columns:1.8fr 1.6fr 1.5fr 1.1fr .7fr auto}
+  .restbalk{height:7px;border-radius:999px;background:var(--paper-2);overflow:hidden;margin-top:5px}
+  .restbalk i{display:block;height:100%;border-radius:999px;background:var(--teal)}
+  .restbalk.krap i{background:var(--mustard)}
+  .aflopers{display:flex;flex-direction:column;gap:10px}
+  .afloper{display:flex;align-items:center;gap:13px;border:1px solid var(--line);border-radius:14px;
+    background:var(--paper);padding:12px 14px;flex-wrap:wrap}
+  .afloper .wat{flex:1;min-width:180px;font-size:13.5px}
+  .afloper .wat strong{display:block;font-size:14.5px}
+  .afloper .dagen{font-family:var(--mono);font-size:12px;padding:5px 10px;border-radius:999px;
+    background:color-mix(in srgb,var(--mustard) 20%,transparent);color:#8A6608;white-space:nowrap}
+  .afloper .dagen.krap{background:color-mix(in srgb,var(--clay) 18%,transparent);color:var(--clay)}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand"><img src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><span class="tag">CMS</span></div>
+  <nav class="sb-nav">
+    <a href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
+    <a href="paginas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>Pagina's <span class="badge" data-badge="pages">47</span></a>
+    <a class="active" href="inzet.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/><path d="M12 15v3"/></svg>Inzet <span class="badge" data-badge="inzet">3</span></a>
+    <a href="analytics.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>Analytics</a>
+    <a href="berichten.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>Berichten <span class="badge" data-badge="mail">2</span></a>
+    <a href="instellingen.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1L14.5 2h-5l-.4 2.6a7 7 0 0 0-1.7 1l-2.3-1-2 3.4L3 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1l.4 2.6h5l.4-2.6a7 7 0 0 0 1.7-1l2.3 1 2-3.4-2-1.5a7 7 0 0 0 .1-1z"/></svg>Instellingen</a>
+  </nav>
+  <div class="sb-user"><img src="lieve.jpg" alt=""><div><div class="nm">Lieve van der Weijde</div><div class="rl">Relatiebeheerder</div></div></div>
+</aside>
+
+<div class="mobile-top">
+  <img class="lg" src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><span class="tag">CMS</span>
+  <span class="mu"><img src="lieve.jpg" alt=""></span>
+</div>
+<nav class="mobile-nav">
+  <a href="dashboard.html">Dashboard</a><a href="paginas.html">Pagina's</a>
+  <a class="active" href="inzet.html">Inzet</a>
+  <a href="analytics.html">Analytics</a><a href="berichten.html">Berichten</a><a href="instellingen.html">Instellingen</a>
+</nav>
+
+<main class="main">
+  <div class="topbar">
+    <div class="greet">
+      <div class="crumbs"><a href="dashboard.html">Dashboard</a> › <span>Inzet</span></div>
+      <h1>Inzet</h1>
+      <p>Wie zit waar, tot wanneer — en wie komt er binnenkort vrij?</p>
+    </div>
+    <div class="grow"></div>
+    <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg><input id="q" placeholder="Zoek op consultant of opdrachtgever…"></div>
+    <button class="btn accent" id="nieuweInzet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Inzet vastleggen</button>
+  </div>
+
+  <section class="kpis">
+    <div class="kpi c-teal"><div class="lbl">Nu ingezet</div><div class="val" id="kIngezet">—</div><div class="sub" id="kIngezetSub">—</div></div>
+    <div class="kpi c-mustard"><div class="lbl">Loopt af · 60 dagen</div><div class="val" id="kAf">—</div><div class="sub">verlenging bespreken</div></div>
+    <div class="kpi c-tangerine"><div class="lbl">Beschikbaar</div><div class="val" id="kVrij">—</div><div class="sub" id="kVrijSub">—</div></div>
+    <div class="kpi c-petrol"><div class="lbl">Bezettingsgraad</div><div class="val" id="kBezet">—</div><div class="sub">van de inzetbare uren</div></div>
+  </section>
+
+  <section class="card" style="margin-bottom:22px">
+    <div class="card-head">
+      <div><h2>Loopt binnenkort af</h2><p class="card-sub">Op tijd het gesprek aangaan scheelt leegloop.</p></div>
+      <span class="pill rev" id="afPill">—</span>
+    </div>
+    <div class="aflopers" id="aflopers"></div>
+  </section>
+
+  <section class="card" style="margin-bottom:22px">
+    <div class="card-head">
+      <div><h2>Bezetting over tijd</h2><p class="card-sub" id="tlSub">—</p></div>
+      <div class="tabs" style="margin:0" id="tabs">
+        <button class="tab active" data-f="all">Iedereen</button>
+        <button class="tab" data-f="ingezet">Ingezet</button>
+        <button class="tab" data-f="binnenkort">Loopt af</button>
+        <button class="tab" data-f="beschikbaar">Beschikbaar</button>
+      </div>
+    </div>
+    <div class="tl-wrap">
+      <div class="tl-grid">
+        <div class="tl-kop"><div></div><div class="tl-maanden" id="tlMaanden"></div></div>
+        <div id="tlRijen"></div>
+      </div>
+    </div>
+    <div class="tl-legenda">
+      <span><i style="background:var(--teal)"></i>Lopende opdracht</span>
+      <span><i style="background:var(--mustard)"></i>Loopt binnen 60 dagen af</span>
+      <span><i style="border:1.5px dashed var(--tangerine);background:color-mix(in srgb,var(--tangerine) 10%,transparent)"></i>Beschikbaar</span>
+      <span><i style="background:var(--clay);width:3px"></i>Vandaag</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div><h2>Alle inzet</h2><p class="card-sub">Klik op een rij voor het volledige profiel.</p></div>
+      <button class="btn line sm" data-toast="Export gestart — inzet-overzicht.csv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Export</button>
+    </div>
+    <div class="rows">
+      <div class="row row-inzet rhead">
+        <div>Consultant</div><div>Opdrachtgever</div><div>Periode</div><div>Resterend</div><div>Uren</div><div></div>
+      </div>
+    </div>
+    <div class="rows" id="rijen"></div>
+  </section>
+</main>
+
+<!-- ============ inzet vastleggen / verlengen ============ -->
+<div class="ov" id="mInzet">
+  <div class="modal">
+    <div class="modal-head">
+      <div><h3 id="izTitel">Inzet vastleggen</h3><p id="izSub">—</p></div>
+      <button class="iconbtn x" data-close aria-label="Sluiten">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label for="izWie">Consultant</label><select id="izWie"></select></div>
+      <div class="row2">
+        <div class="field"><label for="izKlant">Opdrachtgever</label>
+          <select id="izKlant">
+            <option>Radboudumc</option><option>Gemeente Arnhem</option><option>ROC Rijnmond</option>
+            <option>Waterschap Rivierenland</option><option>Zorggroep Helmond</option>
+            <option>Onderwijsgroep Brabant</option><option>Nieuwe opdrachtgever…</option>
+          </select></div>
+        <div class="field"><label for="izRol">Rol in de opdracht</label><input type="text" id="izRol" placeholder="Bijv. Projectleider HR-transitie"></div>
+      </div>
+      <div class="row3">
+        <div class="field"><label for="izStart">Startdatum</label><input type="date" id="izStart"></div>
+        <div class="field"><label for="izEind">Einddatum</label><input type="date" id="izEind"></div>
+        <div class="field"><label for="izUren">Uren per week</label><input type="text" id="izUren" value="32"></div>
+      </div>
+      <div class="field"><label for="izVerleng">Afspraak over verlenging</label><input type="text" id="izVerleng" placeholder="Bijv. optie van 6 maanden"></div>
+      <div class="setrow" style="border-top:1px solid var(--line)">
+        <div class="tx"><strong>Herinnering 60 dagen voor het einde</strong><span>Dan is er nog tijd om te verlengen of iets nieuws te zoeken.</span></div>
+        <label class="switch"><input type="checkbox" id="izHerinner" checked><span class="tr"></span></label>
+      </div>
+      <div class="note" id="izNote" style="margin-top:6px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+        <span id="izDuur">Kies een start- en einddatum.</span>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn danger" id="izBeeindig" style="margin-right:auto">Inzet beëindigen</button>
+      <button class="btn ghost" data-close>Annuleer</button>
+      <button class="btn accent" id="izOpslaan">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<div class="demo-flag">Demo — nepdata</div>
+
+<script src="cms.js"></script>
+<script>
+(function(){
+  var data = Reijn.load();
+  var filter = 'all', q = '';
+
+  /* de tijdlijn loopt van deze maand tot twaalf maanden verder */
+  var START = new Date(Reijn.VANDAAG.getFullYear(), Reijn.VANDAAG.getMonth(), 1);
+  var EIND  = new Date(START.getFullYear() + 1, START.getMonth(), 1);
+  var SPAN  = EIND - START;
+  var MAAND = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+
+  function pct(d){ return Math.max(0, Math.min(100, (d - START) / SPAN * 100)); }
+  function parse(t){ if(!t) return null; var x=t.split('-'); return new Date(+x[0], +x[1]-1, +x[2]); }
+
+  function lijst(){
+    return data.pages.filter(function(p){
+      if (p.status === 'arch') return false;
+      var i = Reijn.inzetInfo(p);
+      if (filter !== 'all' && i.status !== filter) return false;
+      if (!q) return true;
+      return (p.naam + ' ' + p.functie + ' ' + (i.klant || '')).toLowerCase().indexOf(q) > -1;
+    });
+  }
+
+  /* ---------- kerncijfers ---------- */
+  function kpis(){
+    var actief = data.pages.filter(function(p){ return p.status !== 'arch'; });
+    var info = actief.map(Reijn.inzetInfo);
+    var ingezet = info.filter(function(i){ return i.status !== 'beschikbaar'; });
+    var vrij = info.filter(function(i){ return i.status === 'beschikbaar'; });
+    var af = info.filter(function(i){ return i.loopAf; });
+
+    document.getElementById('kIngezet').textContent = ingezet.length;
+    document.getElementById('kIngezetSub').textContent = 'van ' + actief.length + ' consultants';
+    document.getElementById('kAf').textContent = af.length;
+    document.getElementById('kVrij').textContent = vrij.length;
+    var eerste = vrij.map(function(i){ return i.beschikbaarVanaf; }).filter(Boolean)[0];
+    document.getElementById('kVrijSub').textContent = eerste ? 'eerstvolgende: ' + eerste : 'direct inzetbaar';
+    document.getElementById('kBezet').textContent = Math.round(ingezet.length / actief.length * 100) + '%';
+    document.getElementById('afPill').textContent = af.length + ' binnen 60 dagen';
+    document.querySelectorAll('[data-badge="inzet"]').forEach(function(el){
+      if (af.length) { el.textContent = af.length; el.style.display = ''; } else el.style.display = 'none';
+    });
+  }
+
+  /* ---------- aflopende opdrachten ---------- */
+  function renderAflopers(){
+    var af = data.pages.filter(function(p){ return p.status !== 'arch' && Reijn.inzetInfo(p).loopAf; })
+      .sort(function(a,b){ return Reijn.inzetInfo(a).dagenRest - Reijn.inzetInfo(b).dagenRest; });
+    var el = document.getElementById('aflopers');
+    if (!af.length){
+      el.innerHTML = '<div class="empty"><strong>Niets loopt binnenkort af</strong>De eerstvolgende einddatum ligt verder dan 60 dagen weg.</div>';
+      return;
+    }
+    el.innerHTML = af.map(function(p){
+      var i = Reijn.inzetInfo(p);
+      var krap = i.dagenRest <= 30;
+      return '<div class="afloper">'+
+        '<span class="avatar md" style="background:'+p.kleur+'">'+Reijn.esc(p.init)+'</span>'+
+        '<span class="wat"><strong>'+Reijn.esc(p.naam)+' · '+Reijn.esc(i.klant)+'</strong>'+
+          Reijn.esc(i.rol)+' — tot '+i.eindKort+
+          (i.ruw.verlenging ? ' · <span class="muted">'+Reijn.esc(i.ruw.verlenging)+'</span>' : '')+'</span>'+
+        '<span class="dagen'+(krap?' krap':'')+'">nog '+i.resterend+'</span>'+
+        '<button class="btn line sm" data-verleng="'+p.id+'">Verlengen</button>'+
+        '<a class="btn line sm" href="berichten.html?compose=1&page='+p.id+'">Klant mailen</a>'+
+        '<a class="btn line sm" href="'+Reijn.cvUrl(p)+'" target="_blank">Profiel</a>'+
+      '</div>';
+    }).join('');
+  }
+
+  /* ---------- tijdlijn ---------- */
+  function renderTijdlijn(){
+    var maanden = '';
+    for (var m = 0; m < 12; m++){
+      var d = new Date(START.getFullYear(), START.getMonth() + m, 1);
+      maanden += '<span>' + MAAND[d.getMonth()] + (d.getMonth() === 0 ? " '" + String(d.getFullYear()).slice(2) : '') + '</span>';
+    }
+    var mEl = document.getElementById('tlMaanden');
+    mEl.style.gridTemplateColumns = 'repeat(12,1fr)';
+    mEl.innerHTML = maanden;
+
+    var nu = pct(Reijn.VANDAAG);
+    var items = lijst();
+    document.getElementById('tlSub').textContent =
+      MAAND[START.getMonth()] + ' ' + START.getFullYear() + ' t/m ' +
+      MAAND[(START.getMonth() + 11) % 12] + ' ' + (START.getMonth() > 0 ? START.getFullYear() + 1 : START.getFullYear()) +
+      ' · ' + items.length + ' consultants';
+
+    document.getElementById('tlRijen').innerHTML = items.map(function(p){
+      var i = Reijn.inzetInfo(p);
+      var baan = '<div class="tl-raster" style="grid-template-columns:repeat(12,1fr)">' +
+        new Array(13).join('<i></i>') + '</div>';
+
+      if (i.klant){
+        var l = pct(parse(i.ruw.start)), r = pct(parse(i.ruw.eind));
+        baan += '<div class="tl-balk' + (i.loopAf ? ' af' : '') + '" style="left:' + l + '%;width:' + Math.max(2, r - l) + '%;' +
+          (i.loopAf ? '' : 'background:' + p.kleur) + '" title="' + Reijn.esc(i.klant) + ' · ' + i.startKort + ' t/m ' + i.eindKort + '" data-ga="' + p.id + '">' +
+          Reijn.esc(i.klant) + '</div>';
+      } else {
+        var vanaf = i.ruw.beschikbaarVanaf ? pct(parse(i.ruw.beschikbaarVanaf)) : 0;
+        baan += '<div class="tl-vrij" style="left:' + vanaf + '%;right:0" data-ga="' + p.id + '">Beschikbaar' +
+          (i.beschikbaarVanaf ? ' vanaf ' + i.beschikbaarVanaf : '') + '</div>';
+      }
+      baan += '<div class="tl-nu" style="left:' + nu + '%"></div>';
+
+      return '<div class="tl-rij">'+
+        '<div class="tl-wie"><span class="avatar sm" style="background:'+p.kleur+'">'+Reijn.esc(p.init)+'</span>'+
+          '<span style="min-width:0"><span class="nm">'+Reijn.esc(p.naam)+'</span>'+
+          '<span class="fn">'+Reijn.esc(p.functie)+'</span></span></div>'+
+        '<div class="tl-baan">'+baan+'</div>'+
+      '</div>';
+    }).join('') || '<div class="empty"><strong>Geen consultants in dit filter</strong></div>';
+  }
+
+  /* ---------- tabel ---------- */
+  function renderRijen(){
+    document.getElementById('rijen').innerHTML = lijst().map(function(p){
+      var i = Reijn.inzetInfo(p);
+      var st = Reijn.INZET_STATUS[i.status];
+      return '<div class="row row-inzet klikbaar" data-ga="'+p.id+'">'+
+        '<div class="p"><span class="avatar md" style="background:'+p.kleur+'">'+Reijn.esc(p.init)+'</span>'+
+          '<div><div class="nm">'+Reijn.esc(p.naam)+'</div><div class="fn">'+Reijn.esc(p.functie)+'</div></div></div>'+
+        '<div class="hide-m">'+(i.klant
+            ? '<div style="font-size:13.5px;font-weight:600">'+Reijn.esc(i.klant)+'</div><div class="fn" style="font-size:12px;color:var(--ink-soft)">'+Reijn.esc(i.rol)+'</div>'
+            : '<span class="pill '+st.cls+'">'+st.label+'</span>')+'</div>'+
+        '<div class="hide-m mono" style="font-size:12px;color:var(--ink-soft)">'+
+          (i.klant ? i.startKort+'<br>t/m '+i.eindKort : (i.beschikbaarVanaf ? 'vrij vanaf '+i.beschikbaarVanaf : 'direct inzetbaar'))+'</div>'+
+        '<div class="hide-m">'+(i.klant
+            ? '<div style="font-size:13px;font-weight:600">'+i.resterend+'</div>'+
+              '<div class="restbalk'+(i.loopAf?' krap':'')+'"><i style="width:'+i.voortgang+'%"></i></div>'
+            : '<span class="muted" style="font-size:13px">—</span>')+'</div>'+
+        '<div class="num hide-m">'+(i.uren ? i.uren+' u' : '—')+'</div>'+
+        '<div class="acts">'+
+          '<button class="iconbtn actbtn" data-verleng="'+p.id+'">'+(i.klant ? 'Verlengen' : 'Inzetten')+'</button>'+
+          '<span class="chev" aria-hidden="true">›</span>'+
+        '</div>'+
+      '</div>';
+    }).join('') || '<div class="empty"><strong>Niets gevonden</strong>Pas je zoekterm of filter aan.</div>';
+  }
+
+  function alles(){ kpis(); renderAflopers(); renderTijdlijn(); renderRijen(); Reijn.animeer(); }
+
+  /* ---------- interactie ---------- */
+  document.getElementById('tabs').addEventListener('click', function(e){
+    var t = e.target.closest('.tab'); if(!t) return;
+    document.querySelectorAll('#tabs .tab').forEach(function(x){ x.classList.remove('active'); });
+    t.classList.add('active'); filter = t.getAttribute('data-f'); renderTijdlijn(); renderRijen();
+  });
+  document.getElementById('q').addEventListener('input', function(e){
+    q = e.target.value.toLowerCase().trim(); renderTijdlijn(); renderRijen();
+  });
+
+  document.addEventListener('click', function(e){
+    var v = e.target.closest('[data-verleng]');
+    if (v){ e.stopPropagation(); openInzet(v.getAttribute('data-verleng')); return; }
+    if (e.target.closest('a,button,input,select')) return;
+    var rij = e.target.closest('[data-ga]');
+    if (rij) window.location.href = Merk.url('pagina.html?id=' + rij.getAttribute('data-ga'));
+  });
+
+  /* ---------- vastleggen / verlengen ---------- */
+  var izWie = document.getElementById('izWie');
+  data.pages.filter(function(p){ return p.status !== 'arch'; }).forEach(function(p){
+    var o = document.createElement('option'); o.value = p.id; o.textContent = p.naam + ' — ' + p.functie;
+    izWie.appendChild(o);
+  });
+
+  /* toISOString() rekent naar UTC; in de Nederlandse zomertijd levert dat een
+     datum van een dag eerder op. Daarom zelf uit de lokale onderdelen opbouwd. */
+  function isoVan(d){
+    var m = d.getMonth() + 1, dag = d.getDate();
+    return d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (dag < 10 ? '0' : '') + dag;
+  }
+
+  function openInzet(id){
+    var p = data.pages.filter(function(x){ return x.id === id; })[0] || data.pages[0];
+    var i = Reijn.inzetInfo(p);
+    izWie.value = p.id;
+    document.getElementById('izTitel').textContent = i.klant ? 'Inzet verlengen' : 'Inzet vastleggen';
+    document.getElementById('izSub').innerHTML = i.klant
+      ? 'Nu bij <b>' + Reijn.esc(i.klant) + '</b>, tot ' + i.eindKort
+      : '<b>' + Reijn.esc(p.naam) + '</b> is nog niet ingepland';
+    document.getElementById('izKlant').value = i.klant || 'Radboudumc';
+    document.getElementById('izRol').value = i.rol || '';
+    document.getElementById('izUren').value = i.uren || 32;
+    document.getElementById('izVerleng').value = i.ruw.verlenging || '';
+    // bij verlengen: aansluiten op de huidige einddatum
+    var start = i.ruw.eind ? new Date(parse(i.ruw.eind).getTime() + 86400000) : Reijn.VANDAAG;
+    var eind = new Date(start.getFullYear(), start.getMonth() + 12, start.getDate());
+    document.getElementById('izStart').value = isoVan(start);
+    document.getElementById('izEind').value = isoVan(eind);
+    document.getElementById('izBeeindig').style.display = i.klant ? '' : 'none';
+    duurTonen();
+    Reijn.openModal('mInzet');
+  }
+
+  function duurTonen(){
+    var a = document.getElementById('izStart').value, b = document.getElementById('izEind').value;
+    var el = document.getElementById('izDuur');
+    if (!a || !b){ el.textContent = 'Kies een start- en einddatum.'; return; }
+    var dagen = Math.round((parse(b) - parse(a)) / 86400000);
+    el.textContent = dagen > 0
+      ? 'Deze opdracht duurt ' + Reijn.looptijd(dagen) + '. Je krijgt 60 dagen voor het einde een seintje.'
+      : 'De einddatum ligt vóór de startdatum.';
+  }
+  ['izStart','izEind'].forEach(function(id){
+    document.getElementById(id).addEventListener('change', duurTonen);
+  });
+
+  document.getElementById('nieuweInzet').addEventListener('click', function(){
+    var vrij = data.pages.filter(function(p){ return p.status !== 'arch' && Reijn.inzetInfo(p).status === 'beschikbaar'; })[0];
+    openInzet(vrij ? vrij.id : data.pages[0].id);
+  });
+
+  document.getElementById('izOpslaan').addEventListener('click', function(){
+    var p = data.pages.filter(function(x){ return x.id === izWie.value; })[0];
+    var eind = document.getElementById('izEind').value;
+    var start = document.getElementById('izStart').value;
+    if (!start || !eind || parse(eind) <= parse(start)){ Reijn.toast('Controleer de datums'); return; }
+
+    var oud = p.inzet || {};
+    if (oud.klant && oud.eind){
+      oud.eerder = oud.eerder || [];
+      oud.eerder.unshift({ klant: oud.klant, rol: oud.rol, start: oud.start, eind: oud.eind });
+    }
+    var dagen = Math.round((parse(eind) - Reijn.VANDAAG) / 86400000);
+    p.inzet = {
+      status: dagen <= 60 ? 'binnenkort' : 'ingezet',
+      klant: document.getElementById('izKlant').value,
+      rol: document.getElementById('izRol').value || 'Opdracht',
+      start: start, eind: eind,
+      uren: parseInt(document.getElementById('izUren').value, 10) || 32,
+      tarief: oud.tarief || 100,
+      verlenging: document.getElementById('izVerleng').value || null,
+      contact: oud.contact || null,
+      eerder: oud.eerder || []
+    };
+    data.activity.unshift({ ic:'clock', kleur:'var(--teal)',
+      tekst:'<b>'+Reijn.esc(p.naam)+'</b> ingepland bij '+Reijn.esc(p.inzet.klant), tijd:'nu' });
+    Reijn.save(data);
+    Reijn.closeModal('mInzet');
+    Reijn.toast(p.naam + ' staat ingepland tot ' + Reijn.datumKort(eind));
+    alles();
+  });
+
+  document.getElementById('izBeeindig').addEventListener('click', function(){
+    var p = data.pages.filter(function(x){ return x.id === izWie.value; })[0];
+    var oud = p.inzet || {};
+    var eerder = oud.eerder || [];
+    if (oud.klant) eerder.unshift({ klant: oud.klant, rol: oud.rol, start: oud.start, eind: oud.eind });
+    p.inzet = { status:'beschikbaar', klant:null, rol:null, start:null, eind:null,
+      uren: oud.uren || 32, tarief: oud.tarief || 100, verlenging:null, contact:null,
+      beschikbaarVanaf: null, eerder: eerder };
+    Reijn.save(data);
+    Reijn.closeModal('mInzet');
+    Reijn.toast(p.naam + ' staat weer als beschikbaar');
+    alles();
+  });
+
+  alles();
+})();
+</script>
+</body>
+</html>

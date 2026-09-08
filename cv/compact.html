@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Compact profiel · Reijn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F2EC; --paper-2:#EDE4D3; --surface:#FBF8F2;
+  --ink:#221E1A; --ink-soft:#5A5249; --line:#D8CDBA;
+  --petrol:#14463E; --petrol-deep:#0E332D; --tangerine:#E8641E;
+  --teal:#2A8C82; --mustard:#D9A521; --clay:#C2452D; --plum:#7A3B57;
+  --c-petrol:#14463E; --c-teal:#2A8C82; --c-mustard:#D9A521;
+  --c-tangerine:#E8641E; --c-clay:#C2452D; --c-plum:#7A3B57;
+  --display:"Bricolage Grotesque",system-ui,sans-serif;
+  --body:"Hanken Grotesk",system-ui,sans-serif;
+  --mono:"Space Mono",monospace;
+  --maxw:1080px;
+  --pad:clamp(18px,4vw,56px);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--tangerine);outline-offset:3px;border-radius:4px}
+.wrap{max-width:var(--maxw);margin:0 auto;padding-inline:var(--pad)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);display:inline-flex;align-items:center;gap:.6em}
+.eyebrow .chip{width:10px;height:10px;border-radius:3px;background:var(--tangerine);transform:rotate(45deg)}
+
+/* ---------- NAV ---------- */
+.nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:12px var(--pad);background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:9px;font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.02em}
+.brand .logo-mark{height:26px;width:auto}
+.nav-actions{display:flex;align-items:center;gap:9px}
+.btn{font-family:var(--body);font-weight:600;font-size:14px;border-radius:999px;padding:10px 17px;cursor:pointer;
+  border:1.5px solid var(--ink);background:transparent;color:var(--ink);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn svg{width:16px;height:16px}
+.btn--solid{background:var(--ink);color:var(--paper)}
+.btn--accent{background:var(--tangerine);border-color:var(--tangerine);color:var(--on-accent,#fff)}
+@media(max-width:620px){.btn-label{display:none}.btn{padding:10px 12px}}
+
+/* ---------- KOP ---------- */
+.kop{background:var(--petrol-deep);color:var(--paper);padding:clamp(28px,5vw,52px) 0}
+.kop-grid{display:grid;grid-template-columns:auto 1fr auto;gap:clamp(18px,3vw,34px);align-items:center}
+.kop-merk{height:30px;width:auto;margin-bottom:16px;opacity:.95}
+.portret{width:132px;height:132px;border-radius:20px;object-fit:cover;flex:0 0 auto;
+  box-shadow:0 18px 40px -22px rgba(0,0,0,.8)}
+.kop h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,4.6vw,46px);line-height:1.02;letter-spacing:-.02em;margin:0}
+.kop .rol{font-size:clamp(16px,2vw,19px);color:color-mix(in srgb,var(--paper) 78%,transparent);margin-top:6px}
+.kop .pitch{margin-top:14px;max-width:52ch;color:color-mix(in srgb,var(--paper) 86%,transparent);font-size:16px}
+.kop .eyebrow{color:color-mix(in srgb,var(--paper) 62%,transparent)}
+.beschikbaar{display:inline-flex;align-items:center;gap:9px;margin-top:16px;padding:9px 15px;border-radius:999px;
+  background:color-mix(in srgb,var(--paper) 12%,transparent);border:1px solid color-mix(in srgb,var(--paper) 25%,transparent);
+  font-size:13.5px;font-weight:600}
+.beschikbaar .stip{width:9px;height:9px;border-radius:50%;background:var(--teal);flex:0 0 auto}
+.beschikbaar.bezet .stip{background:var(--mustard)}
+.kop-cijfers{display:grid;gap:12px;text-align:right}
+.kop-cijfers div{border-left:2px solid color-mix(in srgb,var(--paper) 22%,transparent);padding-left:14px;text-align:left}
+.kop-cijfers b{display:block;font-family:var(--display);font-weight:800;font-size:26px;line-height:1}
+.kop-cijfers span{font-size:12px;color:color-mix(in srgb,var(--paper) 68%,transparent)}
+@media(max-width:900px){
+  .kop-grid{grid-template-columns:auto 1fr}
+  .kop-cijfers{grid-column:1/-1;grid-template-columns:repeat(3,1fr);text-align:left;margin-top:6px}
+}
+@media(max-width:560px){
+  .kop-grid{grid-template-columns:1fr}
+  .portret{width:96px;height:96px}
+  .kop-cijfers{gap:10px}
+}
+
+/* ---------- SECTIES ---------- */
+section.blok{padding:clamp(34px,5vw,56px) 0;border-bottom:1px solid var(--line)}
+.sec-kop{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.sec-kop h2{font-family:var(--display);font-weight:700;font-size:clamp(21px,2.6vw,27px);letter-spacing:-.02em;margin:0}
+.sec-kop p{margin:0;color:var(--ink-soft);font-size:14.5px}
+
+/* aanpak: drie compacte kaarten in plaats van grote beeldblokken */
+.aanpak{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.kaart{border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:20px 19px}
+.kaart .nr{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+.kaart h3{font-family:var(--display);font-weight:700;font-size:18px;margin:9px 0 7px;letter-spacing:-.01em}
+.kaart p{margin:0;font-size:14.5px;color:var(--ink-soft);line-height:1.5}
+.kaart .streep{height:4px;width:38px;border-radius:999px;margin-bottom:14px}
+.kaart .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px}
+.kaart .tags span{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;
+  background:var(--paper-2);color:var(--ink-soft);padding:4px 9px;border-radius:6px}
+@media(max-width:820px){.aanpak{grid-template-columns:1fr}}
+
+/* loopbaan: compacte regels, geen uitklap */
+.loopbaan{display:flex;flex-direction:column}
+.lb{display:grid;grid-template-columns:150px 1fr;gap:18px;padding:15px 0;border-top:1px solid var(--line);align-items:baseline}
+.lb:first-child{border-top:none}
+.lb .jaar{font-family:var(--mono);font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:9px}
+.lb .jaar i{width:9px;height:9px;border-radius:3px;flex:0 0 auto;transform:rotate(45deg)}
+.lb h3{font-family:var(--display);font-weight:700;font-size:17.5px;margin:0 0 3px}
+.lb .org{font-size:14px;color:var(--ink-soft);margin-bottom:5px}
+.lb p{margin:0;font-size:14.5px;color:var(--ink-soft);max-width:62ch}
+@media(max-width:620px){.lb{grid-template-columns:1fr;gap:5px}}
+
+/* kort profiel */
+.profiel{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(18px,3vw,36px)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips span{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-size:14px}
+.feiten{display:grid;gap:11px}
+.feit{display:flex;justify-content:space-between;gap:16px;padding-bottom:9px;border-bottom:1px dashed var(--line);font-size:14.5px}
+.feit:last-child{border-bottom:none}
+.feit .k{color:var(--ink-soft)}
+.feit .v{font-weight:600;text-align:right}
+.klein{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px}
+@media(max-width:760px){.profiel{grid-template-columns:1fr}}
+
+/* quote */
+.quote{background:var(--petrol);color:var(--paper);border-radius:20px;padding:clamp(24px,3.5vw,38px)}
+.quote p{margin:0 0 18px;font-family:var(--display);font-weight:500;font-size:clamp(18px,2.3vw,24px);line-height:1.35}
+.quote .wie{display:flex;align-items:center;gap:12px;font-size:14px}
+.quote .av{width:40px;height:40px;border-radius:50%;background:var(--tangerine);color:var(--on-accent,#fff);
+  display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:15px;flex:0 0 auto}
+.quote .rol{color:color-mix(in srgb,var(--paper) 70%,transparent);font-size:13px}
+
+/* contact */
+.cta{background:var(--tangerine);color:var(--on-accent,#fff);padding:clamp(30px,4.5vw,50px) 0}
+.cta-grid{display:flex;align-items:center;gap:clamp(16px,3vw,32px);flex-wrap:wrap}
+.cta h2{font-family:var(--display);font-weight:800;font-size:clamp(22px,3vw,32px);margin:0 0 6px;letter-spacing:-.02em}
+.cta p{margin:0;max-width:46ch;font-size:15.5px;opacity:.92}
+.cta-kaart{display:flex;align-items:center;gap:14px;background:color-mix(in srgb,#fff 88%,transparent);
+  color:var(--ink);border-radius:16px;padding:14px 18px;margin-left:auto}
+.cta-avatar{width:60px;height:60px;border-radius:50%;object-fit:cover;object-position:center 18%;flex:0 0 auto}
+.cta-kaart strong{display:block;font-family:var(--display);font-size:17px}
+.cta-kaart a{display:block;font-size:13.5px;color:var(--ink-soft)}
+.cta-kaart a:hover{color:var(--tangerine)}
+
+/* voettekst */
+.foot{background:var(--petrol-deep);color:var(--sb-dim,rgba(246,242,236,.78));padding:30px 0 26px;font-size:14px}
+.foot-grid{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:flex-start}
+.foot .brand{color:var(--paper);font-size:19px}
+.foot-tag{max-width:34ch;margin-top:10px;font-size:14px}
+.foot-col{display:flex;flex-direction:column;gap:5px}
+.foot-col h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 6px;color:color-mix(in srgb,var(--paper) 60%,transparent)}
+.foot-col a{white-space:pre-line}
+.foot-col a:hover{color:var(--paper)}
+
+@media print{
+  .nav,.cta,.beschikbaar{display:none!important}
+  body{font-size:11pt;background:#fff}
+  .kop{background:#fff;color:#000;border-bottom:2px solid #000}
+  section.blok{padding:14pt 0;break-inside:avoid}
+}
+</style>
+<link rel="stylesheet" href="brand.css">
+<script src="brand.js"></script>
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="#top"><img class="logo-mark" src="reijn-logo.png" alt="">Reijn</a>
+  <nav class="nav-actions">
+    <a class="btn" href="#contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg><span class="btn-label">Contact</span></a>
+    <button class="btn btn--solid" id="pdf" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span class="btn-label">Download PDF</span></button>
+  </nav>
+</header>
+<a id="top"></a>
+
+<!-- ============ KOP (geen videoheader) ============ -->
+<header class="kop">
+  <div class="wrap">
+    <img class="kop-merk hero-merk brand-logo" src="reijn-logo-light.png" alt="">
+    <div class="kop-grid">
+      <img class="portret" id="portret" src="lieve.jpg" alt="">
+      <div>
+        <span class="eyebrow"><span class="chip"></span><span id="eyebrow">Compact profiel</span></span>
+        <h1 id="naam">—</h1>
+        <div class="rol" id="rol">—</div>
+        <p class="pitch" id="pitch">—</p>
+        <div class="beschikbaar" id="beschikbaar"><span class="stip"></span><span id="beschikbaarTx">—</span></div>
+      </div>
+      <div class="kop-cijfers">
+        <div><b id="cJaren">9</b><span>jaar ervaring</span></div>
+        <div><b id="cOpdrachten">12</b><span>opdrachten</span></div>
+        <div><b id="cUren">32</b><span>uur beschikbaar</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ AANPAK — drie compacte blokken ============ -->
+<section class="blok">
+  <div class="wrap">
+    <div class="sec-kop">
+      <h2>Waar ik het verschil maak</h2>
+      <p>Drie terreinen waarop opdrachtgevers me inschakelen</p>
+    </div>
+    <div class="aanpak">
+      <article class="kaart">
+        <div class="streep" style="background:var(--c-petrol)"></div>
+        <div class="nr">01 — Richting</div>
+        <h3>Strategisch HR-advies</h3>
+        <p>Scherp krijgen wat een organisatie de komende jaren nodig heeft aan mensen, en dat vertalen naar een uitvoerbaar plan.</p>
+        <div class="tags"><span>Personeelsplanning</span><span>HR-beleid</span></div>
+      </article>
+      <article class="kaart">
+        <div class="streep" style="background:var(--c-tangerine)"></div>
+        <div class="nr">02 — Beweging</div>
+        <h3>Verandering &amp; cultuur</h3>
+        <p>Teams en leidinggevenden door transities begeleiden, met aandacht voor weerstand en een vaste hand op het einddoel.</p>
+        <div class="tags"><span>Cultuurtrajecten</span><span>Leiderschap</span></div>
+      </article>
+      <article class="kaart">
+        <div class="streep" style="background:var(--c-mustard)"></div>
+        <div class="nr">03 — Aantrekkingskracht</div>
+        <h3>Recruitment &amp; branding</h3>
+        <p>Een geloofwaardig werkgeversverhaal neerzetten en dat doorvertalen naar het hele wervings- en onboardingsproces.</p>
+        <div class="tags"><span>Employer branding</span><span>Onboarding</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LOOPBAAN — compact ============ -->
+<section class="blok">
+  <div class="wrap">
+    <div class="sec-kop"><h2>Loopbaan</h2><p>De laatste drie rollen</p></div>
+    <div class="loopbaan" id="loopbaan"></div>
+  </div>
+</section>
+
+<!-- ============ KORT PROFIEL ============ -->
+<section class="blok">
+  <div class="wrap">
+    <div class="sec-kop"><h2>Het profiel in het kort</h2></div>
+    <div class="profiel">
+      <div>
+        <div class="klein">Expertise</div>
+        <div class="chips">
+          <span>Strategisch HR-advies</span><span>Verandermanagement</span>
+          <span>Verzuim &amp; vitaliteit</span><span>Werving &amp; selectie</span><span>Personeelsplanning</span>
+        </div>
+      </div>
+      <div>
+        <div class="klein">Goed om te weten</div>
+        <div class="feiten">
+          <div class="feit"><span class="k">Werkgebied</span><span class="v">Publieke sector</span></div>
+          <div class="feit"><span class="k">Standplaats</span><span class="v" id="fStandplaats">Landelijk inzetbaar</span></div>
+          <div class="feit"><span class="k">Talen</span><span class="v">Nederlands · Engels · Duits</span></div>
+          <div class="feit"><span class="k">Beschikbaar</span><span class="v" id="fBeschikbaar">—</span></div>
+          <div class="feit"><span class="k">Huidige opdracht</span><span class="v" id="fOpdracht">—</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUOTE ============ -->
+<section class="blok" style="border-bottom:none">
+  <div class="wrap">
+    <div class="quote">
+      <p>“Voelt feilloos aan wat een organisatie nodig heeft. Rustig waar het kan en scherp waar het moet — juist die combinatie maakt het verschil.”</p>
+      <div class="wie"><span class="av">PA</span>
+        <span><strong>Priscilla Altum</strong><span class="rol" style="display:block">Teamleider HRM · Gemeente Vlaardingen</span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section class="cta" id="contact">
+  <div class="wrap cta-grid">
+    <div>
+      <h2>Kennismaken?</h2>
+      <p>Benieuwd of <span id="ctaNaam">deze consultant</span> past bij jouw opgave? Neem contact op met Lieve.</p>
+    </div>
+    <div class="cta-kaart">
+      <img class="cta-avatar" src="lieve.jpg" alt="Lieve van der Weijde">
+      <div>
+        <strong class="cta-contact-name">Lieve van der Weijde</strong>
+        <a href="tel:06-50018751">06 - 50 01 87 51</a>
+        <a href="mailto:lieve.vanderweijde@reijnhrm.nl">lieve.vanderweijde@reijnhrm.nl</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VOETTEKST ============ -->
+<footer class="foot">
+  <div class="wrap foot-grid">
+    <div>
+      <span class="brand"><img class="logo-mark" src="reijn-logo-light.png" alt="">Reijn</span>
+      <p class="foot-tag">Een visueel CV van Reijn — meesters in HRM. Verbinding, aandacht en karakter.</p>
+    </div>
+    <div class="foot-col">
+      <h4>Contact</h4>
+      <a href="mailto:gijs@reijnhrm.nl">gijs@reijnhrm.nl</a>
+      <a href="tel:+31000000000">+31 (0)40 000 00 00</a>
+    </div>
+    <div class="foot-col">
+      <h4>Reijn</h4>
+      <a href="#">Het Atelier, Helmond</a>
+      <a href="#">reijnhrm.nl</a>
+    </div>
+  </div>
+</footer>
+
+<script src="cms.js"></script>
+<script>
+(function(){
+  /* Deze layout is een sjabloon: naam, rol en beschikbaarheid komen uit de
+     demo-data, zodat hij voor elke consultant werkt (?id=...). */
+  var data = Reijn.load();
+  var id = Reijn.param('id') || 'gijs-wassenberg';
+  var p = data.pages.filter(function(x){ return x.id === id; })[0] || data.pages[0];
+  var i = Reijn.inzetInfo(p);
+
+  document.title = p.naam + ' — Compact profiel · ' + Merk.org;
+  document.getElementById('naam').textContent = p.naam;
+  document.getElementById('rol').textContent = p.functie;
+  document.getElementById('eyebrow').textContent = 'Compact profiel · ' + p.functie;
+  document.getElementById('ctaNaam').textContent = p.naam.split(' ')[0];
+  document.getElementById('pitch').textContent =
+    'Verbinder tussen mens en organisatie. Werkt het liefst daar waar strategie en uitvoering elkaar raken.';
+
+  /* De demo-data heeft geen portretfoto per consultant; daarom initialen in
+     de eigen kleur. Zodra er een foto is, kan hier het pad in. */
+  document.getElementById('portret').outerHTML =
+    '<div class="portret" style="background:' + p.kleur + ';display:grid;place-items:center;' +
+    'font-family:var(--display);font-weight:800;font-size:44px;color:#fff">' + Reijn.esc(p.init) + '</div>';
+
+  /* beschikbaarheid uit de inzet-tracker */
+  var bes = document.getElementById('beschikbaar');
+  var tx = document.getElementById('beschikbaarTx');
+  if (i.klant){
+    bes.classList.add('bezet');
+    tx.textContent = 'Nu bij ' + i.klant + ' — beschikbaar vanaf ' + i.eindKort;
+    document.getElementById('fBeschikbaar').textContent = i.eindKort;
+    document.getElementById('fOpdracht').textContent = i.klant + ' · ' + i.rol;
+  } else {
+    tx.textContent = i.beschikbaarVanaf ? 'Beschikbaar vanaf ' + i.beschikbaarVanaf : 'Direct beschikbaar';
+    document.getElementById('fBeschikbaar').textContent = i.beschikbaarVanaf || 'direct';
+    document.getElementById('fOpdracht').textContent = 'geen lopende opdracht';
+  }
+  document.getElementById('cUren').textContent = i.uren || 32;
+  document.getElementById('cOpdrachten').textContent = (i.eerder.length + (i.klant ? 1 : 0)) || 1;
+
+  /* loopbaan: huidige opdracht plus de eerdere, compact */
+  var kleuren = ['var(--c-petrol)','var(--c-tangerine)','var(--c-mustard)','var(--c-teal)'];
+  var rijen = [];
+  if (i.klant) rijen.push({ van: i.startKort, tot: 'heden', rol: i.rol, org: i.klant,
+    tekst: 'Lopende opdracht voor ' + i.uren + ' uur per week.' });
+  i.eerder.forEach(function(e){
+    rijen.push({ van: Reijn.datumKort(e.start), tot: Reijn.datumKort(e.eind), rol: e.rol, org: e.klant,
+      tekst: 'Afgeronde opdracht.' });
+  });
+  rijen.push({ van: '2017', tot: '2021', rol: 'HR-adviseur', org: Merk.org,
+    tekst: 'Vaste basis: advies aan leidinggevenden en de eerste eigen trajecten.' });
+
+  document.getElementById('loopbaan').innerHTML = rijen.slice(0, 3).map(function(r, n){
+    return '<div class="lb">'+
+      '<div class="jaar"><i style="background:'+kleuren[n % kleuren.length]+'"></i>'+
+        Reijn.esc(r.van)+' — '+Reijn.esc(r.tot)+'</div>'+
+      '<div><h3>'+Reijn.esc(r.rol)+'</h3><div class="org">'+Reijn.esc(r.org)+'</div>'+
+      '<p>'+Reijn.esc(r.tekst)+'</p></div>'+
+    '</div>';
+  }).join('');
+
+  document.getElementById('pdf').addEventListener('click', function(){ window.print(); });
+})();
+</script>
+</body>
+</html>
