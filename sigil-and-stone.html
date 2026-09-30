@@ -1,0 +1,2557 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+</head>
+<body style="margin:0">
+<title>Sigil &amp; Stone</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Spectral:ital,wght@0,400;0,600;1,400&family=Barlow+Condensed:wght@400;600&display=swap">
+<style>
+/* Layout: full-bleed 3D table, two thin glass rails (far seat above, your seat below),
+   a slim event log at the left edge, and centred prompts only when the game needs an answer. */
+:root{
+  --ground:#0a0908;          /* behind the canvas */
+  --ink:#f1e4cd;             /* parchment text */
+  --ink-dim:#a9977c;
+  --ink-faint:#6d6252;
+  --glass:rgba(22,18,15,.72);
+  --glass-edge:rgba(214,186,132,.22);
+  --brass:#c9922f;
+  --ember:#d4452b;
+  --tide:#3f8fb8;
+  --verdant:#5b9a4e;
+  --umbra:#8461ad;
+  --aurum:#dcb85e;
+  --alarm:#c8482f;
+  --display:"Cinzel",Georgia,serif;
+  --body:"Spectral",Georgia,serif;
+  --data:"Barlow Condensed","Arial Narrow",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{
+  background:var(--ground);color:var(--ink);
+  font-family:var(--body);overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
+#stage{position:fixed;inset:0}
+#stage canvas{display:block;width:100%;height:100%;touch-action:none}
+
+#hud{position:fixed;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between}
+#hud button{pointer-events:auto}
+
+.rail{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:10px 16px;
+  background:linear-gradient(to bottom,rgba(10,8,7,.82),rgba(10,8,7,0));
+  min-width:0;
+}
+.rail-bottom{
+  justify-content:space-between;
+  background:linear-gradient(to top,rgba(10,8,7,.88),rgba(10,8,7,0));
+  padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
+}
+.rail-top{padding-top:calc(10px + env(safe-area-inset-top,0px))}
+
+.seat{display:flex;flex-direction:column;gap:1px;min-width:0}
+.seat-name{font-family:var(--display);font-weight:500;font-size:15px;letter-spacing:.04em;color:var(--ink)}
+.seat-tag{font-family:var(--data);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint)}
+
+.metrics{display:flex;gap:4px;flex-wrap:wrap}
+.metric{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:44px;padding:4px 8px;border-radius:3px;
+  background:var(--glass);border:1px solid var(--glass-edge);
+}
+.metric b{font-family:var(--data);font-weight:600;font-size:19px;line-height:1;font-variant-numeric:tabular-nums;color:var(--ink)}
+.metric span{font-family:var(--data);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin-top:2px}
+.metric.hurt b{color:var(--alarm)}
+
+.essence{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.ess-group{display:flex;align-items:center;gap:3px}
+.pip{width:11px;height:11px;border-radius:50%;border:1px solid rgba(0,0,0,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.22)}
+.pip.spent{opacity:.22}
+
+.turn{display:flex;align-items:center;gap:12px;margin-left:auto}
+#phaseLabel{font-family:var(--data);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-dim);text-align:right}
+
+.btn{
+  font-family:var(--data);font-size:14px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink);background:var(--glass);border:1px solid var(--glass-edge);
+  padding:9px 16px;border-radius:3px;cursor:pointer;
+  transition:background .18s,border-color .18s,transform .12s;
+}
+.btn:hover:not(:disabled){background:rgba(46,36,28,.9);border-color:rgba(214,186,132,.5)}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.38;cursor:default}
+.btn:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.btn.primary{
+  background:linear-gradient(to bottom,#3b2a18,#221709);
+  border-color:rgba(201,146,47,.55);color:#f6e6c4;
+  box-shadow:0 1px 0 rgba(255,225,170,.18) inset,0 6px 18px rgba(0,0,0,.45);
+}
+.btn.primary:hover:not(:disabled){background:linear-gradient(to bottom,#4c3720,#2c1d0c)}
+.btn.ghost{background:transparent;border-color:rgba(214,186,132,.28);color:var(--ink-dim)}
+
+#log{
+  position:absolute;left:16px;top:50%;transform:translateY(-50%);
+  width:196px;display:flex;flex-direction:column;gap:5px;
+  font-size:12.5px;line-height:1.35;color:var(--ink-dim);
+}
+#log div{
+  background:linear-gradient(to right,rgba(16,13,11,.78),rgba(16,13,11,0));
+  border-left:2px solid var(--glass-edge);padding:3px 8px;
+}
+#log div:last-child{color:var(--ink);border-left-color:var(--brass)}
+
+#banner,#inspect{
+  position:absolute;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;
+  padding:10px 14px;border-radius:4px;max-width:calc(100% - 32px);
+  background:var(--glass);border:1px solid var(--glass-edge);
+  backdrop-filter:blur(6px);
+}
+#banner{top:28%;font-family:var(--body);font-size:14px}
+#banner[data-tone="attack"]{border-color:rgba(212,69,43,.6)}
+#inspect{bottom:70px}
+#bannerText{color:var(--ink)}
+
+#veil{
+  position:fixed;inset:0;display:grid;place-items:center;padding:24px;
+  background:radial-gradient(120% 90% at 50% 40%,rgba(12,9,7,.62),rgba(6,5,4,.96));
+  backdrop-filter:blur(3px);
+  transition:opacity .6s ease;
+}
+#veil.gone{opacity:0;pointer-events:none}
+.plate{max-width:520px;text-align:center;display:flex;flex-direction:column;gap:16px;align-items:center}
+.plate h1{
+  font-family:var(--display);font-weight:700;font-size:clamp(34px,7vw,56px);
+  letter-spacing:.06em;margin:0;text-wrap:balance;
+  color:#f6e7c6;text-shadow:0 2px 24px rgba(201,146,47,.28);
+}
+.plate .rule{width:120px;height:1px;background:linear-gradient(to right,transparent,var(--brass),transparent)}
+.plate .sub{font-family:var(--data);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-faint)}
+.plate p{margin:0;font-size:15px;line-height:1.6;color:var(--ink-dim);max-width:44ch}
+.plate ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px;text-align:left;font-size:13.5px;color:var(--ink-dim)}
+.plate ul b{font-family:var(--data);letter-spacing:.1em;text-transform:uppercase;color:var(--ink);font-weight:600;font-size:12px}
+#result{font-family:var(--display);font-size:26px;letter-spacing:.06em;color:var(--ink)}
+
+@media (max-width:640px){
+  #log{display:none}
+  .metric{min-width:38px;padding:3px 6px}
+  .metric b{font-size:16px}
+  #inspect{bottom:96px}
+  .rail{gap:8px;padding:8px 12px}
+  .seat-name{font-size:13px}
+}
+@media (prefers-reduced-motion:reduce){
+  .btn{transition:none}
+  #veil{transition:none}
+}
+</style>
+
+<div id="stage"><canvas id="c"></canvas></div>
+
+<div id="hud">
+  <div class="rail rail-top">
+    <div class="seat">
+      <span class="seat-name">Varis of the Drowned Choir</span>
+      <span class="seat-tag">Far seat &middot; Tide &amp; Umbra</span>
+    </div>
+    <div class="metrics">
+      <div class="metric" id="oppLifeBox"><b id="oppLife">20</b><span>life</span></div>
+      <div class="metric"><b id="oppHand">0</b><span>hand</span></div>
+      <div class="metric"><b id="oppDeck">0</b><span>deck</span></div>
+      <div class="metric"><b id="oppFallen">0</b><span>fallen</span></div>
+    </div>
+  </div>
+
+  <div id="log"></div>
+  <div id="banner" hidden><span id="bannerText"></span><button id="bannerCancel" class="btn ghost">Cancel</button></div>
+  <div id="inspect" hidden><button id="playBtn" class="btn primary">Play card</button><button id="closeBtn" class="btn ghost">Close</button></div>
+
+  <div class="rail rail-bottom">
+    <div class="metrics">
+      <div class="metric" id="myLifeBox"><b id="myLife">20</b><span>life</span></div>
+      <div class="metric"><b id="myDeck">0</b><span>deck</span></div>
+      <div class="metric"><b id="myFallen">0</b><span>fallen</span></div>
+    </div>
+    <div id="essence" class="essence"></div>
+    <div class="turn">
+      <span id="phaseLabel">Your turn</span>
+      <button id="action" class="btn primary">Begin</button>
+    </div>
+  </div>
+</div>
+
+<div id="veil">
+  <div class="plate" id="plateStart">
+    <div class="sub">Ashen Coil &middot; first printing</div>
+    <h1>Sigil &amp; Stone</h1>
+    <div class="rule"></div>
+    <p>A duel across a lamplit table. You hold the near hand; Varis holds the far one, and you only ever see its backs.</p>
+    <ul>
+      <li><b>Hover</b> a card in hand to lift it. <b>Click</b> it to hold it up and read it.</li>
+      <li><b>Drag</b> a card onto your half of the mat to play it.</li>
+      <li><b>Sources</b> pay for everything &mdash; one may be laid per turn.</li>
+      <li><b>Combat</b> tilts a unit forward. Tilted units are spent until your next turn.</li>
+    </ul>
+    <button class="btn primary" id="startBtn">Take your seat</button>
+  </div>
+  <div class="plate" id="plateEnd" hidden>
+    <div class="sub">The duel is decided</div>
+    <div id="result">&mdash;</div>
+    <div class="rule"></div>
+    <p id="resultNote"></p>
+    <button class="btn primary" id="againBtn">Deal again</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.150.1/three.min.js"></script>
+<script>
+"use strict";
+/* ------------------------------------------------------------------ *
+ *  Sigil & Stone — an original trading-card duel on a 3D table.
+ *  Card frames, faction glyphs, art and cards are all drawn here from
+ *  scratch; nothing is traced from any published game.
+ * ------------------------------------------------------------------ */
+
+/* ---------- small utilities ---------- */
+const TAU = Math.PI * 2;
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const easeOut = t => 1 - Math.pow(1 - t, 3);
+const easeInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+function hash32(str) {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+function rng(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a += 0x6D2B79F5; a >>>= 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function shuffle(arr, rand = Math.random) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function roundRect(ctx, x, y, w, h, r) {
+  const rr = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + rr, y);
+  ctx.lineTo(x + w - rr, y); ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
+  ctx.lineTo(x + w, y + h - rr); ctx.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
+  ctx.lineTo(x + rr, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - rr);
+  ctx.lineTo(x, y + rr); ctx.quadraticCurveTo(x, y, x + rr, y);
+  ctx.closePath();
+}
+function mix(a, b, t) {
+  const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+  const r = Math.round(lerp((pa >> 16) & 255, (pb >> 16) & 255, t));
+  const g = Math.round(lerp((pa >> 8) & 255, (pb >> 8) & 255, t));
+  const bl = Math.round(lerp(pa & 255, pb & 255, t));
+  return "rgb(" + r + "," + g + "," + bl + ")";
+}
+function wrapLines(ctx, text, maxW) {
+  const out = [];
+  for (const para of String(text).split("\n")) {
+    if (!para) { out.push(""); continue; }
+    let line = "";
+    for (const word of para.split(" ")) {
+      const test = line ? line + " " + word : word;
+      if (ctx.measureText(test).width > maxW && line) { out.push(line); line = word; }
+      else line = test;
+    }
+    out.push(line);
+  }
+  return out;
+}
+/* ---------- factions: colour, ink and an original pip glyph each ---------- */
+const FACTIONS = {
+  ember: {
+    label: "Ember", pip: "#d4452b", pipInk: "#2a0c06", plate: "#2c1410", plate2: "#140705",
+    band: "#7d2716", boxTint: "#efdcc0", glyph: "flame",
+    art: ["#190807", "#5f1f0e", "#d4772c", "#f7dda6"]
+  },
+  aurum: {
+    label: "Aurum", pip: "#dcb85e", pipInk: "#3a2c08", plate: "#2c2413", plate2: "#150f06",
+    band: "#7a6221", boxTint: "#f2e6c8", glyph: "sun",
+    art: ["#171204", "#5f4a13", "#d4b25c", "#fdf3d4"]
+  },
+  tide: {
+    label: "Tide", pip: "#3f8fb8", pipInk: "#06202c", plate: "#13242c", plate2: "#070f13",
+    band: "#1c5670", boxTint: "#e2e6e4", glyph: "wave",
+    art: ["#05131c", "#0f4a66", "#3ea1c2", "#d3ecf3"]
+  },
+  umbra: {
+    label: "Umbra", pip: "#8461ad", pipInk: "#150a20", plate: "#1d1626", plate2: "#0b0710",
+    band: "#402b58", boxTint: "#e3dde6", glyph: "crescent",
+    art: ["#0b0711", "#342046", "#7a5da4", "#ded0ee"]
+  },
+  verdant: {
+    label: "Verdant", pip: "#5b9a4e", pipInk: "#0d2009", plate: "#182212", plate2: "#090e06",
+    band: "#33542a", boxTint: "#e7e8c8", glyph: "leaf",
+    art: ["#0a150a", "#28511f", "#71a34a", "#e4ecba"]
+  },
+  stone: {
+    label: "Stone", pip: "#b3a893", pipInk: "#2a251c", plate: "#262320", plate2: "#100e0c",
+    band: "#4d463c", boxTint: "#e9e2d2", glyph: "none",
+    art: ["#14120f", "#454037", "#a39a86", "#eee8d8"]
+  }
+};
+
+function glyphPath(ctx, kind, r) {
+  ctx.beginPath();
+  switch (kind) {
+    case "flame":
+      ctx.moveTo(0, -r * .92);
+      ctx.bezierCurveTo(r * .62, -r * .18, r * .3, r * .3, r * .42, r * .74);
+      ctx.bezierCurveTo(r * .02, r * .5, -r * .04, r * .18, -r * .1, r * .74);
+      ctx.bezierCurveTo(-r * .66, r * .18, -r * .36, -r * .3, 0, -r * .92);
+      ctx.closePath();
+      break;
+    case "sun": {
+      ctx.arc(0, 0, r * .4, 0, TAU);
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * TAU, c = Math.cos(a), s = Math.sin(a);
+        ctx.moveTo(c * r * .56, s * r * .56);
+        ctx.lineTo(c * r * .95 - s * r * .1, s * r * .95 + c * r * .1);
+        ctx.lineTo(c * r * .95 + s * r * .1, s * r * .95 - c * r * .1);
+        ctx.closePath();
+      }
+      break;
+    }
+    case "wave":
+      ctx.moveTo(-r * .92, r * .22);
+      ctx.bezierCurveTo(-r * .46, -r * .48, -r * .1, r * .6, r * .3, -r * .1);
+      ctx.bezierCurveTo(r * .56, -r * .52, r * .8, -r * .2, r * .92, -r * .5);
+      ctx.lineTo(r * .92, r * .62);
+      ctx.lineTo(-r * .92, r * .62);
+      ctx.closePath();
+      break;
+    case "crescent":
+      ctx.arc(0, 0, r * .86, Math.PI * .34, Math.PI * 1.66);
+      ctx.bezierCurveTo(-r * .06, -r * .5, -r * .06, r * .5, r * .3, r * .78);
+      ctx.closePath();
+      break;
+    case "leaf":
+      ctx.moveTo(0, -r * .95);
+      ctx.bezierCurveTo(r * .9, -r * .35, r * .7, r * .6, 0, r * .95);
+      ctx.bezierCurveTo(-r * .7, r * .6, -r * .9, -r * .35, 0, -r * .95);
+      ctx.closePath();
+      break;
+    default:
+      ctx.arc(0, 0, r * .74, 0, TAU);
+  }
+}
+
+/* A cost pip: a bevelled disc in faction colour with the glyph cut into it.
+   Generic cost is a stone disc carrying a numeral. */
+function drawPip(ctx, cx, cy, r, factionKey, numeral) {
+  const f = FACTIONS[factionKey] || FACTIONS.stone;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.shadowColor = "rgba(0,0,0,.55)"; ctx.shadowBlur = r * .5; ctx.shadowOffsetY = r * .16;
+  const g = ctx.createRadialGradient(-r * .3, -r * .4, r * .1, 0, 0, r * 1.05);
+  g.addColorStop(0, mix(f.pip, "#ffffff", .5));
+  g.addColorStop(.55, f.pip);
+  g.addColorStop(1, mix(f.pip, "#000000", .5));
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fill();
+  ctx.shadowColor = "transparent";
+  ctx.lineWidth = Math.max(1, r * .1);
+  ctx.strokeStyle = "rgba(0,0,0,.55)";
+  ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.stroke();
+  ctx.strokeStyle = "rgba(255,255,255,.28)";
+  ctx.lineWidth = Math.max(1, r * .07);
+  ctx.beginPath(); ctx.arc(0, 0, r * .84, Math.PI * 1.05, Math.PI * 1.9); ctx.stroke();
+  if (numeral != null) {
+    ctx.fillStyle = f.pipInk;
+    ctx.font = "700 " + (r * 1.18).toFixed(0) + 'px "Cinzel",Georgia,serif';
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(String(numeral), 0, r * .06);
+  } else {
+    ctx.fillStyle = f.pipInk;
+    glyphPath(ctx, f.glyph, r * .66);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+/* ---------- procedural art, seeded from the card's own name ---------- */
+function ridge(ctx, x, y, w, h, baseY, amp, rand, fill, spikes) {
+  ctx.beginPath();
+  ctx.moveTo(x, y + h);
+  const steps = 26;
+  const ph = rand() * TAU, ph2 = rand() * TAU;
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    let yy = baseY
+      + Math.sin(t * (spikes ? 9 : 3.1) + ph) * amp
+      + Math.sin(t * (spikes ? 21 : 6.3) + ph2) * amp * .42;
+    ctx.lineTo(x + t * w, y + yy);
+  }
+  ctx.lineTo(x + w, y + h);
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+}
+
+function drawArt(ctx, x, y, w, h, def) {
+  const f = FACTIONS[def.faction] || FACTIONS.stone;
+  const rand = rng(hash32(def.name + "|" + def.faction));
+  const A = f.art;
+  ctx.save();
+  roundRect(ctx, x, y, w, h, 5); ctx.clip();
+
+  // sky
+  const sky = ctx.createLinearGradient(x, y, x, y + h);
+  sky.addColorStop(0, A[0]);
+  sky.addColorStop(.42, mix(A[1], A[0], .35));
+  sky.addColorStop(.72, A[1]);
+  sky.addColorStop(1, mix(A[1], A[0], .6));
+  ctx.fillStyle = sky; ctx.fillRect(x, y, w, h);
+
+  // light source
+  const lx = x + w * (.22 + rand() * .56), ly = y + h * (.2 + rand() * .18);
+  const halo = ctx.createRadialGradient(lx, ly, 0, lx, ly, h * .58);
+  halo.addColorStop(0, A[3]);
+  halo.addColorStop(.12, A[2]);
+  halo.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.globalAlpha = .4; ctx.fillStyle = halo; ctx.fillRect(x, y, w, h); ctx.globalAlpha = 1;
+  ctx.fillStyle = A[3]; ctx.globalAlpha = .85;
+  ctx.beginPath(); ctx.arc(lx, ly, h * (def.art === "burst" ? .035 : .055), 0, TAU); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  if (def.art === "burst") {
+    // radiating rays and a churn of particles around the light
+    ctx.save();
+    ctx.translate(lx, ly);
+    const rays = 16 + Math.floor(rand() * 10);
+    for (let i = 0; i < rays; i++) {
+      const a = rand() * TAU, len = h * (.3 + rand() * .75), wd = .012 + rand() * .05;
+      const g = ctx.createLinearGradient(0, 0, Math.cos(a) * len, Math.sin(a) * len);
+      g.addColorStop(0, A[3]); g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = g; ctx.globalAlpha = .18 + rand() * .3;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(Math.cos(a + wd) * len, Math.sin(a + wd) * len);
+      ctx.lineTo(Math.cos(a - wd) * len, Math.sin(a - wd) * len);
+      ctx.closePath(); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    for (let i = 0; i < 3; i++) {
+      ctx.strokeStyle = A[2]; ctx.globalAlpha = .28 + i * .12;
+      ctx.lineWidth = 1.4 + rand() * 2.4;
+      ctx.beginPath();
+      const r0 = h * (.14 + i * .12 + rand() * .06);
+      ctx.arc(0, 0, r0, rand() * TAU, rand() * TAU + 1.4 + rand() * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  }
+
+  // layered ridges
+  const layers = def.art === "burst" ? 2 : 4;
+  for (let i = 0; i < layers; i++) {
+    const t = i / Math.max(1, layers - 1);
+    const fill = mix(A[1], A[0], .5 + t * .5);
+    ridge(ctx, x, y, w, h, h * (.5 + t * .2), h * (.11 - t * .02), rand, fill, i < 2 && def.art !== "field");
+  }
+
+  if (def.art === "field") {
+    // a standing arch on the horizon
+    const ax = x + w * (.3 + rand() * .4), aw = w * (.1 + rand() * .07), top = y + h * .32;
+    ctx.fillStyle = mix(A[0], "#000000", .35);
+    ctx.beginPath();
+    ctx.moveTo(ax - aw, y + h);
+    ctx.lineTo(ax - aw * .72, top + aw * .7);
+    ctx.quadraticCurveTo(ax, top - aw * .2, ax + aw * .72, top + aw * .7);
+    ctx.lineTo(ax + aw, y + h);
+    ctx.lineTo(ax + aw * .5, y + h);
+    ctx.lineTo(ax + aw * .34, top + aw * 1.15);
+    ctx.quadraticCurveTo(ax, top + aw * .62, ax - aw * .34, top + aw * 1.15);
+    ctx.lineTo(ax - aw * .5, y + h);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = A[2]; ctx.globalAlpha = .4; ctx.lineWidth = 1.6;
+    ctx.stroke(); ctx.globalAlpha = 1;
+  }
+
+  if (def.art === "figure") {
+    // a silhouetted bearing: stacked plates, a crown of spurs, one lit core
+    const cx = x + w * .5 + (rand() - .5) * w * .1;
+    const base = y + h * .99, sc = h * (.62 + rand() * .12);
+    const dark = mix(A[0], "#000000", .55);
+    ctx.save();
+    ctx.translate(cx, base);
+    ctx.fillStyle = "rgba(0,0,0,.4)";
+    ctx.beginPath(); ctx.ellipse(0, 0, sc * .5, sc * .06, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = dark;
+    // torso
+    ctx.beginPath();
+    ctx.moveTo(-sc * .3, 0);
+    ctx.quadraticCurveTo(-sc * .38, -sc * .42, -sc * .27, -sc * .62);
+    ctx.lineTo(sc * .27, -sc * .62);
+    ctx.quadraticCurveTo(sc * .38, -sc * .42, sc * .3, 0);
+    ctx.closePath(); ctx.fill();
+    // shoulders
+    for (const s of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(s * sc * .1, -sc * .58);
+      ctx.quadraticCurveTo(s * sc * .58, -sc * .74, s * sc * .46, -sc * .48);
+      ctx.quadraticCurveTo(s * sc * .3, -sc * .52, s * sc * .1, -sc * .5);
+      ctx.closePath(); ctx.fill();
+    }
+    // head and spurs
+    ctx.beginPath(); ctx.ellipse(0, -sc * .74, sc * .13, sc * .15, 0, 0, TAU); ctx.fill();
+    const spurs = 2 + Math.floor(rand() * 4);
+    for (let i = 0; i < spurs; i++) {
+      const s = i % 2 ? 1 : -1, k = Math.floor(i / 2);
+      ctx.beginPath();
+      ctx.moveTo(s * sc * .08, -sc * (.8 + k * .03));
+      ctx.lineTo(s * sc * (.24 + k * .16), -sc * (.98 + k * .14 + rand() * .1));
+      ctx.lineTo(s * sc * .16, -sc * (.78 + k * .04));
+      ctx.closePath(); ctx.fill();
+    }
+    // rim light on the side the lamp is on
+    const side = lx > cx ? 1 : -1;
+    ctx.strokeStyle = A[2]; ctx.lineWidth = Math.max(1.3, sc * .018); ctx.globalAlpha = .75;
+    ctx.beginPath();
+    ctx.moveTo(side * sc * .3, -sc * .02);
+    ctx.quadraticCurveTo(side * sc * .4, -sc * .44, side * sc * .28, -sc * .62);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0, -sc * .74, sc * .14, side > 0 ? -1.3 : 1.85, side > 0 ? 1.3 : 4.45);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    // core
+    ctx.fillStyle = A[3];
+    ctx.shadowColor = A[2]; ctx.shadowBlur = sc * .2;
+    ctx.beginPath(); ctx.arc(0, -sc * .44, sc * .035, 0, TAU); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  }
+
+  // drifting motes
+  for (let i = 0; i < 40; i++) {
+    const px = x + rand() * w, py = y + rand() * h;
+    ctx.globalAlpha = .06 + rand() * .3;
+    ctx.fillStyle = rand() > .35 ? A[3] : A[2];
+    ctx.beginPath(); ctx.arc(px, py, .5 + rand() * 1.7, 0, TAU); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  // vignette + inner shadow
+  const vig = ctx.createRadialGradient(x + w / 2, y + h * .48, h * .18, x + w / 2, y + h * .5, h * .82);
+  vig.addColorStop(0, "rgba(0,0,0,0)");
+  vig.addColorStop(1, "rgba(0,0,0,.52)");
+  ctx.fillStyle = vig; ctx.fillRect(x, y, w, h);
+  ctx.restore();
+}
+/* ---------- the card frame ---------- */
+const TEX_W = 640, TEX_H = 894;          // 1 : 1.397, the proportion of a playing card
+const RARITY = { common: "#8d8578", uncommon: "#a8b6bb", rare: "#dcb85e" };
+
+function newCanvas(w, h) {
+  const cv = document.createElement("canvas");
+  cv.width = w; cv.height = h;
+  return cv;
+}
+
+function brushedPlate(ctx, x, y, w, h, r, c1, c2, rand) {
+  const g = ctx.createLinearGradient(x, y, x + w * .35, y + h);
+  g.addColorStop(0, mix(c1, "#ffffff", .1));
+  g.addColorStop(.45, c1);
+  g.addColorStop(1, c2);
+  roundRect(ctx, x, y, w, h, r); ctx.fillStyle = g; ctx.fill();
+  ctx.save();
+  roundRect(ctx, x, y, w, h, r); ctx.clip();
+  for (let i = 0; i < 160; i++) {
+    const yy = y + rand() * h;
+    ctx.globalAlpha = .03 + rand() * .05;
+    ctx.strokeStyle = rand() > .5 ? "#ffffff" : "#000000";
+    ctx.lineWidth = .6 + rand() * 1.2;
+    ctx.beginPath(); ctx.moveTo(x, yy); ctx.lineTo(x + w, yy + (rand() - .5) * 10); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+function drawCardFace(ctx, def) {
+  const f = FACTIONS[def.faction] || FACTIONS.stone;
+  const rand = rng(hash32("frame" + def.name));
+  const W = TEX_W, H = TEX_H, m = 20, R = 34;
+  ctx.clearRect(0, 0, W, H);
+
+  // ---- body plate
+  brushedPlate(ctx, 0, 0, W, H, R, f.plate, f.plate2, rand);
+  // outer keyline
+  ctx.strokeStyle = "rgba(0,0,0,.85)"; ctx.lineWidth = 6;
+  roundRect(ctx, 3, 3, W - 6, H - 6, R - 2); ctx.stroke();
+  ctx.strokeStyle = "rgba(214,186,132,.2)"; ctx.lineWidth = 2;
+  roundRect(ctx, m * .55, m * .55, W - m * 1.1, H - m * 1.1, R - 8); ctx.stroke();
+  // corner notches, the set's own mark on every card
+  ctx.fillStyle = "rgba(201,146,47,.5)";
+  for (const [sx, sy] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
+    const cx = sx > 0 ? m + 4 : W - m - 4, cy = sy > 0 ? m + 4 : H - m - 4;
+    ctx.save(); ctx.translate(cx, cy); ctx.scale(sx, sy);
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(22, 0); ctx.lineTo(0, 22); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
+  const ix = m + 10, iw = W - (m + 10) * 2;
+
+  // ---- name plate
+  const npY = m + 8, npH = 54;
+  roundRect(ctx, ix, npY, iw, npH, 6);
+  const ng = ctx.createLinearGradient(ix, npY, ix, npY + npH);
+  ng.addColorStop(0, "rgba(12,9,7,.9)"); ng.addColorStop(1, "rgba(30,24,18,.86)");
+  ctx.fillStyle = ng; ctx.fill();
+  ctx.strokeStyle = "rgba(0,0,0,.6)"; ctx.lineWidth = 2; ctx.stroke();
+
+  const pips = def.cost ? costPips(def.cost) : [];
+  const pr = 17, pgap = 37;
+  let px = ix + iw - 16 - pr;
+  for (let i = pips.length - 1; i >= 0; i--) {
+    drawPip(ctx, px, npY + npH / 2, pr, pips[i].faction, pips[i].numeral);
+    px -= pgap;
+  }
+  const nameRoom = iw - 32 - (pips.length ? pips.length * pgap : 0);
+  ctx.textAlign = "left"; ctx.textBaseline = "middle";
+  let nameSize = 27;
+  do {
+    ctx.font = "700 " + nameSize + 'px "Cinzel",Georgia,serif';
+    if (ctx.measureText(def.name).width <= nameRoom) break;
+    nameSize -= 1;
+  } while (nameSize > 16);
+  ctx.fillStyle = "#f2e5ca";
+  ctx.fillText(def.name, ix + 16, npY + npH / 2 + 1);
+
+  // ---- art window
+  const aY = npY + npH + 12, aH = 372;
+  drawArt(ctx, ix, aY, iw, aH, def);
+  ctx.strokeStyle = "rgba(0,0,0,.8)"; ctx.lineWidth = 4;
+  roundRect(ctx, ix, aY, iw, aH, 5); ctx.stroke();
+  ctx.strokeStyle = "rgba(214,186,132,.16)"; ctx.lineWidth = 1.4;
+  roundRect(ctx, ix + 3, aY + 3, iw - 6, aH - 6, 4); ctx.stroke();
+
+  // ---- type band
+  const tY = aY + aH + 10, tH = 44;
+  const tg = ctx.createLinearGradient(ix, tY, ix + iw, tY);
+  tg.addColorStop(0, mix(f.band, "#000000", .35));
+  tg.addColorStop(.5, f.band);
+  tg.addColorStop(1, mix(f.band, "#000000", .45));
+  roundRect(ctx, ix, tY, iw, tH, 5); ctx.fillStyle = tg; ctx.fill();
+  ctx.strokeStyle = "rgba(0,0,0,.6)"; ctx.lineWidth = 2; ctx.stroke();
+  ctx.font = '500 20px "Cinzel",Georgia,serif';
+  ctx.fillStyle = "#f4e9d2"; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+  ctx.fillText(def.type + (def.sub ? " · " + def.sub : ""), ix + 14, tY + tH / 2 + 1);
+  // rarity lozenge
+  const rc = RARITY[def.rarity] || RARITY.common;
+  ctx.save();
+  ctx.translate(ix + iw - 26, tY + tH / 2); ctx.rotate(Math.PI / 4);
+  ctx.fillStyle = rc; ctx.fillRect(-7, -7, 14, 14);
+  ctx.strokeStyle = "rgba(0,0,0,.6)"; ctx.lineWidth = 2; ctx.strokeRect(-7, -7, 14, 14);
+  ctx.restore();
+
+  // ---- text box
+  const bY = tY + tH + 10, bH = 292;
+  const bg = ctx.createLinearGradient(ix, bY, ix, bY + bH);
+  bg.addColorStop(0, f.boxTint);
+  bg.addColorStop(1, mix(f.boxTint, "#8c7f68", .34));
+  roundRect(ctx, ix, bY, iw, bH, 5); ctx.fillStyle = bg; ctx.fill();
+  // paper tooth
+  ctx.save(); roundRect(ctx, ix, bY, iw, bH, 5); ctx.clip();
+  for (let i = 0; i < 900; i++) {
+    ctx.globalAlpha = .03 + rand() * .06;
+    ctx.fillStyle = rand() > .5 ? "#000000" : "#ffffff";
+    ctx.fillRect(ix + rand() * iw, bY + rand() * bH, 1.6, 1.6);
+  }
+  ctx.globalAlpha = 1; ctx.restore();
+  ctx.strokeStyle = "rgba(0,0,0,.55)"; ctx.lineWidth = 2;
+  roundRect(ctx, ix, bY, iw, bH, 5); ctx.stroke();
+
+  const pad = 20, textW = iw - pad * 2;
+  let ty = bY + 30;
+  ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+  if (def.text) {
+    ctx.font = '400 21px "Spectral",Georgia,serif';
+    ctx.fillStyle = "#231c14";
+    for (const line of wrapLines(ctx, def.text, textW)) {
+      if (line) ctx.fillText(line, ix + pad, ty);
+      ty += 27;
+    }
+    ty += 6;
+  }
+  if (def.flavor) {
+    ctx.strokeStyle = "rgba(40,30,20,.24)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(ix + pad, ty - 12); ctx.lineTo(ix + iw - pad, ty - 12); ctx.stroke();
+    ctx.font = 'italic 400 19px "Spectral",Georgia,serif';
+    ctx.fillStyle = "rgba(48,38,26,.82)";
+    const room = def.stats ? textW - 118 : textW;
+    for (const line of wrapLines(ctx, def.flavor, room)) {
+      if (line) ctx.fillText(line, ix + pad, ty + 10);
+      ty += 25;
+    }
+  }
+
+  // ---- stat lozenge
+  if (def.stats) {
+    const sw = 132, sh = 62, sx = W - m - 14 - sw, sy = H - m - 20 - sh;
+    brushedPlate(ctx, sx, sy, sw, sh, 8, mix(f.plate, "#6b5d48", .5), f.plate2, rand);
+    ctx.strokeStyle = "rgba(0,0,0,.7)"; ctx.lineWidth = 3;
+    roundRect(ctx, sx, sy, sw, sh, 8); ctx.stroke();
+    ctx.strokeStyle = "rgba(255,240,210,.22)"; ctx.lineWidth = 1.4;
+    roundRect(ctx, sx + 4, sy + 4, sw - 8, sh - 8, 6); ctx.stroke();
+    ctx.font = '700 31px "Cinzel",Georgia,serif';
+    ctx.fillStyle = "#f6e9cd"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(def.stats[0] + " / " + def.stats[1], sx + sw / 2, sy + sh / 2 + 2);
+  }
+
+  // ---- collector line
+  ctx.font = '600 15px "Barlow Condensed",Arial,sans-serif';
+  ctx.fillStyle = "rgba(230,210,175,.5)"; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+  ctx.fillText("ASHEN COIL · " + def.num + " · " + f.label.toUpperCase(), m + 16, H - m - 14);
+}
+
+function drawCardBack(ctx) {
+  const W = TEX_W, H = TEX_H, R = 34, rand = rng(90210);
+  ctx.clearRect(0, 0, W, H);
+  brushedPlate(ctx, 0, 0, W, H, R, "#2a2119", "#0f0b07", rand);
+  ctx.strokeStyle = "rgba(0,0,0,.85)"; ctx.lineWidth = 6;
+  roundRect(ctx, 3, 3, W - 6, H - 6, R - 2); ctx.stroke();
+
+  // leather grain
+  ctx.save(); roundRect(ctx, 0, 0, W, H, R); ctx.clip();
+  for (let i = 0; i < 2600; i++) {
+    ctx.globalAlpha = .02 + rand() * .06;
+    ctx.fillStyle = rand() > .5 ? "#c9a06a" : "#000000";
+    ctx.fillRect(rand() * W, rand() * H, 2, 2);
+  }
+  ctx.globalAlpha = 1;
+
+  // filigree border
+  ctx.strokeStyle = "rgba(201,146,47,.42)"; ctx.lineWidth = 3;
+  roundRect(ctx, 30, 30, W - 60, H - 60, 22); ctx.stroke();
+  ctx.strokeStyle = "rgba(201,146,47,.18)"; ctx.lineWidth = 1.5;
+  roundRect(ctx, 42, 42, W - 84, H - 84, 16); ctx.stroke();
+
+  // central rosette: interlocking arcs over a stone ring
+  const cx = W / 2, cy = H / 2;
+  const glow = ctx.createRadialGradient(cx, cy, 10, cx, cy, 250);
+  glow.addColorStop(0, "rgba(201,146,47,.3)");
+  glow.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.strokeStyle = "rgba(222,176,96,.6)"; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.arc(0, 0, 150, 0, TAU); ctx.stroke();
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(0, 0, 132, 0, TAU); ctx.stroke();
+  for (let i = 0; i < 8; i++) {
+    ctx.save(); ctx.rotate((i / 8) * TAU);
+    ctx.strokeStyle = "rgba(222,176,96,.5)"; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(0, -76, 76, Math.PI * .18, Math.PI * .82); ctx.stroke();
+    ctx.fillStyle = "rgba(222,176,96,.32)";
+    ctx.beginPath(); ctx.arc(0, -150, 7, 0, TAU); ctx.fill();
+    ctx.restore();
+  }
+  // inner stone
+  const st = ctx.createRadialGradient(-20, -26, 6, 0, 0, 64);
+  st.addColorStop(0, "#8e8270"); st.addColorStop(1, "#231c14");
+  ctx.fillStyle = st; ctx.beginPath(); ctx.arc(0, 0, 60, 0, TAU); ctx.fill();
+  ctx.strokeStyle = "rgba(0,0,0,.7)"; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(0, 0, 60, 0, TAU); ctx.stroke();
+  ctx.fillStyle = "rgba(240,222,186,.85)";
+  glyphPath(ctx, "sun", 34); ctx.fill();
+  ctx.restore();
+
+  ctx.font = '700 26px "Cinzel",Georgia,serif';
+  ctx.fillStyle = "rgba(233,213,175,.72)";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText("SIGIL", cx, cy - 214);
+  ctx.fillText("& STONE", cx, cy + 218);
+  ctx.font = '600 15px "Barlow Condensed",Arial,sans-serif';
+  ctx.fillStyle = "rgba(233,213,175,.4)";
+  ctx.fillText("A S H E N   C O I L", cx, cy + 260);
+  ctx.restore();
+}
+
+/* cost -> ordered list of pips: faction pips first, then one generic numeral */
+function costPips(cost) {
+  const out = [];
+  for (const k of Object.keys(cost)) {
+    if (k === "any") continue;
+    for (let i = 0; i < cost[k]; i++) out.push({ faction: k, numeral: null });
+  }
+  if (cost.any) out.unshift({ faction: "stone", numeral: cost.any });
+  return out;
+}
+function costTotal(cost) {
+  let n = cost.any || 0;
+  for (const k of Object.keys(cost)) if (k !== "any") n += cost[k];
+  return n;
+}
+/* ---------- the set: Ashen Coil ---------- */
+const SET = {};
+function card(def) { SET[def.id] = def; return def; }
+
+/* --- the near seat: Ember & Aurum --- */
+card({
+  id: "emberVent", num: "001", name: "Ember Vent", faction: "ember", type: "Source", sub: "Vent",
+  rarity: "common", art: "field", gives: "ember",
+  text: "Lay one Source per turn. It pays one Ember each of your turns.",
+  flavor: "The coil breathes out, and the forges wake."
+});
+card({
+  id: "sunlitTerrace", num: "002", name: "Sunlit Terrace", faction: "aurum", type: "Source", sub: "Terrace",
+  rarity: "common", art: "field", gives: "aurum",
+  text: "Lay one Source per turn. It pays one Aurum each of your turns.",
+  flavor: "Stone that keeps the afternoon long after dusk."
+});
+card({
+  id: "cinderjaw", num: "007", name: "Cinderjaw Hound", faction: "ember", type: "Unit", sub: "Beast",
+  rarity: "common", art: "figure", cost: { ember: 1 }, stats: [2, 1], keywords: ["noblock"],
+  text: "Cinderjaw Hound cannot block.",
+  flavor: "It runs one direction only, and that direction is forward."
+});
+card({
+  id: "lanternAcolyte", num: "011", name: "Lantern Acolyte", faction: "aurum", type: "Unit", sub: "Devotee",
+  rarity: "common", art: "figure", cost: { aurum: 1 }, stats: [1, 2],
+  arrive: { kind: "life", amount: 2 },
+  text: "When Lantern Acolyte arrives, gain 2 life.",
+  flavor: "She trims the wick before she draws the blade."
+});
+card({
+  id: "coalfoot", num: "014", name: "Coalfoot Vanguard", faction: "ember", type: "Unit", sub: "Warden",
+  rarity: "common", art: "figure", cost: { any: 1, ember: 1 }, stats: [2, 2],
+  arrive: { kind: "damage", amount: 1, target: "unit", optional: true },
+  text: "When Coalfoot Vanguard arrives, deal 1 damage to a unit.",
+  flavor: "Ash to the ankle, iron to the chin."
+});
+card({
+  id: "ashenDuelist", num: "018", name: "Ashen Duelist", faction: "ember", type: "Unit", sub: "Duellist",
+  rarity: "uncommon", art: "figure", cost: { any: 1, ember: 1 }, stats: [3, 1], keywords: ["elusive"],
+  text: "Ashen Duelist cannot be blocked by units with defence 2 or less.",
+  flavor: "Three strikes offered. Only the first is honest."
+});
+card({
+  id: "gildedSentinel", num: "021", name: "Gilded Sentinel", faction: "aurum", type: "Unit", sub: "Warden",
+  rarity: "uncommon", art: "figure", cost: { any: 2, aurum: 1 }, stats: [2, 4], keywords: ["vigilant"],
+  text: "Vigilant. Attacking does not tilt Gilded Sentinel.",
+  flavor: "Gold leaf over old scars, and the scars hold."
+});
+card({
+  id: "forgewright", num: "024", name: "Forgewright Adept", faction: "ember", type: "Unit", sub: "Artisan",
+  rarity: "rare", art: "figure", cost: { any: 2, ember: 1 }, stats: [2, 3], aura: { atk: 1 },
+  text: "Your other units have +1 attack.",
+  flavor: "She sharpens the line, not the blade."
+});
+card({
+  id: "paladin", num: "027", name: "Dawnhallow Paladin", faction: "aurum", type: "Unit", sub: "Devotee",
+  rarity: "uncommon", art: "figure", cost: { any: 2, aurum: 2 }, stats: [3, 4], onAttack: { kind: "life", amount: 1 },
+  text: "Whenever Dawnhallow Paladin attacks, gain 1 life.",
+  flavor: "Her charge is counted in candles, not in miles."
+});
+card({
+  id: "titan", num: "030", name: "Emberbound Titan", faction: "ember", type: "Unit", sub: "Colossus",
+  rarity: "rare", art: "figure", cost: { any: 3, ember: 2 }, stats: [5, 5], keywords: ["overrun"],
+  text: "Overrun. Damage beyond what its blockers can take carries through to the far seat.",
+  flavor: "Chained at the wrists so the rest of it can be aimed."
+});
+card({
+  id: "scorchline", num: "033", name: "Scorchline", faction: "ember", type: "Spell", sub: "Rite",
+  rarity: "common", art: "burst", cost: { ember: 1 },
+  spell: { kind: "damage", amount: 3, target: "unit" },
+  text: "Deal 3 damage to a unit.",
+  flavor: "A straight line, drawn once, in the one colour that carries."
+});
+card({
+  id: "anvilRite", num: "036", name: "Anvil Rite", faction: "ember", type: "Spell", sub: "Rite",
+  rarity: "common", art: "burst", cost: { any: 1, ember: 1 },
+  spell: { kind: "buff", atk: 2, def: 2, target: "mine" },
+  text: "A unit you control gets +2 / +2 until end of turn.",
+  flavor: "Quench it in the noise of the room."
+});
+card({
+  id: "rally", num: "039", name: "Rally the Coil", faction: "aurum", type: "Spell", sub: "Rite",
+  rarity: "uncommon", art: "burst", cost: { any: 2, aurum: 1 },
+  spell: { kind: "draw", amount: 2 },
+  text: "Draw two cards.",
+  flavor: "Every hand at the table turns over at once."
+});
+card({
+  id: "sealInLight", num: "042", name: "Seal in Light", faction: "aurum", type: "Spell", sub: "Rite",
+  rarity: "uncommon", art: "burst", cost: { any: 1, aurum: 1 },
+  spell: { kind: "destroy", target: "unit", cond: "atk>=3", condText: "attack 3 or greater" },
+  text: "Destroy a unit with attack 3 or greater.",
+  flavor: "Nothing large stays hidden in a lit room."
+});
+
+/* --- the far seat: Tide & Umbra --- */
+card({
+  id: "tidalShelf", num: "004", name: "Tidal Shelf", faction: "tide", type: "Source", sub: "Shelf",
+  rarity: "common", art: "field", gives: "tide",
+  text: "Lay one Source per turn. It pays one Tide each of your turns.",
+  flavor: "Low water shows the stair; high water keeps the count."
+});
+card({
+  id: "umbralRift", num: "005", name: "Umbral Rift", faction: "umbra", type: "Source", sub: "Rift",
+  rarity: "common", art: "field", gives: "umbra",
+  text: "Lay one Source per turn. It pays one Umbra each of your turns.",
+  flavor: "A seam in the floor of the world, and a draught from it."
+});
+card({
+  id: "shoalstep", num: "045", name: "Shoalstep Drifter", faction: "tide", type: "Unit", sub: "Drifter",
+  rarity: "common", art: "figure", cost: { tide: 1 }, stats: [1, 2],
+  text: "", flavor: "It walks the tideline as if the line were a road."
+});
+card({
+  id: "hollowed", num: "048", name: "Hollowed Acolyte", faction: "umbra", type: "Unit", sub: "Devotee",
+  rarity: "common", art: "figure", cost: { umbra: 1 }, stats: [2, 1],
+  text: "", flavor: "The robes keep the shape the acolyte has stopped keeping."
+});
+card({
+  id: "eel", num: "051", name: "Mirrormarsh Eel", faction: "tide", type: "Unit", sub: "Beast",
+  rarity: "common", art: "figure", cost: { any: 1, tide: 1 }, stats: [2, 2],
+  arrive: { kind: "draw", amount: 1 },
+  text: "When Mirrormarsh Eel arrives, draw a card.",
+  flavor: "It swims the reflection, not the water."
+});
+card({
+  id: "stalker", num: "054", name: "Nightmoor Stalker", faction: "umbra", type: "Unit", sub: "Duellist",
+  rarity: "uncommon", art: "figure", cost: { any: 2, umbra: 1 }, stats: [3, 2], keywords: ["elusive"],
+  text: "Nightmoor Stalker cannot be blocked by units with defence 2 or less.",
+  flavor: "The moor gives it a different name every night."
+});
+card({
+  id: "choirmask", num: "057", name: "Choirmask Adept", faction: "tide", type: "Unit", sub: "Chorister",
+  rarity: "uncommon", art: "figure", cost: { any: 2, tide: 1 }, stats: [2, 3], keywords: ["vigilant"],
+  text: "Vigilant. Attacking does not tilt Choirmask Adept.",
+  flavor: "It sings both parts, so it never has to stop."
+});
+card({
+  id: "deepcurrent", num: "060", name: "Deepcurrent Warden", faction: "tide", type: "Unit", sub: "Warden",
+  rarity: "uncommon", art: "figure", cost: { any: 2, tide: 2 }, stats: [3, 5],
+  text: "", flavor: "Patient as a sluice gate, and about as forgiving."
+});
+card({
+  id: "rotcairn", num: "063", name: "Rotcairn Abomination", faction: "umbra", type: "Unit", sub: "Colossus",
+  rarity: "uncommon", art: "figure", cost: { any: 3, umbra: 2 }, stats: [4, 6],
+  text: "", flavor: "Assembled out of everything the cairn was built to keep down."
+});
+card({
+  id: "leviathan", num: "066", name: "Gloomtide Leviathan", faction: "tide", type: "Unit", sub: "Colossus",
+  rarity: "rare", art: "figure", cost: { any: 4, tide: 2 }, stats: [6, 6], keywords: ["overrun"],
+  text: "Overrun. Damage beyond what its blockers can take carries through to the near seat.",
+  flavor: "The choir drowned learning its name."
+});
+card({
+  id: "undertow", num: "069", name: "Undertow", faction: "tide", type: "Spell", sub: "Rite",
+  rarity: "common", art: "burst", cost: { any: 1, tide: 1 },
+  spell: { kind: "bounce", target: "unit" },
+  text: "Return a unit to its owner's hand.",
+  flavor: "One step back, and then the floor is gone."
+});
+card({
+  id: "ebb", num: "072", name: "Ebb the Light", faction: "umbra", type: "Spell", sub: "Rite",
+  rarity: "common", art: "burst", cost: { umbra: 1 },
+  spell: { kind: "buff", atk: -2, def: -2, target: "unit" },
+  text: "A unit gets −2 / −2 until end of turn.",
+  flavor: "Not darkness. Subtraction."
+});
+card({
+  id: "marrowTithe", num: "075", name: "Marrow Tithe", faction: "umbra", type: "Spell", sub: "Rite",
+  rarity: "uncommon", art: "burst", cost: { any: 2, umbra: 1 },
+  spell: { kind: "destroy", target: "unit", cond: "def<=3", condText: "defence 3 or less" },
+  text: "Destroy a unit with defence 3 or less.",
+  flavor: "The rift keeps a ledger and the ledger is never behind."
+});
+
+const DECKLIST = {
+  you: [
+    ["emberVent", 6], ["sunlitTerrace", 6],
+    ["cinderjaw", 2], ["lanternAcolyte", 2], ["coalfoot", 2], ["ashenDuelist", 2],
+    ["gildedSentinel", 2], ["forgewright", 1], ["paladin", 2], ["titan", 1],
+    ["scorchline", 2], ["anvilRite", 1], ["rally", 1], ["sealInLight", 2]
+  ],
+  foe: [
+    ["tidalShelf", 6], ["umbralRift", 6],
+    ["shoalstep", 2], ["hollowed", 2], ["eel", 2], ["stalker", 2],
+    ["choirmask", 2], ["deepcurrent", 2], ["rotcairn", 1], ["leviathan", 1],
+    ["undertow", 2], ["ebb", 2], ["marrowTithe", 2]
+  ]
+};
+
+/* ---------- texture cache: one face texture per printing, shared by every copy ---------- */
+const faceTextures = new Map();
+let backTexture = null;
+
+function faceTexture(def) {
+  if (faceTextures.has(def.id)) return faceTextures.get(def.id);
+  const cv = newCanvas(TEX_W, TEX_H);
+  drawCardFace(cv.getContext("2d"), def);
+  const tex = new THREE.CanvasTexture(cv);
+  tex.anisotropy = maxAniso;
+  tex.encoding = THREE.sRGBEncoding;
+  faceTextures.set(def.id, tex);
+  return tex;
+}
+function getBackTexture() {
+  if (!backTexture) {
+    const cv = newCanvas(TEX_W, TEX_H);
+    drawCardBack(cv.getContext("2d"));
+    backTexture = new THREE.CanvasTexture(cv);
+    backTexture.anisotropy = maxAniso;
+    backTexture.encoding = THREE.sRGBEncoding;
+  }
+  return backTexture;
+}
+/* ---------- the table ---------- */
+const CARD_W = 1.0, CARD_H = 1.397;
+const MAT_W = 10.8, MAT_D = 7.9;
+const ZONE = {
+  foeSources: -2.15, foeUnits: -0.95, youUnits: 0.95, youSources: 2.15,
+  youHand: { z: 3.95, y: 1.55 }, foeHand: { z: -4.55, y: 1.22 }
+};
+const PILE = {
+  youDeck: [4.05, 2.25], youFallen: [4.05, 0.7],
+  foeDeck: [-4.05, -2.25], foeFallen: [-4.05, -0.7]
+};
+const SCALE = { table: 0.74, source: 0.62, hand: 0.74, hold: 0.9 };
+
+const canvasEl = document.getElementById("c");
+const renderer = new THREE.WebGLRenderer({ canvas: canvasEl, antialias: true, powerPreference: "high-performance" });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.12;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const maxAniso = renderer.capabilities.getMaxAnisotropy();
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x070605);
+scene.fog = new THREE.Fog(0x070605, 14, 30);
+
+const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 90);
+const camTarget = new THREE.Vector3(0, 0.1, -0.3);
+let narrow = false;
+
+/* Frame a band about 7.1 units wide across the middle of the mat: on a wide
+   screen the whole mat fits, on a phone the felt crops and the rows still do not. */
+function layoutViewport() {
+  const w = window.innerWidth, h = window.innerHeight;
+  renderer.setSize(w, h, false);
+  const aspect = w / Math.max(1, h);
+  narrow = aspect < 1.05;
+  const fov = clamp(2 * Math.atan(0.355 / aspect) * 180 / Math.PI, 38, 58);
+  camera.fov = fov;
+  camera.aspect = aspect;
+  const tanH = Math.tan(fov / 2 * Math.PI / 180) * aspect;
+  const k = clamp(0.355 / tanH, 1, 1.7);
+  camera.position.set(0, 7.4 * Math.pow(k, 0.8), 7.9 * k);
+  camTarget.set(0, narrow ? 0.85 : 0.1, narrow ? -1.25 : -0.3);
+  camera.lookAt(camTarget);
+  camera.updateProjectionMatrix();
+}
+let resizeTimer = null;
+window.addEventListener("resize", () => {
+  layoutViewport();
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (!state.busy && !ui.drag && !ui.held) reflow({ dur: 0 });
+  }, 140);
+});
+
+/* --- lighting: one hooded lamp over the mat, cold fill, two coloured rims --- */
+scene.add(new THREE.AmbientLight(0x4a423b, 0.62));
+const lamp = new THREE.SpotLight(0xffe2b4, 1.75, 0, 0.78, 0.62, 1);
+lamp.position.set(0.6, 9.4, 3.4);
+lamp.target.position.set(0, 0, 0.2);
+lamp.castShadow = true;
+lamp.shadow.mapSize.set(2048, 2048);
+lamp.shadow.camera.near = 2; lamp.shadow.camera.far = 22;
+lamp.shadow.bias = -0.0009;
+lamp.shadow.normalBias = 0.03;
+scene.add(lamp, lamp.target);
+const fill = new THREE.DirectionalLight(0x8fa8c4, 0.34);
+fill.position.set(-7, 5.5, -5);
+scene.add(fill);
+const rimA = new THREE.PointLight(0xd4452b, 0.55, 16, 2);
+rimA.position.set(6.2, 1.4, 2.4);
+const rimB = new THREE.PointLight(0x3f8fb8, 0.5, 16, 2);
+rimB.position.set(-6.2, 1.6, -2.4);
+scene.add(rimA, rimB);
+
+/* --- the room behind the lamp: a dim warm gradient, not a void --- */
+(function backdrop() {
+  const cv = document.createElement("canvas");
+  cv.width = 4; cv.height = 256;
+  const ctx = cv.getContext("2d");
+  const g = ctx.createLinearGradient(0, 0, 0, 256);
+  g.addColorStop(0, "#050404");
+  g.addColorStop(.52, "#0d0a08");
+  g.addColorStop(.66, "#241709");
+  g.addColorStop(.8, "#120c07");
+  g.addColorStop(1, "#060504");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 4, 256);
+  const tex = new THREE.CanvasTexture(cv);
+  tex.encoding = THREE.sRGBEncoding;
+  const dome = new THREE.Mesh(
+    new THREE.SphereGeometry(42, 24, 16),
+    new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false, toneMapped: false, depthWrite: false })
+  );
+  dome.renderOrder = -10;
+  scene.add(dome);
+})();
+
+/* --- procedural wood for the table --- */
+function woodTexture(size, planks, tone) {
+  const cv = newCanvas(size, size), ctx = cv.getContext("2d");
+  const rand = rng(hash32("wood" + tone + planks));
+  ctx.fillStyle = tone; ctx.fillRect(0, 0, size, size);
+  const ph = size / planks;
+  for (let p = 0; p < planks; p++) {
+    const y0 = p * ph;
+    ctx.fillStyle = mix(tone, rand() > .5 ? "#000000" : "#6b4a2a", .06 + rand() * .16);
+    ctx.fillRect(0, y0, size, ph);
+    for (let g = 0; g < 46; g++) {
+      const gy = y0 + rand() * ph;
+      ctx.strokeStyle = rand() > .45 ? "rgba(0,0,0,.2)" : "rgba(160,110,60,.14)";
+      ctx.lineWidth = .6 + rand() * 2.1;
+      ctx.beginPath();
+      ctx.moveTo(-10, gy);
+      for (let x = 0; x <= size; x += size / 12) {
+        ctx.lineTo(x, gy + Math.sin(x / size * 6 + p + g) * ph * .16 + (rand() - .5) * 2);
+      }
+      ctx.stroke();
+    }
+    ctx.strokeStyle = "rgba(0,0,0,.42)"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, y0); ctx.lineTo(size, y0); ctx.stroke();
+  }
+  const tex = new THREE.CanvasTexture(cv);
+  tex.encoding = THREE.sRGBEncoding;
+  tex.anisotropy = maxAniso;
+  return tex;
+}
+
+const tableTop = woodTexture(1024, 9, "#3a2617");
+const tableSide = woodTexture(512, 3, "#2a1b10");
+const tableMats = [
+  new THREE.MeshStandardMaterial({ map: tableSide, roughness: .82 }),
+  new THREE.MeshStandardMaterial({ map: tableSide, roughness: .82 }),
+  new THREE.MeshStandardMaterial({ map: tableTop, roughness: .62, metalness: .04 }),
+  new THREE.MeshStandardMaterial({ color: 0x120c07, roughness: .9 }),
+  new THREE.MeshStandardMaterial({ map: tableSide, roughness: .82 }),
+  new THREE.MeshStandardMaterial({ map: tableSide, roughness: .82 })
+];
+const table = new THREE.Mesh(new THREE.BoxGeometry(16.5, 0.62, 12.4), tableMats);
+table.position.set(0, -0.31, -0.2);
+table.receiveShadow = true;
+scene.add(table);
+
+/* --- the mat, with its zones printed on it --- */
+function matTexture() {
+  const MW = 1440, MH = Math.round(MW * MAT_D / MAT_W);
+  const cv = newCanvas(MW, MH), ctx = cv.getContext("2d");
+  const rand = rng(4242);
+  const X = x => (x + MAT_W / 2) / MAT_W * MW;
+  const Z = z => (z + MAT_D / 2) / MAT_D * MH;
+  const U = u => u / MAT_W * MW;
+
+  const g = ctx.createLinearGradient(0, 0, 0, MH);
+  g.addColorStop(0, "#14282a"); g.addColorStop(.5, "#1b3330"); g.addColorStop(1, "#122225");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, MW, MH);
+  for (let i = 0; i < 42000; i++) {
+    ctx.globalAlpha = .02 + rand() * .07;
+    ctx.fillStyle = rand() > .5 ? "#0a1416" : "#3f6a5e";
+    ctx.fillRect(rand() * MW, rand() * MH, 2, 2);
+  }
+  ctx.globalAlpha = 1;
+
+  // watermark rosette at the centre
+  ctx.save();
+  ctx.translate(MW / 2, MH / 2);
+  ctx.globalAlpha = .07; ctx.strokeStyle = "#e8d3a4"; ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.arc(0, 0, U(1.5), 0, TAU); ctx.stroke();
+  ctx.beginPath(); ctx.arc(0, 0, U(1.32), 0, TAU); ctx.stroke();
+  for (let i = 0; i < 8; i++) {
+    ctx.save(); ctx.rotate(i / 8 * TAU);
+    ctx.beginPath(); ctx.arc(0, -U(.74), U(.74), Math.PI * .18, Math.PI * .82); ctx.stroke();
+    ctx.restore();
+  }
+  ctx.fillStyle = "#e8d3a4"; glyphPath(ctx, "sun", U(.4)); ctx.fill();
+  ctx.restore();
+  ctx.globalAlpha = 1;
+
+  // centre line
+  ctx.strokeStyle = "rgba(232,211,164,.16)"; ctx.lineWidth = 2;
+  ctx.setLineDash([16, 14]);
+  ctx.beginPath(); ctx.moveTo(U(.45), Z(0)); ctx.lineTo(MW - U(.45), Z(0)); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // zone bands
+  function band(z, cardScale, label, slots, flip) {
+    const h = CARD_H * cardScale + .3, w = slots * (CARD_W * cardScale + .28) + .12;
+    ctx.save();
+    ctx.strokeStyle = "rgba(232,211,164,.2)"; ctx.lineWidth = 2.5;
+    roundRect(ctx, X(-w / 2), Z(z - h / 2), U(w), U(h), U(.1));
+    ctx.stroke();
+    ctx.strokeStyle = "rgba(232,211,164,.07)"; ctx.lineWidth = 1.4;
+    roundRect(ctx, X(-w / 2) + 7, Z(z - h / 2) + 7, U(w) - 14, U(h) - 14, U(.07));
+    ctx.stroke();
+    ctx.translate(X(-w / 2) - U(.16), Z(z));
+    if (flip) ctx.rotate(Math.PI);
+    ctx.rotate(-Math.PI / 2);
+    ctx.font = '600 26px "Barlow Condensed",Arial,sans-serif';
+    ctx.fillStyle = "rgba(232,211,164,.42)";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(label, 0, 0);
+    ctx.restore();
+  }
+  band(ZONE.foeUnits, SCALE.table, "U N I T S", 6, true);
+  band(ZONE.foeSources, SCALE.source, "S O U R C E S", 7, true);
+  band(ZONE.youUnits, SCALE.table, "U N I T S", 6, false);
+  band(ZONE.youSources, SCALE.source, "S O U R C E S", 7, false);
+
+  // pile rings
+  function ring(x, z, label, flip) {
+    ctx.save();
+    ctx.strokeStyle = "rgba(232,211,164,.2)"; ctx.lineWidth = 2.5;
+    roundRect(ctx, X(x - CARD_W * SCALE.table / 2) - 6, Z(z - CARD_H * SCALE.table / 2) - 6,
+      U(CARD_W * SCALE.table) + 12, U(CARD_H * SCALE.table) + 12, U(.09));
+    ctx.stroke();
+    ctx.translate(X(x), Z(z + (flip ? -1 : 1) * (CARD_H * SCALE.table / 2 + .26)));
+    if (flip) ctx.rotate(Math.PI);
+    ctx.font = '600 22px "Barlow Condensed",Arial,sans-serif';
+    ctx.fillStyle = "rgba(232,211,164,.38)";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(label, 0, 0);
+    ctx.restore();
+  }
+  ring(PILE.youDeck[0], PILE.youDeck[1], "D E C K", false);
+  ring(PILE.youFallen[0], PILE.youFallen[1], "F A L L E N", false);
+  ring(PILE.foeDeck[0], PILE.foeDeck[1], "D E C K", true);
+  ring(PILE.foeFallen[0], PILE.foeFallen[1], "F A L L E N", true);
+
+  // edge stitching and vignette
+  ctx.strokeStyle = "rgba(0,0,0,.5)"; ctx.lineWidth = 10;
+  roundRect(ctx, 6, 6, MW - 12, MH - 12, U(.3)); ctx.stroke();
+  ctx.strokeStyle = "rgba(232,211,164,.22)"; ctx.lineWidth = 2;
+  ctx.setLineDash([9, 11]);
+  roundRect(ctx, 22, 22, MW - 44, MH - 44, U(.26)); ctx.stroke();
+  ctx.setLineDash([]);
+  const vig = ctx.createRadialGradient(MW / 2, MH / 2, MH * .2, MW / 2, MH / 2, MH * .92);
+  vig.addColorStop(0, "rgba(0,0,0,0)"); vig.addColorStop(1, "rgba(0,0,0,.5)");
+  ctx.fillStyle = vig; ctx.fillRect(0, 0, MW, MH);
+
+  const tex = new THREE.CanvasTexture(cv);
+  tex.encoding = THREE.sRGBEncoding;
+  tex.anisotropy = maxAniso;
+  return tex;
+}
+const mat = new THREE.Mesh(
+  new THREE.PlaneGeometry(MAT_W, MAT_D),
+  new THREE.MeshStandardMaterial({ map: matTexture(), roughness: .95, metalness: 0 })
+);
+mat.rotation.x = -Math.PI / 2;
+mat.position.y = 0.006;
+mat.receiveShadow = true;
+scene.add(mat);
+
+/* --- the far seat: a chair, someone in it, and a lit nameplate --- */
+const farSeat = new THREE.Group();
+const chairWood = new THREE.MeshStandardMaterial({ map: tableSide, color: 0x6b5236, roughness: .8 });
+const chairBack = new THREE.Mesh(new THREE.BoxGeometry(2.9, 1.5, 0.16), chairWood);
+chairBack.position.set(0, 1.3, -6.3);
+chairBack.rotation.x = 0.07;
+for (const s of [-1, 1]) {
+  const post = new THREE.Mesh(new THREE.BoxGeometry(0.2, 3.1, 0.2), chairWood);
+  post.position.set(s * 1.44, 0.6, -6.26);
+  farSeat.add(post);
+  const finial = new THREE.Mesh(new THREE.SphereGeometry(0.15, 16, 12), chairWood);
+  finial.position.set(s * 1.44, 2.1, -6.26);
+  farSeat.add(finial);
+}
+farSeat.add(chairBack);
+
+const shade = new THREE.MeshStandardMaterial({ color: 0x05060b, roughness: 1, metalness: 0 });
+const torso = new THREE.Mesh(new THREE.SphereGeometry(1.05, 24, 18), shade);
+torso.scale.set(1.3, 0.95, 0.7);
+torso.position.set(0, 0.05, -5.55);
+const head = new THREE.Mesh(new THREE.SphereGeometry(0.38, 24, 18), shade);
+head.position.set(0, 1.32, -5.66);
+head.scale.set(1, 1.12, .96);
+const hood = new THREE.Mesh(new THREE.SphereGeometry(0.62, 24, 16, 0, TAU, 0, Math.PI * .66), shade);
+hood.position.set(0, 1.4, -5.78);
+hood.rotation.x = -0.24;
+farSeat.add(torso, head, hood);
+for (const s of [-1, 1]) {
+  const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.2, 1.5, 12), shade);
+  arm.position.set(s * 0.92, 0.5, -4.95);
+  arm.rotation.set(1.16, 0, s * -0.22);
+  farSeat.add(arm);
+}
+const backLight = new THREE.PointLight(0x5a7f9c, 1.15, 10, 2);
+backLight.position.set(0, 2.7, -7.6);
+farSeat.add(backLight);
+
+function plateTexture(line1, line2) {
+  const cv = newCanvas(640, 148), ctx = cv.getContext("2d");
+  const g = ctx.createLinearGradient(0, 0, 0, 148);
+  g.addColorStop(0, "#2a2016"); g.addColorStop(1, "#100b06");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 640, 148);
+  ctx.strokeStyle = "rgba(222,176,96,.5)"; ctx.lineWidth = 4;
+  roundRect(ctx, 8, 8, 624, 132, 8); ctx.stroke();
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.font = '700 40px "Cinzel",Georgia,serif';
+  ctx.fillStyle = "#f0dcab";
+  ctx.fillText(line1, 320, 58);
+  ctx.font = '600 22px "Barlow Condensed",Arial,sans-serif';
+  ctx.fillStyle = "rgba(240,220,171,.62)";
+  ctx.fillText(line2, 320, 104);
+  const tex = new THREE.CanvasTexture(cv);
+  tex.encoding = THREE.sRGBEncoding;
+  tex.anisotropy = maxAniso;
+  return tex;
+}
+const plate = new THREE.Mesh(
+  new THREE.PlaneGeometry(2.3, 0.53),
+  new THREE.MeshBasicMaterial({ map: plateTexture("VARIS", "OF THE DROWNED CHOIR · FAR SEAT"), toneMapped: false })
+);
+plate.position.set(0, 0.16, -4.35);
+plate.rotation.x = -1.18;
+farSeat.add(plate);
+scene.add(farSeat);
+
+/* --- deck stacks --- */
+function makeStack(x, z, faceUp) {
+  const mats = [
+    new THREE.MeshStandardMaterial({ color: 0x7d7059, roughness: .95 }),
+    new THREE.MeshStandardMaterial({ color: 0x7d7059, roughness: .95 }),
+    new THREE.MeshStandardMaterial({ map: getBackTexture(), roughness: .6 }),
+    new THREE.MeshStandardMaterial({ color: 0x1a140e, roughness: .85 }),
+    new THREE.MeshStandardMaterial({ color: 0x7d7059, roughness: .95 }),
+    new THREE.MeshStandardMaterial({ color: 0x7d7059, roughness: .95 })
+  ];
+  const m = new THREE.Mesh(new THREE.BoxGeometry(CARD_W * SCALE.table, 1, CARD_H * SCALE.table), mats);
+  m.castShadow = true;
+  m.position.set(x, 0, z);
+  if (faceUp) m.rotation.y = Math.PI;
+  scene.add(m);
+  return m;
+}
+const stacks = {
+  youDeck: makeStack(PILE.youDeck[0], PILE.youDeck[1], false),
+  foeDeck: makeStack(PILE.foeDeck[0], PILE.foeDeck[1], true)
+};
+function setStack(mesh, count) {
+  const h = Math.max(0.0001, count * 0.0085);
+  mesh.scale.y = h;
+  mesh.position.y = h / 2 + 0.008;
+  mesh.visible = count > 0;
+}
+/* ---------- card objects ---------- */
+function roundedShape(w, h, r) {
+  const s = new THREE.Shape();
+  const x = -w / 2, y = -h / 2;
+  s.moveTo(x + r, y);
+  s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+  s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
+  s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+  return s;
+}
+function remapUV(geo, w, h) {
+  const uv = geo.attributes.uv;
+  for (let i = 0; i < uv.count; i++) {
+    uv.setXY(i, uv.getX(i) / w + 0.5, uv.getY(i) / h + 0.5);
+  }
+  uv.needsUpdate = true;
+  return geo;
+}
+const CARD_GEO = remapUV(new THREE.ShapeGeometry(roundedShape(CARD_W, CARD_H, 0.058), 8), CARD_W, CARD_H);
+const GLOW_GEO = (() => {
+  const outer = roundedShape(CARD_W * 1.1, CARD_H * 1.07, 0.07);
+  outer.holes.push(new THREE.Path(roundedShape(CARD_W * .995, CARD_H * .997, 0.058).getPoints(24)));
+  return new THREE.ShapeGeometry(outer, 8);
+})();
+
+const backMatBase = new THREE.MeshStandardMaterial({
+  map: getBackTexture(), roughness: .62, metalness: .04, alphaTest: .4
+});
+
+let uidCounter = 0;
+const allCards = [];
+
+function makeCard(def, owner) {
+  const g = new THREE.Group();
+  const front = new THREE.Mesh(CARD_GEO, new THREE.MeshStandardMaterial({
+    map: faceTexture(def), roughness: .55, metalness: .03, alphaTest: .4
+  }));
+  front.position.z = 0.004;
+  front.castShadow = true;
+  const back = new THREE.Mesh(CARD_GEO, backMatBase.clone());
+  back.position.z = -0.004;
+  back.rotation.y = Math.PI;
+  const glow = new THREE.Mesh(GLOW_GEO, new THREE.MeshBasicMaterial({
+    color: 0xc9922f, transparent: true, opacity: 0, blending: THREE.AdditiveBlending,
+    depthWrite: false, toneMapped: false, side: THREE.DoubleSide
+  }));
+  glow.position.z = 0.007;
+  g.add(front, back, glow);
+
+  const c = {
+    uid: ++uidCounter, def, owner, obj: g, front, back, glow,
+    zone: "deck", tempAtk: 0, tempDef: 0, damage: 0,
+    spent: false, fresh: true, attacking: false, blocking: null,
+    glowTone: null, glowPulse: 0
+  };
+  g.userData.card = c;
+  front.userData.card = c;
+  g.scale.setScalar(SCALE.table);
+  g.visible = false;
+  scene.add(g);
+  allCards.push(c);
+  return c;
+}
+
+/* ---------- transforms and tweening ---------- */
+const dummy = new THREE.Object3D();
+function faceCamera(pos, roll, away) {
+  dummy.position.copy(pos);
+  dummy.up.set(0, 1, 0);
+  if (away) {
+    dummy.lookAt(pos.x * 2 - camera.position.x, pos.y * 2 - camera.position.y + 1.6, pos.z * 2 - camera.position.z);
+  } else {
+    dummy.lookAt(camera.position);
+  }
+  if (roll) dummy.rotateZ(roll);
+  dummy.updateMatrixWorld();
+  return dummy.quaternion.clone();
+}
+function flatQuat(mine, tilt) {
+  dummy.rotation.set(-Math.PI / 2 + (tilt || 0) * (mine ? 1 : -1), 0, mine ? 0 : Math.PI);
+  dummy.updateMatrixWorld();
+  return dummy.quaternion.clone();
+}
+
+const tweens = [];
+function animate(card, target, dur, delay) {
+  const obj = card.obj;
+  return new Promise(resolve => {
+    tweens.push({
+      obj, resolve,
+      dur: dur == null ? 0.4 : dur,
+      delay: delay || 0, t: 0, started: false,
+      toPos: target.pos ? target.pos.clone() : null,
+      toQuat: target.quat ? target.quat.clone() : null,
+      toScale: target.scale == null ? null : target.scale,
+      fromPos: new THREE.Vector3(), fromQuat: new THREE.Quaternion(), fromScale: 1,
+      arc: target.arc || 0
+    });
+  });
+}
+function snap(card, target) {
+  if (target.pos) card.obj.position.copy(target.pos);
+  if (target.quat) card.obj.quaternion.copy(target.quat);
+  if (target.scale != null) card.obj.scale.setScalar(target.scale);
+}
+function stopTweens(card) {
+  for (let i = tweens.length - 1; i >= 0; i--) {
+    if (tweens[i].obj === card.obj) { tweens[i].resolve(); tweens.splice(i, 1); }
+  }
+}
+function updateTweens(dt) {
+  for (let i = tweens.length - 1; i >= 0; i--) {
+    const w = tweens[i];
+    if (w.delay > 0) { w.delay -= dt; continue; }
+    if (!w.started) {
+      w.started = true;
+      w.fromPos.copy(w.obj.position);
+      w.fromQuat.copy(w.obj.quaternion);
+      w.fromScale = w.obj.scale.x;
+    }
+    w.t += dt / Math.max(0.0001, w.dur);
+    const k = easeInOut(clamp(w.t, 0, 1));
+    if (w.toPos) {
+      w.obj.position.lerpVectors(w.fromPos, w.toPos, k);
+      if (w.arc) w.obj.position.y += Math.sin(k * Math.PI) * w.arc;
+    }
+    if (w.toQuat) w.obj.quaternion.copy(w.fromQuat).slerp(w.toQuat, k);
+    if (w.toScale != null) w.obj.scale.setScalar(lerp(w.fromScale, w.toScale, k));
+    if (w.t >= 1) { w.resolve(); tweens.splice(i, 1); }
+  }
+}
+
+/* ---------- where every card belongs right now ---------- */
+function restingTransform(c) {
+  const mine = c.owner === "you";
+  switch (c.zone) {
+    case "hand": {
+      const hand = state[c.owner].hand;
+      const i = hand.indexOf(c), n = hand.length;
+      const t = n > 1 ? (i / (n - 1)) * 2 - 1 : 0;
+      const conf = mine ? ZONE.youHand : ZONE.foeHand;
+      // Every card swings about one pivot below the hand, the way a fan held in
+      // the fingers does: the outer cards ride lower and lean away from centre.
+      const per = mine ? (narrow ? 0.062 : 0.075) : 0.055;
+      const spread = Math.min(mine ? 0.46 : 0.36, n * per);
+      const XR = mine ? (narrow ? 4.2 : 4.9) : 4.2;   // how far the fan opens
+      const YR = mine ? 7.6 : 5.6;                    // how far the edges dip
+      const th = t * spread;
+      const drop = YR * (Math.cos(th) - 1);
+      const side = mine ? 1 : -1;
+      const pos = new THREE.Vector3(
+        XR * Math.sin(th) * side,
+        conf.y + drop * 0.45,
+        conf.z - drop * 0.3 * side
+      );
+      return { pos, quat: faceCamera(pos, -th * side, !mine), scale: mine ? SCALE.hand : SCALE.hand * .8 };
+    }
+    case "units": case "sources": {
+      const row = state[c.owner][c.zone];
+      const i = row.indexOf(c), n = Math.max(1, row.length);
+      const src = c.zone === "sources";
+      const sc = src ? SCALE.source : SCALE.table;
+      const step = CARD_W * sc + (src ? 0.2 : 0.28);
+      const z = mine ? (src ? ZONE.youSources : ZONE.youUnits) : (src ? ZONE.foeSources : ZONE.foeUnits);
+      const x = (i - (n - 1) / 2) * step * (mine ? 1 : -1);
+      let zz = z, y = 0.012, tilt = 0;
+      if (c.spent) tilt = 0.42;
+      if (c.attacking) { zz = z + (mine ? -0.62 : 0.62); y = 0.06; }
+      if (c.blocking) { zz = z + (mine ? -0.34 : 0.34); y = 0.06; }
+      return { pos: new THREE.Vector3(x, y, zz), quat: flatQuat(mine, tilt), scale: sc };
+    }
+    case "fallen": {
+      const pile = state[c.owner].fallen;
+      const i = Math.max(0, pile.indexOf(c));
+      const p = mine ? PILE.youFallen : PILE.foeFallen;
+      return {
+        pos: new THREE.Vector3(p[0] + (i % 3) * 0.012, 0.01 + i * 0.009, p[1] + (i % 2) * 0.012),
+        quat: flatQuat(mine, 0), scale: SCALE.table
+      };
+    }
+    default: {
+      const p = mine ? PILE.youDeck : PILE.foeDeck;
+      const i = state[c.owner].deck.indexOf(c);
+      dummy.rotation.set(Math.PI / 2, 0, mine ? 0 : Math.PI);
+      dummy.updateMatrixWorld();
+      return {
+        pos: new THREE.Vector3(p[0], 0.014 + Math.max(0, i) * 0.0085, p[1]),
+        quat: dummy.quaternion.clone(), scale: SCALE.table
+      };
+    }
+  }
+}
+
+/* only cards resting on the mat cast; a held fan throws hard wedges across the felt */
+function syncShadow(c) {
+  c.front.castShadow = c.zone === "units" || c.zone === "sources" || c.zone === "fallen";
+}
+function reflow(opts) {
+  const dur = opts && opts.dur != null ? opts.dur : 0.36;
+  const jobs = [];
+  for (const c of allCards) {
+    if (c.zone === "deck" || c.zone === "cast" || c === ui.held || c === ui.drag) continue;
+    c.obj.visible = true;
+    syncShadow(c);
+    const t = restingTransform(c);
+    if (ui.hover === c && c.zone === "hand" && c.owner === "you") {
+      t.pos.y += 0.6; t.pos.z += 0.14; t.scale *= 1.06;
+    }
+    if (dur === 0) snap(c, t);
+    else jobs.push(animate(c, t, dur));
+  }
+  return Promise.all(jobs);
+}
+/* ---------- game state ---------- */
+function seat(name) {
+  return { name, hand: [], units: [], sources: [], fallen: [], deck: [], life: 20, essence: {}, laid: false };
+}
+const state = {
+  you: seat("You"), foe: seat("Varis"),
+  turn: "you", phase: "idle", over: false, busy: false, round: 0
+};
+const ui = { hover: null, held: null, drag: null, targeting: null, blockPick: null, pointerDown: null, pressTimer: null };
+const other = s => (s === "you" ? "foe" : "you");
+
+function effStats(c) {
+  let a = c.def.stats[0] + c.tempAtk, d = c.def.stats[1] + c.tempDef;
+  for (const o of state[c.owner].units) if (o !== c && o.def.aura) a += o.def.aura.atk || 0;
+  return [Math.max(0, a), d];
+}
+const isDead = c => effStats(c)[1] - c.damage <= 0;
+
+function essenceTotals(side) {
+  const t = {};
+  for (const s of state[side].sources) {
+    const k = s.def.gives;
+    t[k] = (t[k] || 0) + 1;
+  }
+  return t;
+}
+function canPay(side, cost) {
+  if (!cost) return true;
+  const pool = Object.assign({}, state[side].essence);
+  let free = 0;
+  for (const k of Object.keys(pool)) free += pool[k];
+  let need = cost.any || 0;
+  for (const k of Object.keys(cost)) {
+    if (k === "any") continue;
+    if ((pool[k] || 0) < cost[k]) return false;
+    pool[k] -= cost[k];
+    need += 0;
+    free -= cost[k];
+  }
+  return free >= need;
+}
+function pay(side, cost) {
+  if (!cost) return;
+  const pool = state[side].essence;
+  for (const k of Object.keys(cost)) {
+    if (k === "any") continue;
+    pool[k] -= cost[k];
+  }
+  let generic = cost.any || 0;
+  while (generic > 0) {
+    let best = null;
+    for (const k of Object.keys(pool)) if (pool[k] > 0 && (best === null || pool[k] > pool[best])) best = k;
+    if (best === null) break;
+    pool[best]--; generic--;
+  }
+}
+
+/* ---------- HUD ---------- */
+const el = id => document.getElementById(id);
+const dom = {
+  oppLife: el("oppLife"), oppHand: el("oppHand"), oppDeck: el("oppDeck"), oppFallen: el("oppFallen"),
+  myLife: el("myLife"), myDeck: el("myDeck"), myFallen: el("myFallen"),
+  oppLifeBox: el("oppLifeBox"), myLifeBox: el("myLifeBox"),
+  essence: el("essence"), phase: el("phaseLabel"), action: el("action"),
+  log: el("log"), banner: el("banner"), bannerText: el("bannerText"), bannerCancel: el("bannerCancel"),
+  inspect: el("inspect"), playBtn: el("playBtn"), closeBtn: el("closeBtn"),
+  veil: el("veil"), plateStart: el("plateStart"), plateEnd: el("plateEnd"),
+  result: el("result"), resultNote: el("resultNote")
+};
+
+const logLines = [];
+function say(text) {
+  logLines.push(text);
+  while (logLines.length > 5) logLines.shift();
+  dom.log.innerHTML = "";
+  for (const line of logLines) {
+    const d = document.createElement("div");
+    d.textContent = line;
+    dom.log.appendChild(d);
+  }
+}
+
+function updateHUD() {
+  dom.oppLife.textContent = state.foe.life;
+  dom.oppHand.textContent = state.foe.hand.length;
+  dom.oppDeck.textContent = state.foe.deck.length;
+  dom.oppFallen.textContent = state.foe.fallen.length;
+  dom.myLife.textContent = state.you.life;
+  dom.myDeck.textContent = state.you.deck.length;
+  dom.myFallen.textContent = state.you.fallen.length;
+  dom.oppLifeBox.classList.toggle("hurt", state.foe.life <= 5);
+  dom.myLifeBox.classList.toggle("hurt", state.you.life <= 5);
+  setStack(stacks.youDeck, state.you.deck.length);
+  setStack(stacks.foeDeck, state.foe.deck.length);
+
+  const totals = essenceTotals("you");
+  dom.essence.innerHTML = "";
+  const keys = Object.keys(totals);
+  if (!keys.length) {
+    const s = document.createElement("span");
+    s.style.cssText = "font-family:var(--data);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint)";
+    s.textContent = "No sources laid";
+    dom.essence.appendChild(s);
+  }
+  for (const k of keys) {
+    const grp = document.createElement("div");
+    grp.className = "ess-group";
+    grp.title = FACTIONS[k].label + " essence";
+    for (let i = 0; i < totals[k]; i++) {
+      const p = document.createElement("i");
+      p.className = "pip" + (i < (state.you.essence[k] || 0) ? "" : " spent");
+      p.style.background = FACTIONS[k].pip;
+      grp.appendChild(p);
+    }
+    dom.essence.appendChild(grp);
+  }
+
+  const labels = {
+    idle: "—", main: "Your turn · main", combat: "Your turn · combat",
+    blocking: "Varis attacks · blockers", foe: "Varis is thinking", over: "Finished"
+  };
+  dom.phase.textContent = labels[state.phase] || "—";
+
+  let label = "End turn", on = state.turn === "you" && !state.busy && !state.over;
+  if (state.phase === "combat") {
+    label = state.you.units.some(c => c.attacking) ? "Declare attack" : "End turn";
+  } else if (state.phase === "main") {
+    label = state.you.units.some(canAttack) ? "To combat" : "End turn";
+  } else if (state.phase === "blocking") {
+    label = state.foe.units.some(c => c.attacking && !blockersOf(c).length) ? "Take the hits" : "Resolve combat";
+    on = !state.busy;
+  } else if (state.phase === "foe" || state.phase === "idle") {
+    label = state.phase === "foe" ? "Varis is thinking" : "—";
+    on = false;
+  }
+  dom.action.textContent = label;
+  dom.action.disabled = !on;
+}
+
+function showBanner(text, cancellable, tone) {
+  dom.bannerText.textContent = text;
+  dom.bannerCancel.hidden = !cancellable;
+  dom.banner.hidden = false;
+  if (tone) dom.banner.dataset.tone = tone; else delete dom.banner.dataset.tone;
+}
+function hideBanner() { dom.banner.hidden = true; }
+
+/* ---------- stat badges ---------- */
+const badges = new Map();
+function badgeFor(c) {
+  let b = badges.get(c);
+  if (!b) {
+    const cv = newCanvas(200, 92);
+    const tex = new THREE.CanvasTexture(cv);
+    tex.encoding = THREE.sRGBEncoding;
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false, toneMapped: false }));
+    sp.scale.set(0.62, 0.285, 1);
+    sp.renderOrder = 6;
+    scene.add(sp);
+    b = { sprite: sp, cv, tex, key: "" };
+    badges.set(c, b);
+  }
+  return b;
+}
+function drawBadge(b, a, d, hurt) {
+  const ctx = b.cv.getContext("2d");
+  ctx.clearRect(0, 0, 200, 92);
+  roundRect(ctx, 6, 6, 188, 80, 12);
+  ctx.fillStyle = "rgba(10,8,6,.88)"; ctx.fill();
+  ctx.strokeStyle = hurt ? "rgba(200,72,47,.9)" : "rgba(201,146,47,.75)";
+  ctx.lineWidth = 4; ctx.stroke();
+  ctx.font = '700 44px "Cinzel",Georgia,serif';
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillStyle = hurt ? "#f0b6a6" : "#f4e6c8";
+  ctx.fillText(a + " / " + d, 100, 48);
+  b.tex.needsUpdate = true;
+}
+function updateBadges() {
+  for (const [c, b] of badges) b.sprite.visible = false;
+  for (const side of ["you", "foe"]) {
+    for (const c of state[side].units) {
+      const [a, d] = effStats(c);
+      const left = d - c.damage;
+      const base = c.def.stats;
+      if (a === base[0] && d === base[1] && c.damage === 0) continue;
+      const b = badgeFor(c);
+      const key = a + "/" + left + "/" + (c.damage > 0);
+      if (b.key !== key) { drawBadge(b, a, left, c.damage > 0); b.key = key; }
+      b.sprite.visible = true;
+      b.sprite.position.copy(c.obj.position);
+      b.sprite.position.y += 0.34;
+      b.sprite.position.z -= 0.42;
+    }
+  }
+}
+
+/* ---------- highlighting ---------- */
+const TONE = { ok: 0xc9922f, attack: 0xd4452b, block: 0x3f8fb8, target: 0xdcb85e, bad: 0x8a2f1f };
+function clearGlows() { for (const c of allCards) c.glowTone = null; }
+function refreshGlows() {
+  clearGlows();
+  if (state.over) return;
+  if (ui.targeting) {
+    for (const c of allCards) if (ui.targeting.predicate(c)) c.glowTone = TONE.target;
+    return;
+  }
+  if (state.phase === "combat") {
+    for (const c of state.you.units) c.glowTone = c.attacking ? TONE.attack : (canAttack(c) ? TONE.ok : null);
+  } else if (state.phase === "blocking") {
+    for (const c of state.foe.units) if (c.attacking) c.glowTone = TONE.attack;
+    for (const c of state.you.units) {
+      if (c === ui.blockPick) c.glowTone = TONE.block;
+      else if (c.blocking) c.glowTone = 0x2c6f8f;
+      else if (canBlock(c)) c.glowTone = TONE.ok;
+    }
+  } else if (state.phase === "main" && ui.hover && ui.hover.zone === "hand" && ui.hover.owner === "you") {
+    ui.hover.glowTone = playable(ui.hover) ? TONE.ok : TONE.bad;
+  }
+}
+
+/* ---------- block link lines ---------- */
+const linkGroup = new THREE.Group();
+scene.add(linkGroup);
+function updateLinks() {
+  while (linkGroup.children.length) {
+    const c = linkGroup.children.pop();
+    c.geometry.dispose(); linkGroup.remove(c);
+  }
+  const pairs = [];
+  for (const side of ["you", "foe"]) {
+    for (const c of state[side].units) {
+      if (c.blocking && c.blocking.zone === "units") pairs.push([c, c.blocking]);
+    }
+  }
+  for (const [b, a] of pairs) {
+    const geo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(b.obj.position.x, 0.1, b.obj.position.z),
+      new THREE.Vector3(a.obj.position.x, 0.1, a.obj.position.z)
+    ]);
+    const line = new THREE.Line(geo, new THREE.LineBasicMaterial({
+      color: 0x8fd0e8, transparent: true, opacity: .55, depthTest: false
+    }));
+    line.renderOrder = 4;
+    linkGroup.add(line);
+  }
+}
+/* ---------- rules helpers ---------- */
+const kw = (c, k) => (c.def.keywords || []).indexOf(k) >= 0;
+const canAttack = c => c.zone === "units" && !c.spent && !c.fresh && effStats(c)[0] > 0;
+const canBlock = c => c.zone === "units" && !c.spent && !kw(c, "noblock") && !c.blocking;
+function canBlockAttacker(b, a) {
+  if (kw(a, "elusive") && effStats(b)[1] - b.damage <= 2) return false;
+  return true;
+}
+function blockersOf(a) {
+  const out = [];
+  for (const side of ["you", "foe"]) for (const c of state[side].units) if (c.blocking === a) out.push(c);
+  return out;
+}
+function condOK(cond, c) {
+  const [a, d] = effStats(c);
+  if (cond === "atk>=3") return a >= 3;
+  if (cond === "def<=3") return d - c.damage <= 3;
+  return true;
+}
+function legalTargets(side, spec) {
+  const out = [];
+  for (const s of ["you", "foe"]) {
+    if (spec.target === "mine" && s !== side) continue;
+    for (const c of state[s].units) if (!spec.cond || condOK(spec.cond, c)) out.push(c);
+  }
+  return out;
+}
+function playable(c) {
+  if (state.over || state.busy || ui.targeting) return false;
+  if (state.turn !== "you" || state.phase !== "main") return false;
+  if (c.owner !== "you" || c.zone !== "hand") return false;
+  if (c.def.type === "Source") return !state.you.laid;
+  if (!canPay("you", c.def.cost)) return false;
+  const sp = c.def.spell;
+  if (sp && sp.target && !legalTargets("you", sp).length) return false;
+  return true;
+}
+function moveTo(c, zone) {
+  const s = state[c.owner];
+  for (const key of ["hand", "units", "sources", "fallen", "deck"]) {
+    const i = s[key].indexOf(c);
+    if (i >= 0) s[key].splice(i, 1);
+  }
+  c.zone = zone;
+  if (s[zone]) s[zone].push(c);
+}
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const does = (side, you, they) => side === "you" ? "You " + you : state[side].name + " " + they;
+
+/* ---------- drawing, playing, dying ---------- */
+async function drawCards(side, n) {
+  for (let i = 0; i < n; i++) {
+    const s = state[side];
+    if (!s.deck.length) { say(does(side, "have", "has") + " no cards left to draw."); continue; }
+    const c = s.deck[s.deck.length - 1];
+    snap(c, restingTransform(c));
+    c.obj.visible = true;
+    moveTo(c, "hand");
+    updateHUD();
+    await reflow({ dur: 0.44 });
+  }
+}
+
+async function playFromHand(side, c) {
+  const s = state[side];
+  const def = c.def;
+  if (def.type === "Source") {
+    s.laid = true;
+    moveTo(c, "sources");
+    s.essence[def.gives] = (s.essence[def.gives] || 0) + 1;
+    say(does(side, "lay", "lays") + " " + def.name + ".");
+    updateHUD();
+    await reflow({ dur: 0.4 });
+    return;
+  }
+  pay(side, def.cost);
+  updateHUD();
+  if (def.type === "Unit") {
+    moveTo(c, "units");
+    c.fresh = true;
+    say(does(side, "call", "calls") + " " + def.name + ".");
+    await reflow({ dur: 0.42 });
+    if (def.arrive) await applyEffect(side, def.arrive, c);
+  } else {
+    // a spell is held up over the middle of the table, then set down among the fallen
+    moveTo(c, "cast");
+    stopTweens(c);
+    const p = new THREE.Vector3(side === "you" ? 1.9 : -1.9, 1.5, side === "you" ? 1.5 : -1.5);
+    await animate(c, { pos: p, quat: faceCamera(p, 0, false), scale: 0.95 }, 0.34);
+    say(does(side, "cast", "casts") + " " + def.name + ".");
+    await wait(340);
+    if (def.spell) await applyEffect(side, def.spell, c);
+    moveTo(c, "fallen");
+    await reflow({ dur: 0.4 });
+  }
+  await checkDeaths();
+}
+
+function requestTarget(pred, prompt, cancellable) {
+  return new Promise(resolve => {
+    ui.targeting = { predicate: pred, resolve: resolve };
+    showBanner(prompt, !!cancellable);
+    refreshGlows();
+  });
+}
+function finishTarget(c) {
+  const t = ui.targeting;
+  ui.targeting = null;
+  hideBanner();
+  refreshGlows();
+  if (t) t.resolve(c);
+}
+
+function aiPickTarget(spec, cands) {
+  const mine = cands.filter(c => c.owner === "foe");
+  const theirs = cands.filter(c => c.owner === "you");
+  const worst = list => list.slice().sort((a, b) => {
+    const A = effStats(a), B = effStats(b);
+    return (B[0] * 2 + B[1]) - (A[0] * 2 + A[1]);
+  })[0];
+  if (spec.kind === "buff" && (spec.atk || 0) > 0) return worst(mine) || null;
+  return worst(theirs) || worst(mine) || null;
+}
+
+async function chooseTarget(side, spec, prompt) {
+  const cands = legalTargets(side, spec);
+  if (!cands.length) return null;
+  if (side === "foe") return aiPickTarget(spec, cands);
+  if (cands.length === 1 && !spec.optional) return cands[0];
+  return await requestTarget(c => cands.indexOf(c) >= 0, prompt, !!spec.optional);
+}
+
+async function applyEffect(side, spec, source) {
+  const s = state[side];
+  switch (spec.kind) {
+    case "damage": {
+      const t = await chooseTarget(side, spec, "Choose a unit to take " + spec.amount + " damage");
+      if (t) { t.damage += spec.amount; say(t.def.name + " takes " + spec.amount + " damage."); }
+      break;
+    }
+    case "buff": {
+      const up = (spec.atk || 0) >= 0;
+      const t = await chooseTarget(side, spec, up ? "Choose a unit to strengthen" : "Choose a unit to weaken");
+      if (t) {
+        t.tempAtk += spec.atk || 0; t.tempDef += spec.def || 0;
+        say(t.def.name + " is " + (up ? "strengthened" : "weakened") + ".");
+      }
+      break;
+    }
+    case "destroy": {
+      const t = await chooseTarget(side, spec, "Choose a unit with " + (spec.condText || "any stats") + " to destroy");
+      if (t) { t.damage = 999; say(t.def.name + " is destroyed."); }
+      break;
+    }
+    case "bounce": {
+      const t = await chooseTarget(side, spec, "Choose a unit to send back to hand");
+      if (t) {
+        t.tempAtk = 0; t.tempDef = 0; t.damage = 0; t.attacking = false; t.blocking = null; t.spent = false;
+        moveTo(t, "hand");
+        say(t.def.name + " is pulled back to hand.");
+        updateHUD();
+        await reflow({ dur: 0.4 });
+      }
+      break;
+    }
+    case "draw":
+      await drawCards(side, spec.amount);
+      break;
+    case "life":
+      s.life += spec.amount;
+      say(does(side, spec.amount >= 0 ? "gain" : "lose", spec.amount >= 0 ? "gains" : "loses") + " " + Math.abs(spec.amount) + " life.");
+      updateHUD();
+      break;
+  }
+  updateHUD();
+}
+
+async function checkDeaths() {
+  const dead = [];
+  for (const side of ["you", "foe"]) for (const c of state[side].units) if (isDead(c)) dead.push(c);
+  if (!dead.length) return;
+  for (const c of dead) {
+    c.tempAtk = 0; c.tempDef = 0; c.damage = 0;
+    c.attacking = false; c.blocking = null; c.spent = false;
+    for (const o of allCards) if (o.blocking === c) o.blocking = null;
+    moveTo(c, "fallen");
+    say(c.def.name + " falls.");
+  }
+  updateHUD();
+  await reflow({ dur: 0.45 });
+}
+
+/* ---------- combat ---------- */
+async function fight(attackSide) {
+  const defSide = other(attackSide);
+  const attackers = state[attackSide].units.filter(c => c.attacking);
+  if (!attackers.length) return;
+  hideBanner();
+  updateLinks();
+  await wait(420);
+
+  // the clash: attackers lunge, then settle
+  await Promise.all(attackers.map(a => {
+    const t = restingTransform(a);
+    t.pos.z += attackSide === "you" ? -0.3 : 0.3;
+    t.pos.y += 0.12;
+    return animate(a, t, 0.16);
+  }));
+
+  let lifeLoss = 0;
+  for (const a of attackers) {
+    const bl = blockersOf(a);
+    const atk = effStats(a)[0];
+    if (!bl.length) { lifeLoss += atk; continue; }
+    let left = atk;
+    for (const b of bl) {
+      a.damage += effStats(b)[0];
+      const room = Math.max(0, effStats(b)[1] - b.damage);
+      const give = Math.min(left, room);
+      b.damage += give;
+      left -= give;
+    }
+    if (left > 0 && kw(a, "overrun")) lifeLoss += left;
+  }
+  if (lifeLoss > 0) {
+    state[defSide].life -= lifeLoss;
+    say(does(defSide, "take", "takes") + " " + lifeLoss + " damage.");
+    flashDamage(defSide);
+  } else {
+    say("Nothing gets through.");
+  }
+  updateHUD();
+  for (const c of state[attackSide].units) c.attacking = false;
+  for (const side of ["you", "foe"]) for (const c of state[side].units) c.blocking = null;
+  updateLinks();
+  await reflow({ dur: 0.34 });
+  await checkDeaths();
+}
+
+function flashDamage(side) {
+  const box = side === "you" ? dom.myLifeBox : dom.oppLifeBox;
+  box.animate(
+    [{ boxShadow: "0 0 0 0 rgba(200,72,47,.9)" }, { boxShadow: "0 0 0 14px rgba(200,72,47,0)" }],
+    { duration: 620, easing: "ease-out" }
+  );
+}
+
+async function declareMyAttack() {
+  state.busy = true; updateHUD();
+  const attackers = state.you.units.filter(c => c.attacking);
+  for (const a of attackers) {
+    if (!kw(a, "vigilant")) a.spent = true;
+    if (a.def.onAttack) await applyEffect("you", a.def.onAttack, a);
+  }
+  say("You send in " + attackers.length + (attackers.length === 1 ? " unit." : " units."));
+  await reflow({ dur: 0.36 });
+  // Varis blocks
+  const available = state.foe.units.filter(canBlock);
+  for (const a of attackers.slice().sort((x, y) => effStats(y)[0] - effStats(x)[0])) {
+    let pick = null, pickScore = -1;
+    for (const b of available) {
+      if (b.blocking || !canBlockAttacker(b, a)) continue;
+      const [ba, bd] = effStats(b), [aa, ad] = effStats(a);
+      const kills = ba >= ad - a.damage, dies = aa >= bd - b.damage;
+      let score = (kills ? 3 : 0) + (dies ? 0 : 2) + (aa >= state.foe.life ? 4 : 0);
+      if (!kills && dies && state.foe.life > aa + 4) score = -1;
+      if (score > pickScore) { pickScore = score; pick = b; }
+    }
+    if (pick && pickScore > 0) pick.blocking = a;
+  }
+  const blocks = state.foe.units.filter(c => c.blocking).length;
+  say(blocks ? "Varis blocks with " + blocks + (blocks === 1 ? " unit." : " units.") : "Varis lets them through.");
+  await reflow({ dur: 0.34 });
+  await fight("you");
+  await endTurn("you");
+}
+
+let blockResolve = null;
+async function foeDeclareAttack(attackers) {
+  for (const a of attackers) {
+    a.attacking = true;
+    if (!kw(a, "vigilant")) a.spent = true;
+    if (a.def.onAttack) await applyEffect("foe", a.def.onAttack, a);
+  }
+  say("Varis attacks with " + attackers.length + (attackers.length === 1 ? " unit." : " units."));
+  state.phase = "blocking";
+  state.busy = false;
+  ui.blockPick = null;
+  refreshGlows(); updateHUD();
+  await reflow({ dur: 0.4 });
+  showBanner("Click one of your units, then an attacker, to block.", false, "attack");
+  await new Promise(res => { blockResolve = res; });
+  blockResolve = null;
+  state.busy = true;
+  ui.blockPick = null;
+  refreshGlows(); updateHUD();
+  await fight("foe");
+}
+
+/* ---------- turn flow ---------- */
+async function startTurn(side) {
+  if (state.over) return;
+  const s = state[side];
+  state.turn = side;
+  state.phase = side === "you" ? "main" : "foe";
+  state.busy = side !== "you";
+  s.laid = false;
+  for (const c of s.units) { c.spent = false; c.fresh = false; c.attacking = false; c.blocking = null; }
+  s.essence = essenceTotals(side);
+  say(side === "you" ? "Your turn." : "Varis takes the turn.");
+  updateHUD(); refreshGlows();
+  await reflow({ dur: 0.3 });
+  await drawCards(side, 1);
+  if (checkEnd()) return;
+  if (side === "you") {
+    state.busy = false;
+    updateHUD(); refreshGlows();
+  } else {
+    await foeTurn();
+  }
+}
+
+async function endTurn(side) {
+  for (const c of allCards) {
+    c.tempAtk = 0; c.tempDef = 0; c.damage = 0;
+    c.attacking = false; c.blocking = null;
+  }
+  hideBanner();
+  updateLinks();
+  updateHUD();
+  await reflow({ dur: 0.3 });
+  if (checkEnd()) return;
+  await startTurn(other(side));
+}
+
+function checkEnd() {
+  if (state.over) return true;
+  const youOut = state.you.life <= 0, foeOut = state.foe.life <= 0;
+  if (!youOut && !foeOut) return false;
+  state.over = true;
+  state.phase = "over";
+  hideBanner();
+  clearGlows();
+  updateHUD();
+  dom.plateStart.hidden = true;
+  dom.plateEnd.hidden = false;
+  dom.result.textContent = foeOut && !youOut ? "The near seat holds" : youOut && !foeOut ? "Varis takes the table" : "Both seats fall";
+  dom.resultNote.textContent = foeOut && !youOut
+    ? "Varis is out of life. The lamp is yours until someone deals again."
+    : "Your life is spent. Varis gathers the cards without a word.";
+  dom.veil.classList.remove("gone");
+  return true;
+}
+
+/* ---------- the far seat plays ---------- */
+async function foeTurn() {
+  state.busy = true; updateHUD();
+  await wait(520);
+  const s = state.foe;
+
+  const src = s.hand.find(c => c.def.type === "Source");
+  if (src && !s.laid) { await playFromHand("foe", src); await wait(300); }
+
+  for (let guard = 0; guard < 8; guard++) {
+    const options = s.hand.filter(c => {
+      if (c.def.type === "Source") return false;
+      if (!canPay("foe", c.def.cost)) return false;
+      const sp = c.def.spell;
+      if (sp && sp.target && !legalTargets("foe", sp).length) return false;
+      return true;
+    });
+    if (!options.length) break;
+    const threat = state.you.units.reduce((m, c) => Math.max(m, effStats(c)[0] * 2 + effStats(c)[1]), 0);
+    const score = c => {
+      const total = costTotal(c.def.cost || {});
+      if (c.def.type === "Unit") return 10 + total + effStats(c)[0];
+      const sp = c.def.spell;
+      if (!sp) return 4;
+      if (sp.kind === "destroy" || sp.kind === "bounce") return threat >= 7 ? 26 : 3;
+      if (sp.kind === "buff" && (sp.atk || 0) < 0) return threat >= 5 ? 18 : 3;
+      if (sp.kind === "draw") return 12;
+      return 8;
+    };
+    options.sort((a, b) => score(b) - score(a));
+    const pickCard = options[0];
+    if (score(pickCard) < 5) break;
+    await playFromHand("foe", pickCard);
+    await wait(360);
+    if (checkEnd()) return;
+  }
+
+  const blockers = state.you.units.filter(canBlock);
+  const attackers = s.units.filter(u => {
+    if (!canAttack(u)) return false;
+    const [a, d] = effStats(u);
+    if (!blockers.length) return true;
+    const survives = blockers.every(b => effStats(b)[0] < d - u.damage);
+    const kills = blockers.some(b => a >= effStats(b)[1] - b.damage);
+    return survives || kills || state.you.life <= a;
+  });
+  if (attackers.length) {
+    await foeDeclareAttack(attackers);
+    if (checkEnd()) return;
+  } else {
+    say("Varis holds the line.");
+  }
+  await endTurn("foe");
+}
+
+/* ---------- pointer input ---------- */
+const rayc = new THREE.Raycaster();
+const ndc = new THREE.Vector2();
+const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+const hitPoint = new THREE.Vector3();
+
+function setNDC(e) {
+  ndc.x = (e.clientX / window.innerWidth) * 2 - 1;
+  ndc.y = -(e.clientY / window.innerHeight) * 2 + 1;
+}
+function pickList() {
+  const out = [];
+  for (const c of allCards) {
+    if (!c.obj.visible) continue;
+    if (c.zone === "units" || c.zone === "sources") out.push(c.front);
+    else if (c.zone === "hand" && c.owner === "you") out.push(c.front);
+  }
+  return out;
+}
+function pickCardAt(e) {
+  setNDC(e);
+  rayc.setFromCamera(ndc, camera);
+  const hits = rayc.intersectObjects(pickList(), false);
+  return hits.length ? hits[0].object.userData.card : null;
+}
+function matPointAt(e) {
+  setNDC(e);
+  rayc.setFromCamera(ndc, camera);
+  return rayc.ray.intersectPlane(dragPlane, hitPoint) ? hitPoint.clone() : null;
+}
+
+const veilPlane = new THREE.Mesh(
+  new THREE.PlaneGeometry(30, 30),
+  new THREE.MeshBasicMaterial({ color: 0x06050a, transparent: true, opacity: .8, depthWrite: false, toneMapped: false })
+);
+veilPlane.position.z = -2.95;
+veilPlane.visible = false;
+camera.add(veilPlane);
+scene.add(camera);
+
+function holdCard(c) {
+  if (ui.held === c) return;
+  if (ui.held) releaseHold(true);
+  ui.held = c;
+  stopTweens(c);
+  c.front.castShadow = false;
+  const fwd = new THREE.Vector3();
+  camera.getWorldDirection(fwd);
+  const p = camera.position.clone().addScaledVector(fwd, 2.55);
+  animate(c, { pos: p, quat: faceCamera(p, 0, false), scale: SCALE.hold }, 0.3);
+  veilPlane.visible = true;
+  dom.playBtn.hidden = !playable(c);
+  dom.inspect.hidden = false;
+}
+function releaseHold(quiet) {
+  const c = ui.held;
+  ui.held = null;
+  veilPlane.visible = false;
+  dom.inspect.hidden = true;
+  if (c) { stopTweens(c); syncShadow(c); animate(c, restingTransform(c), quiet ? 0.2 : 0.3); }
+}
+
+function onCardClick(c) {
+  if (ui.targeting) {
+    if (ui.targeting.predicate(c)) finishTarget(c);
+    return;
+  }
+  if (state.phase === "blocking" && !state.busy) {
+    if (c.owner === "you" && c.zone === "units") {
+      if (c.blocking) { c.blocking = null; ui.blockPick = null; }
+      else if (canBlock(c)) ui.blockPick = ui.blockPick === c ? null : c;
+      else { say(c.def.name + " cannot block."); return; }
+      refreshGlows(); updateLinks(); updateHUD(); reflow({ dur: .24 });
+      return;
+    }
+    if (c.owner === "foe" && c.attacking && ui.blockPick) {
+      if (!canBlockAttacker(ui.blockPick, c)) { say(c.def.name + " slips past small blockers."); return; }
+      ui.blockPick.blocking = c;
+      ui.blockPick = null;
+      refreshGlows(); updateHUD(); reflow({ dur: .24 }).then(updateLinks);
+      return;
+    }
+    holdCard(c);
+    return;
+  }
+  if (state.phase === "combat" && !state.busy && c.owner === "you" && c.zone === "units") {
+    if (!canAttack(c)) {
+      say(c.fresh ? c.def.name + " only just arrived." : c.def.name + " is spent.");
+      return;
+    }
+    c.attacking = !c.attacking;
+    refreshGlows(); updateHUD(); reflow({ dur: .24 });
+    return;
+  }
+  holdCard(c);
+}
+
+canvasEl.addEventListener("pointermove", e => {
+  if (ui.drag) {
+    const p = matPointAt(e);
+    if (p) {
+      const c = ui.drag;
+      c.obj.position.set(p.x, 0.55, p.z);
+      c.obj.quaternion.copy(flatQuat(true, 0.62));
+      c.obj.scale.setScalar(SCALE.hand * .92);
+    }
+    return;
+  }
+  if (ui.pointerDown && !ui.drag) {
+    const d = Math.abs(e.clientX - ui.pointerDown.x) + Math.abs(e.clientY - ui.pointerDown.y);
+    if (d > 10) {
+      clearTimeout(ui.pressTimer);
+      const c = ui.pointerDown.card;
+      if (c && playable(c)) {
+        ui.drag = c;
+        stopTweens(c);
+        c.front.castShadow = false;
+        if (ui.hover === c) ui.hover = null;
+        showBanner("Drop it on your half of the mat", true);
+      } else {
+        ui.pointerDown = null;
+      }
+    }
+    return;
+  }
+  if (ui.held || state.busy) return;
+  const c = pickCardAt(e);
+  const next = c && c.zone === "hand" && c.owner === "you" ? c : null;
+  if (next !== ui.hover) {
+    ui.hover = next;
+    refreshGlows();
+    reflow({ dur: .18 });
+  }
+  canvasEl.style.cursor = c ? "pointer" : "default";
+});
+
+canvasEl.addEventListener("pointerdown", e => {
+  if (e.button === 2) return;
+  if (ui.held) { releaseHold(); return; }
+  const c = pickCardAt(e);
+  ui.pointerDown = c ? { x: e.clientX, y: e.clientY, card: c } : { x: e.clientX, y: e.clientY, card: null };
+  if (c) {
+    clearTimeout(ui.pressTimer);
+    ui.pressTimer = setTimeout(() => {
+      if (ui.pointerDown && !ui.drag) { ui.pointerDown = null; holdCard(c); }
+    }, 480);
+  }
+});
+
+window.addEventListener("pointerup", async e => {
+  clearTimeout(ui.pressTimer);
+  const down = ui.pointerDown;
+  ui.pointerDown = null;
+  if (ui.drag) {
+    const c = ui.drag;
+    ui.drag = null;
+    hideBanner();
+    const p = matPointAt(e);
+    const ok = p && p.z > 0.1 && p.z < MAT_D / 2 && Math.abs(p.x) < MAT_W / 2 && playable(c);
+    if (ok) {
+      state.busy = true; updateHUD();
+      await playFromHand("you", c);
+      state.busy = false;
+      refreshGlows(); updateHUD();
+      if (checkEnd()) return;
+    } else {
+      animate(c, restingTransform(c), 0.3);
+    }
+    return;
+  }
+  if (!down || !down.card) return;
+  const moved = Math.abs(e.clientX - down.x) + Math.abs(e.clientY - down.y) > 10;
+  if (!moved) onCardClick(down.card);
+});
+
+canvasEl.addEventListener("contextmenu", e => {
+  e.preventDefault();
+  const c = pickCardAt(e);
+  if (c) holdCard(c);
+});
+window.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    if (ui.held) releaseHold();
+    else if (ui.targeting && !dom.bannerCancel.hidden) finishTarget(null);
+  }
+});
+
+/* ---------- HUD wiring ---------- */
+dom.bannerCancel.addEventListener("click", () => {
+  if (ui.targeting) finishTarget(null);
+  else if (ui.drag) { const c = ui.drag; ui.drag = null; hideBanner(); animate(c, restingTransform(c), .3); }
+  else hideBanner();
+});
+dom.closeBtn.addEventListener("click", () => releaseHold());
+dom.playBtn.addEventListener("click", async () => {
+  const c = ui.held;
+  if (!c || !playable(c)) return;
+  releaseHold(true);
+  state.busy = true; updateHUD();
+  await playFromHand("you", c);
+  state.busy = false;
+  refreshGlows(); updateHUD();
+  checkEnd();
+});
+dom.action.addEventListener("click", async () => {
+  if (state.busy || state.over) return;
+  if (state.phase === "blocking") {
+    if (blockResolve) blockResolve();
+    return;
+  }
+  if (state.turn !== "you") return;
+  if (state.phase === "main") {
+    if (state.you.units.some(canAttack)) {
+      state.phase = "combat";
+      refreshGlows(); updateHUD();
+      showBanner("Click your units to send them in, then declare the attack.", false);
+      return;
+    }
+    state.busy = true; updateHUD();
+    await endTurn("you");
+    return;
+  }
+  if (state.phase === "combat") {
+    if (state.you.units.some(c => c.attacking)) await declareMyAttack();
+    else { state.busy = true; updateHUD(); await endTurn("you"); }
+  }
+});
+
+/* ---------- render loop ---------- */
+const clock = new THREE.Clock();
+function frame() {
+  const dt = Math.min(0.05, clock.getDelta());
+  const t = clock.elapsedTime;
+  updateTweens(dt);
+  for (const c of allCards) {
+    const want = c.glowTone;
+    const target = want == null ? 0 : (c === ui.hover || c.attacking || c === ui.blockPick ? .85 : .42 + Math.sin(t * 2.6 + c.uid) * .12);
+    if (want != null) c.glow.material.color.setHex(want);
+    c.glow.material.opacity += (target - c.glow.material.opacity) * Math.min(1, dt * 12);
+    c.glow.visible = c.glow.material.opacity > 0.01;
+  }
+  if (ui.held) { for (const [, b] of badges) b.sprite.visible = false; }
+  else updateBadges();
+  if (linkGroup.children.length && tweens.length) updateLinks();
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+
+/* ---------- boot ---------- */
+function buildDeck(side) {
+  const list = [];
+  for (const [id, n] of DECKLIST[side]) for (let i = 0; i < n; i++) list.push(SET[id]);
+  shuffle(list);
+  const s = state[side];
+  for (const def of list) {
+    const c = makeCard(def, side);
+    c.zone = "deck";
+    s.deck.push(c);
+  }
+  for (const c of s.deck) snap(c, restingTransform(c));
+}
+
+async function fontsReady() {
+  if (!document.fonts) return;
+  try {
+    await Promise.all([
+      document.fonts.load('700 27px "Cinzel"'),
+      document.fonts.load('500 20px "Cinzel"'),
+      document.fonts.load('400 21px "Spectral"'),
+      document.fonts.load('italic 400 19px "Spectral"'),
+      document.fonts.load('600 15px "Barlow Condensed"')
+    ]);
+    await document.fonts.ready;
+  } catch (err) { /* fall back to the stack in the font declarations */ }
+}
+const nextFrame = () => new Promise(r => requestAnimationFrame(() => r()));
+
+async function prepare() {
+  const startBtn = el("startBtn");
+  startBtn.disabled = true;
+  startBtn.textContent = "Printing the set…";
+  layoutViewport();
+  frame();
+  await fontsReady();
+  getBackTexture();
+  const ids = new Set();
+  for (const side of ["you", "foe"]) for (const [id] of DECKLIST[side]) ids.add(id);
+  let n = 0;
+  for (const id of ids) { faceTexture(SET[id]); if (++n % 4 === 0) await nextFrame(); }
+  buildDeck("you"); buildDeck("foe");
+  for (const side of ["you", "foe"]) {
+    for (let i = 0; i < 6; i++) {
+      const c = state[side].deck[state[side].deck.length - 1];
+      if (!c) break;
+      c.obj.visible = true;
+      moveTo(c, "hand");
+    }
+  }
+  await reflow({ dur: 0 });
+  updateHUD();
+  startBtn.disabled = false;
+  startBtn.textContent = "Take your seat";
+}
+
+el("startBtn").addEventListener("click", async () => {
+  dom.veil.classList.add("gone");
+  say("Six cards each. You have the near seat.");
+  await wait(340);
+  await startTurn("you");
+});
+el("againBtn").addEventListener("click", () => location.reload());
+
+prepare();
+
+</script>
+
+</body>
+</html>
