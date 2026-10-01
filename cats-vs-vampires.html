@@ -585,8 +585,8 @@ const ZONE = {
   youHand: { z: 3.95, y: 1.5 }, foeHand: { z: -4.62, y: 1.16 }
 };
 const PILE = {
-  youDeck: [-4.55, 3.0], youYard: [-3.6, 3.78],
-  foeDeck: [4.55, -3.0], foeYard: [3.6, -3.78]
+  youDeck: [-4.3, 1.45], youYard: [-4.3, 0.05],
+  foeDeck: [4.3, -1.45], foeYard: [4.3, -0.05]
 };
 const SCALE = { table: 0.72, land: 0.6, hand: 0.74, handTall: 1.46, hold: 0.9 };
 /* A phone gets a narrower board: the stacks tighten and the seats move in. */
@@ -674,8 +674,8 @@ function applyLayout() {
   if (narrow) {
     LAY.landX0 = -2.8; LAY.landStep = 0.26; LAY.unitX = 0.1; LAY.unitSpan = 4.9;
     ZONE.youHand.z = 3.72; ZONE.youHand.y = 1.68;
-    PILE.youDeck = [-3.15, 2.9]; PILE.youYard = [-2.45, 3.62];
-    PILE.foeDeck = [3.15, -2.9]; PILE.foeYard = [2.45, -3.62];
+    PILE.youDeck = [-3.4, 1.35]; PILE.youYard = [-3.4, 0.1];
+    PILE.foeDeck = [3.4, -1.35]; PILE.foeYard = [3.4, -0.1];
     if (avatars) {
       avatars.you.sprite.position.set(2.9, 0.42, 3.1); avatars.you.sprite.scale.set(1.05, 1.36, 1);
       avatars.foe.sprite.position.set(-2.9, 0.42, -3.1); avatars.foe.sprite.scale.set(1.05, 1.36, 1);
@@ -683,8 +683,8 @@ function applyLayout() {
   } else {
     LAY.landX0 = -3.45; LAY.landStep = 0.4; LAY.unitX = 0.55; LAY.unitSpan = 6.9;
     ZONE.youHand.z = 3.95; ZONE.youHand.y = 1.5;
-    PILE.youDeck = [-4.55, 3.0]; PILE.youYard = [-3.6, 3.78];
-    PILE.foeDeck = [4.55, -3.0]; PILE.foeYard = [3.6, -3.78];
+    PILE.youDeck = [-4.3, 1.45]; PILE.youYard = [-4.3, 0.05];
+    PILE.foeDeck = [4.3, -1.45]; PILE.foeYard = [4.3, -0.05];
     if (avatars) {
       avatars.you.sprite.position.set(3.95, 0.42, 3.28); avatars.you.sprite.scale.set(1.24, 1.6, 1);
       avatars.foe.sprite.position.set(-3.95, 0.42, -3.28); avatars.foe.sprite.scale.set(1.24, 1.6, 1);
@@ -1887,7 +1887,7 @@ function emberMaterial(opt) {
         if (uCross > 0.5) {
           // carried across the field, but only while a gust is running
           float stagger = aSeed.x * 0.34;
-          float sits = step(0.46, hash11(uCycle + aSeed.y * 13.0));   // a different crowd each gust
+          float sits = step(0.58, hash11(uCycle + aSeed.y * 13.0));   // a different crowd each gust
           life = (uPhase - stagger) / 0.52;
           alive = step(0.0, life) * step(life, 1.0) * sits;
         } else {
@@ -1977,7 +1977,7 @@ function sowEmbers(opt) {
 // sparks climbing out of the two braziers
 sowEmbers({
   count: 520, seed: 77123, travel: 1.6, rise: 2.9, turbA: 0.3, turbF: 2.1,
-  size: 0.05, stretch: 0.8, bright: 2.9, gustWind: 9.0, cross: false,
+  size: 0.046, stretch: 0.8, bright: 2.1, gustWind: 9.0, cross: false,
   spawn: rand => {
     const b = braziers[Math.floor(rand() * braziers.length)].at;
     return { x: b.x + (rand() - .5) * 0.75, y: b.y + 0.05 + rand() * 0.25, z: b.z + (rand() - .5) * 0.75 };
@@ -1986,7 +1986,7 @@ sowEmbers({
 // and the swarm the gust tears across the whole field
 const gustEmberMat = sowEmbers({
   count: HEAVY_FX ? 2600 : 1000, seed: 5521, travel: 34, rise: 1.1, turbA: 0.95, turbF: 1.7,
-  size: 0.056, stretch: 0.85, bright: 2.5, gustWind: 0, cross: true,
+  size: 0.05, stretch: 0.85, bright: 1.7, gustWind: 0, cross: true,
   spawn: rand => ({
     x: -17 - rand() * 4,
     y: 0.12 + Math.pow(rand(), 1.6) * 2.9,
@@ -2103,7 +2103,7 @@ const smokeMat = new THREE.ShaderMaterial({
     varying float vA, vFog, vUp;
     varying vec3 vW;
     void main(){
-      float a = texture2D(uMap, vUv).a * vA * 0.3;
+      float a = texture2D(uMap, vUv).a * vA * 0.19;
       if (a < 0.004) discard;
       vec3 lit = mix(vec3(0.045, 0.048, 0.052), vec3(0.40, 0.43, 0.47), smoothstep(0.1, 0.95, vUp));
       float dA = length(vW - uEmberA), dB = length(vW - uEmberB);
@@ -2466,10 +2466,10 @@ function makeCard(def, owner) {
   const c = {
     uid: ++uidCounter, def, owner, obj: g, front, back, glow,
     zone: "library",
-    tapped: false, summoningSick: true, attacking: false, blocking: null,
+    tapped: false, summoningSick: true, attacking: false, blocking: null, blocked: false,
     damage: 0, counters: 0, pumpP: 0, pumpT: 0, granted: [],
     auras: [], attachedTo: null,
-    glowTone: null
+    glowTone: null, glowSoft: false
   };
   g.userData.card = c;
   front.userData.card = c;
@@ -2571,19 +2571,21 @@ function restingTransform(c) {
         const pos = new THREE.Vector3(x, conf.y - 0.09 * a * a, conf.z + 0.16 * a * a);
         return { pos, quat: faceCamera(pos, -a * 0.09, false), scale: SCALE.handTall };
       }
-      const per = mine ? (narrow ? 0.062 : 0.075) : 0.055;
-      const spread = Math.min(mine ? 0.46 : 0.36, n * per);
-      const XR = mine ? (narrow ? 4.2 : 4.9) : 4.2;
-      const YR = mine ? 7.6 : 5.6;
-      const th = t * spread;
-      const drop = YR * (Math.cos(th) - 1);
+      // a constant step, so the cards always overlap however many you hold,
+      // laid on a very shallow arc rather than a wide fan
       const side = mine ? 1 : -1;
+      const step = mine ? Math.min(0.58, 6.9 / Math.max(1, n - 1))
+                        : Math.min(0.42, 4.8 / Math.max(1, n - 1));
+      const total = (n - 1) * step;
+      const x = i * step - total / 2;
+      const R = mine ? 16 : 13;
+      const drop = -(x * x) / (2 * R);
       const pos = new THREE.Vector3(
-        XR * Math.sin(th) * side,
-        conf.y + drop * 0.45,
-        conf.z - drop * 0.3 * side
+        x * side,
+        conf.y + drop * 0.85,
+        conf.z - drop * 0.45 * side
       );
-      return { pos, quat: faceCamera(pos, -th * side, !mine), scale: mine ? SCALE.hand : SCALE.hand * .78 };
+      return { pos, quat: faceCamera(pos, (-x / R) * side, !mine), scale: mine ? SCALE.hand : SCALE.hand * .78 };
     }
     case "lands": {
       const row = state[c.owner].lands;
@@ -2748,6 +2750,9 @@ function blockersOf(a) {
   for (const side of ["you", "foe"]) for (const c of state[side].board) if (c.blocking === a) out.push(c);
   return out;
 }
+function lockBlocks(attackSide) {
+  for (const a of state[attackSide].board) if (a.attacking) a.blocked = blockersOf(a).length > 0;
+}
 const isDead = c => effStats(c)[1] - c.damage <= 0 && !c.granted.includes("indestructible");
 
 function moveTo(c, zone) {
@@ -2813,6 +2818,7 @@ function updateHUD() {
   }
 
   clampHandScroll();
+  if (!ui.targeting) refreshGlows();
   const labels = {
     idle: "—", main: "Your turn · main", combat: "Your turn · attackers",
     blocking: "Their attack · blockers", foe: "Their turn", over: "Finished"
@@ -2902,7 +2908,7 @@ function updateBadges() {
 
 /* ---------- glows ---------- */
 const TONE = { ok: 0xc8a24a, attack: 0xd4452b, block: 0x4f9fd8, target: 0x7fd4a0, bad: 0x8a2f1f };
-function clearGlows() { for (const c of allCards) c.glowTone = null; }
+function clearGlows() { for (const c of allCards) { c.glowTone = null; c.glowSoft = false; } }
 function refreshGlows() {
   clearGlows();
   if (state.over) return;
@@ -2920,8 +2926,12 @@ function refreshGlows() {
       else if (canBlockWith(c)) c.glowTone = TONE.ok;
     }
   }
+  for (const c of state.you.hand) {
+    if (playable(c)) { c.glowTone = TONE.ok; c.glowSoft = true; }
+  }
   if (ui.hover && ui.hover.zone === "hand" && ui.hover.owner === "you") {
     ui.hover.glowTone = playable(ui.hover) ? TONE.ok : TONE.bad;
+    ui.hover.glowSoft = false;
   }
 }
 
@@ -3249,39 +3259,61 @@ async function drawCards(side, n) {
 }
 const does = (side, you, they) => side === "you" ? "You " + you : state[side].name + " " + they;
 /* ---------- combat ---------- */
+/* Combat damage in one pass is simultaneous: everything is worked out from
+   the state at the start of the pass and applied together, so a creature that
+   dies to its attacker still deals its own damage back. A creature that was
+   blocked stays blocked — if its blockers leave before damage, nothing gets
+   through to the player. */
 function dealPass(attackSide, first) {
   const defSide = other(attackSide);
+  const alive = c => c.zone === "board" && !isDead(c);
+  const pending = new Map();
+  const slain = new Set();
+  const hit = (c, n) => pending.set(c, (pending.get(c) || 0) + n);
+  const gain = { you: 0, foe: 0 };
   let lifeLoss = 0;
+
   for (const a of state[attackSide].board.slice()) {
-    if (!a.attacking || isDead(a)) continue;
+    if (!a.attacking || !alive(a)) continue;
     if (first !== kwHas(a, "firstStrike")) continue;
-    const bl = blockersOf(a).filter(b => !isDead(b));
+    const bl = blockersOf(a).filter(alive);
     const ap = effStats(a)[0];
     if (!bl.length) {
-      lifeLoss += ap;
-      if (kwHas(a, "lifelink")) gainLife(attackSide, ap);
+      if (a.blocked) continue;             // blocked once, blocked for good
+      if (ap > 0) {
+        lifeLoss += ap;
+        if (kwHas(a, "lifelink")) gain[attackSide] += ap;
+      }
       continue;
     }
+    if (ap <= 0) continue;
     let left = ap;
     const dt = kwHas(a, "deathtouch");
     for (const b of bl) {
       const need = dt ? 1 : Math.max(0, effStats(b)[1] - b.damage);
       const give = Math.min(left, need);
-      if (give > 0) b.damage += dt ? 999 : give;
+      if (give > 0) { hit(b, give); if (dt) slain.add(b); }
       left -= give;
     }
-    if (kwHas(a, "lifelink")) gainLife(attackSide, ap - left);
+    if (kwHas(a, "lifelink")) gain[attackSide] += ap - left;
   }
+
   for (const side of ["you", "foe"]) {
     for (const b of state[side].board.slice()) {
-      if (!b.blocking || isDead(b)) continue;
+      if (!b.blocking || !alive(b)) continue;
       if (first !== kwHas(b, "firstStrike")) continue;
+      if (!alive(b.blocking)) continue;
       const bp = effStats(b)[0];
       if (bp <= 0) continue;
-      b.blocking.damage += kwHas(b, "deathtouch") ? 999 : bp;
-      if (kwHas(b, "lifelink")) gainLife(side, bp);
+      hit(b.blocking, bp);
+      if (kwHas(b, "deathtouch")) slain.add(b.blocking);
+      if (kwHas(b, "lifelink")) gain[side] += bp;
     }
   }
+
+  for (const [c, n] of pending) c.damage += n;
+  for (const c of slain) c.damage = 999;
+  for (const side of ["you", "foe"]) if (gain[side] > 0) gainLife(side, gain[side]);
   if (lifeLoss > 0) {
     loseLife(defSide, lifeLoss);
     say(does(defSide, "take", "takes") + " " + lifeLoss + " damage.");
@@ -3321,7 +3353,7 @@ async function fight(attackSide) {
   if (!any && !inCombat.length) say("Nothing gets through.");
   updateHUD();
 
-  for (const c of state[attackSide].board) c.attacking = false;
+  for (const c of state[attackSide].board) { c.attacking = false; c.blocked = false; }
   for (const side of ["you", "foe"]) for (const c of state[side].board) c.blocking = null;
   updateLinks();
   await reflow({ dur: 0.34 });
@@ -3368,6 +3400,7 @@ async function declareMyAttack() {
       }
     }
   }
+  lockBlocks("you");
   const blocks = state.foe.board.filter(c => c.blocking).length;
   say(blocks ? "The Court blocks with " + blocks + "." : "The Court lets them through.");
   updateLinks();
@@ -3400,6 +3433,7 @@ async function foeDeclareAttack(attackers) {
   blockResolve = null;
   state.busy = true;
   ui.blockPick = null;
+  lockBlocks("foe");
   refreshGlows(); updateHUD();
   await foeCombatTrick();
   await fight("foe");
@@ -3451,7 +3485,7 @@ async function endTurn(side) {
   for (const c of allCards) {
     c.pumpP = 0; c.pumpT = 0; c.damage = 0;
     c.granted.length = 0;
-    c.attacking = false; c.blocking = null;
+    c.attacking = false; c.blocking = null; c.blocked = false;
   }
   hideBanner();
   updateLinks(); updateHUD();
@@ -3575,7 +3609,7 @@ function matPointAt(e) {
 
 const veilPlane = new THREE.Mesh(
   new THREE.PlaneGeometry(30, 30),
-  new THREE.MeshBasicMaterial({ color: 0x05060a, transparent: true, opacity: .82, depthWrite: false, toneMapped: false })
+  new THREE.MeshBasicMaterial({ color: 0x05060a, transparent: true, opacity: .76, depthWrite: false, toneMapped: false })
 );
 veilPlane.position.z = -2.95;
 veilPlane.visible = false;
@@ -3588,6 +3622,10 @@ function holdCard(c) {
   ui.held = c;
   stopTweens(c);
   c.front.castShadow = false;
+  c.front.renderOrder = 30;
+  c.back.renderOrder = 30;
+  c.glow.renderOrder = 31;
+  c.front.material.color.setScalar(1.32);
   const fwd = new THREE.Vector3();
   camera.getWorldDirection(fwd);
   const p = camera.position.clone().addScaledVector(fwd, 2.55);
@@ -3604,7 +3642,14 @@ function releaseHold(quiet) {
   ui.held = null;
   veilPlane.visible = false;
   dom.inspect.hidden = true;
-  if (c) { stopTweens(c); syncShadow(c); animate(c, restingTransform(c), quiet ? 0.2 : 0.3); }
+  if (c) {
+    c.front.renderOrder = 0;
+    c.back.renderOrder = 0;
+    c.glow.renderOrder = 0;
+    c.front.material.color.setScalar(1);
+    stopTweens(c); syncShadow(c);
+    animate(c, restingTransform(c), quiet ? 0.2 : 0.3);
+  }
 }
 
 function onCardClick(c) {
@@ -3873,7 +3918,7 @@ const gradeMat = new THREE.ShaderMaterial({
   uniforms: {
     tScene: { value: null }, tBloomA: { value: null }, tBloomB: { value: null },
     uExposure: { value: 0.66 }, uBloom: { value: 0.24 },
-    uTime: { value: 0 }, uVig: { value: 0.9 }, uAb: { value: 0.0016 }
+    uTime: { value: 0 }, uVig: { value: 0.78 }, uAb: { value: 0.0016 }
   },
   vertexShader: FS_VERT,
   fragmentShader: `
@@ -3990,7 +4035,9 @@ function frame() {
   for (const c of allCards) {
     const want = c.glowTone;
     const target = want == null ? 0
-      : (c === ui.hover || c.attacking || c === ui.blockPick ? .9 : .42 + Math.sin(t * 2.6 + c.uid) * .12);
+      : (c === ui.hover || c.attacking || c === ui.blockPick) ? .95
+      : c.glowSoft ? .3 + Math.sin(t * 1.8 + c.uid) * .08
+      : .42 + Math.sin(t * 2.6 + c.uid) * .12;
     if (want != null) c.glow.material.color.setHex(want);
     c.glow.material.opacity += (target - c.glow.material.opacity) * Math.min(1, dt * 12);
     c.glow.visible = c.glow.material.opacity > 0.01;
