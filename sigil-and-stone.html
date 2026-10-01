@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Cats vs Vampires</title>
+<title>Sigil &amp; Stone</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Spectral:ital,wght@0,400;0,600;1,400&family=Barlow+Condensed:wght@400;600&display=swap">
 <style>
@@ -72,6 +72,14 @@ body{
 .pip.used{opacity:.2}
 .pip.float{background:radial-gradient(circle at 35% 30%,#fff6d8,#c8a24a);box-shadow:0 0 7px rgba(236,205,130,.9)}
 #manaNote{font-family:var(--data);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint)}
+#lifeChip{display:flex;align-items:center;gap:6px;font-family:var(--data)}
+#lifeChip i{
+  font-style:normal;font-size:15px;letter-spacing:.06em;color:var(--ink);
+  background:rgba(14,16,22,.8);border:1px solid var(--glass-edge);
+  border-radius:3px;padding:2px 8px;min-width:34px;text-align:center;
+}
+#lifeChip i:first-child{border-color:rgba(200,162,74,.55);color:#f4e7c8}
+#lifeChip em{font-style:normal;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint)}
 #phaseLabel{font-family:var(--data);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-dim);text-align:right}
 
 .btn{
@@ -143,6 +151,10 @@ body{
   text-transform:uppercase;color:var(--ink-faint);text-align:center;
 }
 #inspect{flex-direction:column;align-items:stretch;max-width:min(560px,calc(100% - 32px))}
+#inspect.walker{
+  left:auto;right:3vw;bottom:auto;top:50%;transform:translateY(-50%);
+  width:min(310px,38vw);max-width:none;
+}
 #inspect .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 #loyalRow{display:flex;flex-direction:column;gap:6px}
 .btn.loyal{text-transform:none;letter-spacing:.02em;font-family:var(--body);font-size:13px;text-align:left}
@@ -167,7 +179,7 @@ button.pick:hover:not(:disabled){border-color:rgba(200,162,74,.75);transform:tra
 button.pick:disabled{opacity:.4;cursor:default}
 
 /* pack and deck tiles */
-.tiles{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));width:min(860px,100%)}
+.tiles{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));width:100%}
 button.tile{
   position:relative;display:flex;flex-direction:column;gap:6px;text-align:left;
   padding:14px 16px 16px;border-radius:5px;cursor:pointer;color:var(--ink);
@@ -186,7 +198,7 @@ button.tile .flag{
 }
 button.tile .dot{position:absolute;top:16px;right:14px;width:11px;height:11px;border-radius:50%;box-shadow:0 0 8px rgba(0,0,0,.6) inset}
 button.tile.adv{border-color:rgba(200,162,74,.42)}
-.plateWide{max-width:900px}
+
 #backBtn{align-self:center}
 #banner[data-tone="attack"]{border-color:rgba(192,64,44,.62)}
 #inspect{bottom:72px}
@@ -213,6 +225,11 @@ button.tile.adv{border-color:rgba(200,162,74,.42)}
 }
 #veil.gone{opacity:0;pointer-events:none}
 .plate{max-width:540px;text-align:center;display:flex;flex-direction:column;gap:15px;align-items:center}
+.plate.plateWide{max-width:940px}
+.qpick{display:flex;align-items:center;gap:7px}
+.qpick span{font-family:var(--data);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-faint);margin-right:3px}
+.qpick .btn{font-size:11px;padding:5px 11px;letter-spacing:.14em}
+.qpick .btn[aria-pressed="true"]{border-color:rgba(200,162,74,.8);color:#f4e7c8;background:rgba(40,33,18,.8)}
 .plate h1{
   font-family:var(--display);font-weight:700;font-size:clamp(30px,6.4vw,52px);
   letter-spacing:.05em;margin:0;text-wrap:balance;color:#f4e7c8;
@@ -273,6 +290,7 @@ button.tile.adv{border-color:rgba(200,162,74,.42)}
   <div id="rail">
     <div id="mana"><span id="manaNote">No mana sources</span></div>
     <button id="yardBtn" class="btn ghost" hidden>Graveyard</button>
+    <span id="lifeChip" hidden><i>20</i><em>vs</em><i>20</i></span>
     <span id="phaseLabel">Your turn</span>
     <button id="action" class="btn primary">Begin</button>
   </div>
@@ -290,6 +308,12 @@ button.tile.adv{border-color:rgba(200,162,74,.42)}
     <h1>Sigil &amp; Stone</h1>
     <div class="rule"></div>
     <div class="tiles" id="packList"></div>
+    <div class="qpick" id="qpick">
+      <span>Detail</span>
+      <button class="btn ghost" data-q="low">Bare</button>
+      <button class="btn ghost" data-q="mid">Some</button>
+      <button class="btn ghost" data-q="high">Full</button>
+    </div>
     <p class="fineprint">Prototype. Card images and rules text are Wizards of the Coast's; the board, the engine and the opponent are not.</p>
   </div>
 
@@ -1342,6 +1366,7 @@ function drawToken(ctx, W, H, def) {
 const CARD_W = 1.0, CARD_H = 1.397;
 const ARENA_R = 5.6;
 const ZONE = {
+  youPerm: 1.95, foePerm: -1.95,
   foeLands: -2.5, foeUnits: -1.18, youUnits: 1.18, youLands: 2.5,
   youHand: { z: 3.95, y: 1.5 }, foeHand: { z: -4.62, y: 1.16 }
 };
@@ -1349,7 +1374,7 @@ const PILE = {
   youDeck: [-4.3, 1.45], youYard: [-4.3, 0.05],
   foeDeck: [4.3, -1.45], foeYard: [4.3, -0.05]
 };
-const SCALE = { table: 0.72, land: 0.6, hand: 0.74, handTall: 1.46, hold: 0.9 };
+const SCALE = { table: 0.72, land: 0.6, hand: 0.74, handTall: 1.34, hold: 0.9 };
 /* A phone gets a narrower board: the stacks tighten and the seats move in. */
 const LAY = { landX0: -3.7, landStep: 0.4, unitX: 0.55, unitSpan: 6.9, permX0: 3.35, permStep: -0.78 };
 const LAND_X0 = -3.7, LAND_STEP = 0.4, UNIT_X = 0.55;   // the figures baked into the stone
@@ -1364,16 +1389,77 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const maxAniso = renderer.capabilities.getMaxAnisotropy();
 
+/* --- how much machine is this? --------------------------------------
+ * Three builds of the same board. A desktop gets the whole field; a current
+ * phone gets a thinner sward and a fraction of the sparks; anything older —
+ * an iPad that stopped updating, a four-core Android, a software renderer —
+ * gets bare ground and no particles at all, because the alternative is two
+ * frames a second. ?quality=low|mid|high overrides, and so does the picker
+ * on the first screen. */
+const QUALITY = (function pickQuality() {
+  const forced = (location.search.match(/[?&]quality=(low|mid|high)/) || [])[1];
+  if (forced) return forced;
+  if (/[?&]lite\b/.test(location.search)) return "low";
+  try {
+    const saved = localStorage.getItem("sigil.quality");
+    if (saved === "low" || saved === "mid" || saved === "high") return saved;
+  } catch (err) { /* private windows throw on the mere mention of storage */ }
+
+  const ua = navigator.userAgent || "";
+  const cores = navigator.hardwareConcurrency || 2;
+  const mem = navigator.deviceMemory || 0;
+  const coarse = !!(window.matchMedia && matchMedia("(pointer: coarse)").matches);
+  let gpu = "";
+  try {
+    const gl = renderer.getContext();
+    const dbg = gl.getExtension("WEBGL_debug_renderer_info");
+    if (dbg) gpu = String(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) || "");
+  } catch (err) { /* most browsers mask this now; the rest of the test stands */ }
+  const g = gpu.toLowerCase();
+
+  if (!renderer.capabilities.isWebGL2) return "low";
+  if (/swiftshader|llvmpipe|software|microsoft basic/.test(g)) return "low";
+
+  // an iPad reports itself as a Mac, so a coarse pointer is what gives it away
+  const iOS = /iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && coarse);
+  if (iOS) {
+    const os = +((ua.match(/OS (\d+)[_.]/) || [])[1] || 0);
+    if (os && os < 15) return "low";                 // stopped getting updates
+    if (/apple a[0-9] |apple a1[0-2] /.test(g)) return "low";
+    return cores >= 6 ? "mid" : "low";
+  }
+  if (coarse || /Android|Mobile/.test(ua)) {
+    if (cores <= 4 || (mem && mem <= 3)) return "low";
+    if (/adreno \(tm\) [1-5]\d\d\b|mali-[tg]?[1-5]\d\d\b|powervr/.test(g)) return "low";
+    return "mid";                                    // a phone never gets the lot
+  }
+  if (cores <= 4 || (mem && mem <= 4)) return "mid";
+  return "high";
+})();
+const Q = {
+  high: { grassA: 185000, grassB: 95000, embers: 520, gust: 2600, smoke: 140, motes: 160,
+          mist: true, bloom: true, props: true, propShadows: true, shadow: 2560, maxDpr: 2 },
+  mid:  { grassA: 46000, grassB: 15000, embers: 190, gust: 620, smoke: 34, motes: 70,
+          mist: true, bloom: true, props: true, propShadows: true, shadow: 1280, maxDpr: 2 },
+  low:  { grassA: 0, grassB: 0, embers: 0, gust: 0, smoke: 0, motes: 0,
+          mist: false, bloom: false, props: true, propShadows: false, shadow: 1024, maxDpr: 1.5 }
+}[QUALITY];
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, Q.maxDpr));
+
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0e1518);
 scene.fog = new THREE.Fog(0x0e1518, 30, 86);
 
-const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 90);
+const camera = new THREE.PerspectiveCamera(38, 1, 1.2, 70);
 const camTarget = new THREE.Vector3(0, 0.1, -0.2);
 let narrow = false;
 
 function layoutViewport() {
   const w = window.innerWidth, h = window.innerHeight;
+  // phones report two or three device pixels per CSS pixel; without this the
+  // whole board is drawn at a third of the screen's resolution and upscaled,
+  // which is what made the played cards unreadable in portrait
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, Q.maxDpr));
   renderer.setSize(w, h, false);
   const aspect = w / Math.max(1, h);
   narrow = aspect < 1.05;
@@ -1433,16 +1519,26 @@ function reflowHand() {
 }
 function applyLayout() {
   if (narrow) {
-    LAY.landX0 = -2.8; LAY.landStep = 0.26; LAY.unitX = 0.1; LAY.unitSpan = 4.9;
-    ZONE.youHand.z = 3.72; ZONE.youHand.y = 1.68;
-    PILE.youDeck = [-3.4, 1.35]; PILE.youYard = [-3.4, 0.1];
-    PILE.foeDeck = [3.4, -1.35]; PILE.foeYard = [3.4, -0.1];
+    // portrait: lands run left from the edge, everything else you have played
+    // shares that band to the right of them, and the hand sits below the lot
+    LAY.landX0 = -2.75; LAY.landStep = 0.235; LAY.unitX = 0.0; LAY.unitSpan = 4.6;
+    LAY.permX0 = 0.3; LAY.permStep = 0.72;
+    ZONE.youUnits = 1.12; ZONE.foeUnits = -1.12;
+    ZONE.youLands = 2.32; ZONE.foeLands = -2.32;
+    ZONE.youPerm = 2.32; ZONE.foePerm = -2.32;
+    ZONE.youHand.z = 3.98; ZONE.youHand.y = 1.5;
+    PILE.youDeck = [-2.95, 1.3]; PILE.youYard = [-2.95, 0.05];
+    PILE.foeDeck = [2.95, -1.3]; PILE.foeYard = [2.95, -0.05];
     if (avatars) {
-      avatars.you.sprite.position.set(2.9, 0.42, 3.1); avatars.you.sprite.scale.set(1.05, 1.36, 1);
-      avatars.foe.sprite.position.set(-2.9, 0.42, -3.1); avatars.foe.sprite.scale.set(1.05, 1.36, 1);
+      avatars.you.sprite.position.set(2.42, 0.42, 2.92); avatars.you.sprite.scale.set(1.0, 1.3, 1);
+      avatars.foe.sprite.position.set(-2.42, 0.42, -2.92); avatars.foe.sprite.scale.set(1.0, 1.3, 1);
     }
   } else {
     LAY.landX0 = -3.45; LAY.landStep = 0.4; LAY.unitX = 0.55; LAY.unitSpan = 6.9;
+    LAY.permX0 = 3.35; LAY.permStep = -0.78;
+    ZONE.youUnits = 1.18; ZONE.foeUnits = -1.18;
+    ZONE.youLands = 2.5; ZONE.foeLands = -2.5;
+    ZONE.youPerm = 1.95; ZONE.foePerm = -1.95;
     ZONE.youHand.z = 3.95; ZONE.youHand.y = 1.5;
     PILE.youDeck = [-4.3, 1.45]; PILE.youYard = [-4.3, 0.05];
     PILE.foeDeck = [4.3, -1.45]; PILE.foeYard = [4.3, -0.05];
@@ -1480,7 +1576,7 @@ const key = new THREE.DirectionalLight(0xfbf1dc, 1.84);
 key.position.copy(KEY_DIR).multiplyScalar(16);
 key.target.position.set(0, 0, -0.2);
 key.castShadow = true;
-key.shadow.mapSize.set(2560, 2560);
+key.shadow.mapSize.set(Q.shadow, Q.shadow);
 key.shadow.camera.left = -13; key.shadow.camera.right = 13;
 key.shadow.camera.top = 13; key.shadow.camera.bottom = -13;
 key.shadow.camera.near = 1; key.shadow.camera.far = 44;
@@ -2115,18 +2211,20 @@ function makeGrassField(opt) {
 /* ?lite in the URL builds the board without the sward and the drifting fire:
    the rules are identical, it just starts in a couple of seconds on a machine
    with no GPU, which is how the engine gets tested. */
-const LITE = /[?&]lite\b/.test(location.search);
-const HEAVY = !LITE && !(window.innerWidth < 900 || window.innerWidth / window.innerHeight < 1.05);
+const LITE = QUALITY === "low";
+const HEAVY = QUALITY === "high";
 const HEAVY_FX = HEAVY;
+// a portrait screen shows less field, so it needs fewer blades for the same look
+const GRASS = (window.innerWidth / Math.max(1, window.innerHeight) < 1.05) ? 0.62 : 1;
 // the sward against the stone
-if (!LITE) makeGrassField({
-  count: HEAVY ? 185000 : 52000, seed: 5150, halfW: 0.023,
+if (Q.grassA) makeGrassField({
+  count: Math.round(Q.grassA * GRASS), seed: 5150, halfW: 0.023,
   rMin: ARENA_R + 0.52, rMax: 12, bias: 1.3,
   hMin: 0.085, hVar: 0.17, lush: 1.0
 });
 // and the field it stands in, running out to the trees
-if (!LITE) makeGrassField({
-  count: HEAVY ? 95000 : 30000, seed: 991, halfW: 0.05, segs: 3,
+if (Q.grassB) makeGrassField({
+  count: Math.round(Q.grassB * GRASS), seed: 991, halfW: 0.05, segs: 3,
   rMin: 11, rMax: 21, bias: 0.8,
   hMin: 0.13, hVar: 0.26, lush: 0.86
 });
@@ -2273,7 +2371,7 @@ function bannerTexture(kind) {
 const bannerTexCat = bannerTexture("cat"), bannerTexBat = bannerTexture("bat");
 
 function markShadows(g) {
-  g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  g.traverse(o => { if (o.isMesh) { o.castShadow = Q.propShadows; o.receiveShadow = true; } });
   return g;
 }
 function makeWheel(broken) {
@@ -2516,13 +2614,13 @@ function makeBrazier() {
 
   for (const b of braziers) place(makeBrazier(), b.at.x, b.at.z, Math.random() * TAU, 0);
 
-  if (LITE) return;
+  if (!Q.props) return;
   scene.add(props);
 })();
 
 /* --- low mist, three layers drifting at different speeds --- */
 const mistLayers = [];
-if (!LITE) (function mist() {
+if (Q.mist) (function mist() {
   const S = 512, cv = newCanvas(S, S), c = cv.getContext("2d");
   const rand = rng(9090);
   c.clearRect(0, 0, S, S);
@@ -2741,8 +2839,8 @@ function sowEmbers(opt) {
 }
 
 // sparks climbing out of the two braziers
-if (!LITE) sowEmbers({
-  count: 520, seed: 77123, travel: 1.6, rise: 2.9, turbA: 0.3, turbF: 2.1,
+if (Q.embers) sowEmbers({
+  count: Q.embers, seed: 77123, travel: 1.6, rise: 2.9, turbA: 0.3, turbF: 2.1,
   size: 0.046, stretch: 0.8, bright: 2.1, gustWind: 9.0, cross: false,
   spawn: rand => {
     const b = braziers[Math.floor(rand() * braziers.length)].at;
@@ -2750,15 +2848,15 @@ if (!LITE) sowEmbers({
   }
 });
 // and the swarm the gust tears across the whole field
-const gustEmberMat = LITE ? null : sowEmbers({
-  count: HEAVY_FX ? 2600 : 1000, seed: 5521, travel: 34, rise: 1.1, turbA: 0.95, turbF: 1.7,
+const gustEmberMat = Q.gust ? sowEmbers({
+  count: Q.gust, seed: 5521, travel: 34, rise: 1.1, turbA: 0.95, turbF: 1.7,
   size: 0.05, stretch: 0.85, bright: 1.7, gustWind: 0, cross: true,
   spawn: rand => ({
     x: -17 - rand() * 4,
     y: 0.12 + Math.pow(rand(), 1.6) * 2.9,
     z: -12 + rand() * 15
   })
-});
+}) : null;
 
 /* --- smoke: soft puffs with real internal structure, not a grey circle --- */
 function smokeAtlas() {
@@ -2886,7 +2984,8 @@ const smokeMat = new THREE.ShaderMaterial({
   geo.setAttribute("position", new THREE.Float32BufferAttribute(
     [-0.5, -0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0, -0.5, 0.5, 0], 3));
   geo.setIndex([0, 1, 2, 0, 2, 3]);
-  const N = LITE ? 1 : (HEAVY_FX ? 140 : 70);
+  const N = Q.smoke;
+  if (!N) return;
   const start = new Float32Array(N * 3), seed = new Float32Array(N * 4);
   const rand = rng(8812);
   for (let i = 0; i < N; i++) {
@@ -2908,7 +3007,7 @@ const smokeMat = new THREE.ShaderMaterial({
 })();
 
 /* --- a little dust in the light, kept faint --- */
-const moteCount = 160;
+const moteCount = Q.motes;
 const motePos = new Float32Array(moteCount * 3);
 const moteSeed = new Float32Array(moteCount);
 for (let i = 0; i < moteCount; i++) {
@@ -3340,6 +3439,12 @@ function boardSlotX(c) {
   const step = Math.min(CARD_W * SCALE.table + 0.28, LAY.unitSpan / Math.max(1, n));
   return LAY.unitX + (i - (n - 1) / 2) * step;
 }
+const _toCam = new THREE.Vector3();
+function liftTowardCamera(pos, n) {
+  if (!n) return pos;
+  _toCam.copy(camera.position).sub(pos).normalize();
+  return pos.addScaledVector(_toCam, n);
+}
 function restingTransform(c) {
   const mine = c.owner === "you";
   switch (c.zone) {
@@ -3355,7 +3460,8 @@ function restingTransform(c) {
         const total = (n - 1) * step;
         const x = i * step - total / 2 - ui.handScroll;
         const a = clamp(x / 3.4, -1.25, 1.25);
-        const pos = new THREE.Vector3(x, conf.y - 0.09 * a * a, conf.z + 0.16 * a * a);
+        const pos = liftTowardCamera(
+          new THREE.Vector3(x, conf.y - 0.09 * a * a, conf.z + 0.16 * a * a), i * 0.03);
         return { pos, quat: faceCamera(pos, -a * 0.09, false), scale: SCALE.handTall };
       }
       // a constant step, so the cards always overlap however many you hold,
@@ -3367,11 +3473,11 @@ function restingTransform(c) {
       const x = i * step - total / 2;
       const R = mine ? 16 : 13;
       const drop = -(x * x) / (2 * R);
-      const pos = new THREE.Vector3(
+      const pos = liftTowardCamera(new THREE.Vector3(
         x * side,
         conf.y + drop * 0.85,
         conf.z - drop * 0.45 * side
-      );
+      ), i * 0.022);
       return { pos, quat: faceCamera(pos, (-x / R) * side, !mine), scale: mine ? SCALE.hand : SCALE.hand * .78 };
     }
     case "lands": {
@@ -3379,16 +3485,19 @@ function restingTransform(c) {
       const i = Math.max(0, row.indexOf(c));
       const z = mine ? ZONE.youLands : ZONE.foeLands;
       return {
-        pos: new THREE.Vector3(LAY.landX0 + i * LAY.landStep, 0.012 + i * 0.004, z),
+        pos: new THREE.Vector3(LAY.landX0 + i * LAY.landStep, 0.05 + i * 0.014, z),
         quat: flatQuat(mine, c.tapped), scale: SCALE.land
       };
     }
     case "board": {
       const side = mine ? 1 : -1;
-      let x = boardSlotX(c), z = mine ? ZONE.youUnits : ZONE.foeUnits, y = 0.016;
+      // every card in a row stands a shade higher than the one before it, so
+      // two that overlap are never fighting over the same depth
+      const slot = Math.max(0, state[c.owner].board.indexOf(c));
+      let x = boardSlotX(c), z = mine ? ZONE.youUnits : ZONE.foeUnits, y = 0.062 + slot * 0.014;
       if (c.attacking) {
         // step up to the centre line, keeping your column
-        z = side * 0.58; y = 0.075;
+        z = side * 0.58; y = 0.12 + slot * 0.014;
         // and lean across if it is going for a planeswalker rather than the player
         if (c.attackTarget && c.attackTarget.zone === "perms") {
           const t = restingTransform(c.attackTarget);
@@ -3400,18 +3509,18 @@ function restingTransform(c) {
         const k = Math.max(0, mates.indexOf(c)), m = Math.max(1, mates.length);
         x = boardSlotX(c.blocking) + (k - (m - 1) / 2) * 0.44;
         z = side * 0.58 + (m > 1 ? (k % 2 ? 0.1 : 0) * side : 0);
-        y = 0.075;
+        y = 0.12 + k * 0.014;
       }
       return { pos: new THREE.Vector3(x, y, z), quat: flatQuat(mine, c.tapped), scale: SCALE.table };
     }
     case "perms": {
       const row = state[c.owner].perms;
       const i = Math.max(0, row.indexOf(c));
-      const z = mine ? ZONE.youLands : ZONE.foeLands;
+      const z = mine ? ZONE.youPerm : ZONE.foePerm;
       const pw = c.def.type === "Planeswalker";
       return {
-        pos: new THREE.Vector3(LAY.permX0 + i * LAY.permStep, 0.014, z),
-        quat: flatQuat(mine, c.tapped), scale: pw ? SCALE.land * 1.12 : SCALE.land * 0.92
+        pos: new THREE.Vector3(LAY.permX0 + i * LAY.permStep, 0.056 + i * 0.014, z),
+        quat: flatQuat(mine, c.tapped), scale: pw ? SCALE.land * 1.08 : SCALE.land * 0.9
       };
     }
     case "impulse": {
@@ -3427,7 +3536,7 @@ function restingTransform(c) {
       const ht = restingTransform(host);
       const k = host.auras.indexOf(c);
       return {
-        pos: new THREE.Vector3(ht.pos.x + 0.3 + k * 0.12, 0.008, ht.pos.z + 0.3 + k * 0.1),
+        pos: new THREE.Vector3(ht.pos.x + 0.3 + k * 0.12, 0.028 + k * 0.012, ht.pos.z + 0.3 + k * 0.1),
         quat: flatQuat(mine, false), scale: SCALE.table * .72
       };
     }
@@ -3436,7 +3545,7 @@ function restingTransform(c) {
       const i = Math.max(0, pile.indexOf(c));
       const p = mine ? PILE.youYard : PILE.foeYard;
       return {
-        pos: new THREE.Vector3(p[0] + (i % 3) * 0.01, 0.012 + i * 0.008, p[1] + (i % 2) * 0.01),
+        pos: new THREE.Vector3(p[0] + (i % 3) * 0.01, 0.05 + i * 0.013, p[1] + (i % 2) * 0.01),
         quat: flatQuat(mine, false), scale: SCALE.table
       };
     }
@@ -3448,7 +3557,7 @@ function restingTransform(c) {
       const p = mine ? PILE.youDeck : PILE.foeDeck;
       const i = state[c.owner].library.indexOf(c);
       return {
-        pos: new THREE.Vector3(p[0], 0.016 + Math.max(0, i) * 0.009, p[1]),
+        pos: new THREE.Vector3(p[0], 0.05 + Math.max(0, i) * 0.009, p[1]),
         quat: deckQuat(mine), scale: SCALE.table
       };
     }
@@ -3734,7 +3843,7 @@ const dom = {
   inspect: el("inspect"), playBtn: el("playBtn"), abilityBtn: el("abilityBtn"), closeBtn: el("closeBtn"),
   loyalRow: el("loyalRow"),
   chooser: el("chooser"), chooserTitle: el("chooserTitle"), chooserList: el("chooserList"), chooserSkip: el("chooserSkip"),
-  yardBtn: el("yardBtn"),
+  yardBtn: el("yardBtn"), lifeChip: el("lifeChip"),
   preview: el("preview"), previewImg: el("preview").querySelector("img"),
   previewNote: el("preview").querySelector(".pnote"),
   veil: el("veil"), plateStart: el("plateStart"), plateEnd: el("plateEnd"),
@@ -3800,6 +3909,11 @@ function updateHUD() {
     dom.mana.appendChild(p);
   }
 
+  dom.lifeChip.hidden = !narrow;
+  if (narrow) {
+    dom.lifeChip.children[0].textContent = state.you.life;
+    dom.lifeChip.children[2].textContent = state.foe.life;
+  }
   const yard = state.you.yard;
   dom.yardBtn.hidden = !yard.length;
   dom.yardBtn.textContent = "Graveyard " + yard.length;
@@ -3997,7 +4111,7 @@ function updateBadges() {
       b.sprite.visible = true;
       b.sprite.position.copy(c.obj.position);
       b.sprite.position.y += 0.3;
-      b.sprite.position.z += 0.38 * (side === "you" ? 1 : -1);
+      b.sprite.position.z -= 0.36 * (side === "you" ? 1 : -1);
     }
   }
 }
@@ -5445,7 +5559,8 @@ function holdCard(c) {
       dom.loyalRow.appendChild(b);
     }
     dom.loyalRow.hidden = false;
-  } else dom.loyalRow.hidden = true;
+    dom.inspect.classList.add("walker");
+  } else { dom.loyalRow.hidden = true; dom.inspect.classList.remove("walker"); }
   dom.inspect.hidden = false;
 }
 function releaseHold(quiet) {
@@ -5709,6 +5824,10 @@ dom.action.addEventListener("click", async () => {
  */
 const RT = { type: THREE.HalfFloatType, format: THREE.RGBAFormat, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, stencilBuffer: false };
 const rtScene = new THREE.WebGLRenderTarget(2, 2, Object.assign({}, RT, { depthBuffer: true }));
+// the default depth attachment on a render target is only 16 bits, which is
+// not enough to separate two cards lying a few hundredths apart on the stone;
+// an explicit depth texture gets us the full 24
+rtScene.depthTexture = new THREE.DepthTexture(2, 2, THREE.UnsignedIntType);
 const rtHalfA = new THREE.WebGLRenderTarget(2, 2, Object.assign({}, RT, { depthBuffer: false }));
 const rtHalfB = new THREE.WebGLRenderTarget(2, 2, Object.assign({}, RT, { depthBuffer: false }));
 const rtQuadA = new THREE.WebGLRenderTarget(2, 2, Object.assign({}, RT, { depthBuffer: false }));
@@ -5866,10 +5985,12 @@ function frame() {
     em.uniforms.uPhase.value = GUST.phase;
     em.uniforms.uCycle.value = GUST.cycle;
   }
-  smokeMat.uniforms.uTime.value = t;
-  smokeMat.uniforms.uPhase.value = (t / GUST.smokePeriod) % 1;
-  smokeMat.uniforms.uCycle.value = Math.floor(t / GUST.smokePeriod);
-  smokeMat.uniforms.uFire.value = ember;
+  if (Q.smoke) {
+    smokeMat.uniforms.uTime.value = t;
+    smokeMat.uniforms.uPhase.value = (t / GUST.smokePeriod) % 1;
+    smokeMat.uniforms.uCycle.value = Math.floor(t / GUST.smokePeriod);
+    smokeMat.uniforms.uFire.value = ember;
+  }
 
   for (const c of allCards) {
     const want = c.glowTone;
@@ -5902,16 +6023,18 @@ function frame() {
   renderer.render(scene, camera);
 
   const s = renderer.getDrawingBufferSize(new THREE.Vector2());
-  brightMat.uniforms.tDiffuse.value = rtScene.texture;
-  fsPass(brightMat, rtHalfA);
-  blurMat.uniforms.tDiffuse.value = rtHalfA.texture;
-  blurMat.uniforms.uDir.value.set(2 / s.x, 0); fsPass(blurMat, rtHalfB);
-  blurMat.uniforms.tDiffuse.value = rtHalfB.texture;
-  blurMat.uniforms.uDir.value.set(0, 2 / s.y); fsPass(blurMat, rtHalfA);
-  blurMat.uniforms.tDiffuse.value = rtHalfA.texture;
-  blurMat.uniforms.uDir.value.set(6 / s.x, 0); fsPass(blurMat, rtQuadA);
-  blurMat.uniforms.tDiffuse.value = rtQuadA.texture;
-  blurMat.uniforms.uDir.value.set(0, 6 / s.y); fsPass(blurMat, rtQuadB);
+  if (Q.bloom) {
+    brightMat.uniforms.tDiffuse.value = rtScene.texture;
+    fsPass(brightMat, rtHalfA);
+    blurMat.uniforms.tDiffuse.value = rtHalfA.texture;
+    blurMat.uniforms.uDir.value.set(2 / s.x, 0); fsPass(blurMat, rtHalfB);
+    blurMat.uniforms.tDiffuse.value = rtHalfB.texture;
+    blurMat.uniforms.uDir.value.set(0, 2 / s.y); fsPass(blurMat, rtHalfA);
+    blurMat.uniforms.tDiffuse.value = rtHalfA.texture;
+    blurMat.uniforms.uDir.value.set(6 / s.x, 0); fsPass(blurMat, rtQuadA);
+    blurMat.uniforms.tDiffuse.value = rtQuadA.texture;
+    blurMat.uniforms.uDir.value.set(0, 6 / s.y); fsPass(blurMat, rtQuadB);
+  }
 
   gradeMat.uniforms.tScene.value = rtScene.texture;
   gradeMat.uniforms.tBloomA.value = rtHalfA.texture;
@@ -5970,6 +6093,20 @@ function tile(title, tag, blurb, opts) {
 function showPlate(id) {
   for (const k of ["platePacks", "plateDecks", "plateStart", "plateEnd"]) el(k).hidden = k !== id;
 }
+function renderQuality() {
+  const box = el("qpick");
+  for (const b of box.querySelectorAll("button")) {
+    b.setAttribute("aria-pressed", b.dataset.q === QUALITY ? "true" : "false");
+    b.title = { low: "No grass, no embers — for an older phone or tablet",
+                mid: "A thinner field and fewer sparks",
+                high: "The whole field, embers and drifting smoke" }[b.dataset.q];
+    b.onclick = () => {
+      if (b.dataset.q === QUALITY) return;
+      try { localStorage.setItem("sigil.quality", b.dataset.q); } catch (err) { /* nothing to do */ }
+      location.replace(location.pathname + "?quality=" + b.dataset.q);
+    };
+  }
+}
 function renderPacks() {
   const box = el("packList");
   box.innerHTML = "";
@@ -5979,6 +6116,7 @@ function renderPacks() {
     b.addEventListener("click", () => pickPack(key));
     box.appendChild(b);
   }
+  renderQuality();
   showPlate("platePacks");
 }
 function pickPack(key) {
