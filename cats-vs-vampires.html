@@ -95,6 +95,18 @@ body{
 .btn.primary:hover:not(:disabled){background:linear-gradient(to bottom,#4d3d1f,#2a2010)}
 .btn.ghost{background:transparent;border-color:rgba(198,178,138,.3);color:var(--ink-dim)}
 
+/* portrait only: a track showing where you are in a hand too wide to fit */
+#handBar{
+  position:absolute;left:50%;transform:translateX(-50%);
+  bottom:calc(52px + env(safe-area-inset-bottom,0px));
+  width:min(62%,280px);height:4px;border-radius:3px;
+  background:rgba(255,255,255,.1);overflow:hidden;
+}
+#handBar i{
+  position:absolute;top:0;bottom:0;border-radius:3px;
+  background:rgba(226,206,160,.6);transition:left .06s linear;
+}
+
 #log{
   position:absolute;left:14px;top:50%;transform:translateY(-50%);
   width:198px;display:flex;flex-direction:column;gap:5px;
@@ -153,6 +165,7 @@ body{
 
 @media (max-width:660px){
   #log{display:none}
+  #youPlate{display:none}
   #inspect{bottom:92px}
   .plateName b{font-size:14px}
   #youPlate{bottom:calc(62px + env(safe-area-inset-bottom,0px))}
@@ -179,6 +192,8 @@ body{
     <button id="abilityBtn" class="btn" hidden>Activate</button>
     <button id="closeBtn" class="btn ghost">Close</button>
   </div>
+
+  <div id="handBar" hidden><i></i></div>
 
   <div id="rail">
     <div id="mana"><span id="manaNote">No lands in play</span></div>
@@ -566,14 +581,14 @@ function drawToken(ctx, W, H) {
 const CARD_W = 1.0, CARD_H = 1.397;
 const ARENA_R = 5.6;
 const ZONE = {
-  foeLands: -2.72, foeUnits: -1.2, youUnits: 1.2, youLands: 2.72,
+  foeLands: -2.5, foeUnits: -1.18, youUnits: 1.18, youLands: 2.5,
   youHand: { z: 3.95, y: 1.5 }, foeHand: { z: -4.62, y: 1.16 }
 };
 const PILE = {
   youDeck: [-4.55, 3.0], youYard: [-3.6, 3.78],
   foeDeck: [4.55, -3.0], foeYard: [3.6, -3.78]
 };
-const SCALE = { table: 0.72, land: 0.6, hand: 0.74, hold: 0.9 };
+const SCALE = { table: 0.72, land: 0.6, hand: 0.74, handTall: 1.46, hold: 0.9 };
 /* A phone gets a narrower board: the stacks tighten and the seats move in. */
 const LAY = { landX0: -3.7, landStep: 0.4, unitX: 0.55, unitSpan: 6.9 };
 const LAND_X0 = -3.7, LAND_STEP = 0.4, UNIT_X = 0.55;   // the figures baked into the stone
@@ -618,11 +633,47 @@ function layoutViewport() {
   camera.lookAt(camTarget);
   camera.updateProjectionMatrix();
   applyLayout();
+  // how much world width the hand band covers on screen, for scroll limits
+  const hp = new THREE.Vector3(0, ZONE.youHand.y, ZONE.youHand.z);
+  const L = camera.position.distanceTo(hp);
+  handHalfWidth = Math.tan(camera.fov / 2 * Math.PI / 180) * camera.aspect * L;
+  clampHandScroll();
   if (typeof resizePost === "function") resizePost();
+}
+let handHalfWidth = 5;
+const HAND_STEP = 1.0;
+function handScrollMax() {
+  if (!narrow) return 0;
+  const n = state.you.hand.length;
+  const span = (n - 1) * HAND_STEP + CARD_W * SCALE.handTall;
+  return Math.max(0, (span - handHalfWidth * 1.82) / 2);
+}
+function clampHandScroll() {
+  const m = handScrollMax();
+  ui.handScroll = clamp(ui.handScroll, -m, m);
+  const bar = document.getElementById("handBar");
+  if (!bar) return;
+  if (m <= 0.02) { bar.hidden = true; return; }
+  bar.hidden = false;
+  const frac = handHalfWidth * 1.82 / ((state.you.hand.length - 1) * HAND_STEP + CARD_W * SCALE.handTall);
+  const t = (ui.handScroll + m) / (2 * m);
+  const thumb = bar.firstElementChild;
+  thumb.style.width = (clamp(frac, 0.12, 1) * 100).toFixed(1) + "%";
+  thumb.style.left = (t * (100 - clamp(frac, 0.12, 1) * 100)).toFixed(1) + "%";
+}
+function reflowHand() {
+  for (const c of state.you.hand) {
+    if (c === ui.held || c === ui.drag) continue;
+    stopTweens(c);
+    c.obj.visible = true;
+    snap(c, restingTransform(c));
+  }
+  clampHandScroll();
 }
 function applyLayout() {
   if (narrow) {
-    LAY.landX0 = -2.95; LAY.landStep = 0.26; LAY.unitX = 0.1; LAY.unitSpan = 4.9;
+    LAY.landX0 = -2.8; LAY.landStep = 0.26; LAY.unitX = 0.1; LAY.unitSpan = 4.9;
+    ZONE.youHand.z = 3.72; ZONE.youHand.y = 1.68;
     PILE.youDeck = [-3.15, 2.9]; PILE.youYard = [-2.45, 3.62];
     PILE.foeDeck = [3.15, -2.9]; PILE.foeYard = [2.45, -3.62];
     if (avatars) {
@@ -630,7 +681,8 @@ function applyLayout() {
       avatars.foe.sprite.position.set(-2.9, 0.42, -3.1); avatars.foe.sprite.scale.set(1.05, 1.36, 1);
     }
   } else {
-    LAY.landX0 = -3.7; LAY.landStep = 0.4; LAY.unitX = 0.55; LAY.unitSpan = 6.9;
+    LAY.landX0 = -3.45; LAY.landStep = 0.4; LAY.unitX = 0.55; LAY.unitSpan = 6.9;
+    ZONE.youHand.z = 3.95; ZONE.youHand.y = 1.5;
     PILE.youDeck = [-4.55, 3.0]; PILE.youYard = [-3.6, 3.78];
     PILE.foeDeck = [4.55, -3.0]; PILE.foeYard = [3.6, -3.78];
     if (avatars) {
@@ -1188,12 +1240,15 @@ function makeGrassField(opt) {
       uEmberB: { value: braziers[1].at.clone() },
       uFogCol: { value: new THREE.Color(0x0e1518) },
       uFogNear: { value: 30 }, uFogFar: { value: 86 },
+      uGust: { value: 0 },
+      uWindDir: { value: new THREE.Vector2(1, 0.2).normalize() },
       uLush: { value: opt.lush == null ? 1 : opt.lush }
     },
     vertexShader: `
       attribute vec3 aOffset;
       attribute vec4 aParams;   // rot, height, phase, tint
-      uniform float uTime;
+      uniform float uTime, uGust;
+      uniform vec2 uWindDir;
       varying float vT, vTint, vFog;
       varying vec3 vN, vW;
       void main(){
@@ -1207,6 +1262,10 @@ function makeGrassField(opt) {
         float bend = (0.1 + gust * 0.3 + gust2 * 0.12) * t * t * sway;
         p.x += bend * hgt;
         p.z += bend * hgt * 0.5;
+        // the gust itself: a hard lean downwind, strongest at the tip
+        float lean = uGust * t * t * (0.55 + 0.45 * sway);
+        p.x += uWindDir.x * lean * hgt * 1.9;
+        p.z += uWindDir.y * lean * hgt * 1.9;
         float c = cos(rot), s = sin(rot);
         vec3 rp = vec3(p.x * c - p.z * s, p.y, p.x * s + p.z * c);
         vec3 wp = rp + aOffset;
@@ -1272,10 +1331,11 @@ function makeGrassField(opt) {
     const r = opt.rMin + u * (opt.rMax - opt.rMin);
     const clump = 0.12 + rand() * 0.4;
     const ca = a + (rand() - .5) * clump * 0.6;
-    const cr = r + (rand() - .5) * clump * 2.2;
+    // nothing is allowed to creep back over the kerb onto the playing stone
+    const cr = Math.max(opt.rMin, r + (rand() - .5) * clump * 2.2);
     const near = clamp(1 - Math.abs(cr - ARENA_R) / 4.2, 0, 1);
     off[k * 3] = Math.cos(ca) * cr;
-    off[k * 3 + 1] = (cr < ARENA_R ? 0.012 : -0.14);
+    off[k * 3 + 1] = -0.14;
     off[k * 3 + 2] = Math.sin(ca) * cr;
     par[k * 4] = rand() * TAU;
     par[k * 4 + 1] = (opt.hMin + rand() * opt.hVar) * (0.7 + near * 0.55);
@@ -1292,10 +1352,11 @@ function makeGrassField(opt) {
 }
 
 const HEAVY = !(window.innerWidth < 900 || window.innerWidth / window.innerHeight < 1.05);
+const HEAVY_FX = HEAVY;
 // the sward against the stone
 makeGrassField({
   count: HEAVY ? 185000 : 52000, seed: 5150, halfW: 0.023,
-  rMin: ARENA_R - 0.85, rMax: 12, bias: 1.35,
+  rMin: ARENA_R + 0.52, rMax: 12, bias: 1.3,
   hMin: 0.085, hVar: 0.17, lush: 1.0
 });
 // and the field it stands in, running out to the trees
@@ -1767,59 +1828,317 @@ runeRing.rotation.x = -Math.PI / 2;
 runeRing.position.y = 0.012;
 scene.add(runeRing);
 
-/* --- embers lifting off the braziers --- */
-const emberMat = new THREE.ShaderMaterial({
-  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-  uniforms: { uTime: { value: 0 }, uScale: { value: 300 } },
+/* --- wind ------------------------------------------------------------
+ * One gust clock drives everything: the grass leans, a swarm of embers is
+ * torn off the braziers and carried the length of the field, and a little
+ * later the smoke follows. Between gusts the air is still.
+ */
+const WIND = new THREE.Vector3(1, 0.05, 0.2).normalize();
+const GUST = { emberPeriod: 17.0, smokePeriod: 26.0, strength: 0, phase: 0, cycle: 0 };
+
+/* A spark: an instanced quad stretched along its own screen-space velocity,
+   with a white-hot core bleeding out to deep red. No round sprites. */
+function emberMaterial(opt) {
+  return new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    uniforms: {
+      uTime: { value: 0 },
+      uGust: { value: 0 },
+      uWind: { value: WIND.clone() },
+      uTravel: { value: opt.travel },
+      uRise: { value: opt.rise },
+      uTurbA: { value: opt.turbA },
+      uTurbF: { value: opt.turbF },
+      uSize: { value: opt.size },
+      uStretch: { value: opt.stretch },
+      uBright: { value: opt.bright },
+      uGustWind: { value: opt.gustWind || 0 },
+      uCross: { value: opt.cross ? 1 : 0 },
+      uPhase: { value: 0 },
+      uCycle: { value: 0 },
+      uFogCol: { value: new THREE.Color(0x0e1518) },
+      uFogNear: { value: 30 }, uFogFar: { value: 86 }
+    },
+    vertexShader: `
+      attribute vec3 aStart;
+      attribute vec4 aSeed;    // stagger, personality, size, speed
+      uniform float uTime, uGust, uTravel, uRise, uTurbA, uTurbF, uSize, uStretch, uGustWind, uCross, uPhase, uCycle;
+      uniform vec3 uWind;
+      varying vec2 vUv;
+      varying float vLife, vHeat, vFog, vSeed;
+
+      float hash11(float n){ return fract(sin(n * 127.1) * 43758.5453); }
+
+      vec3 at(float life, float t){
+        vec3 p = aStart;
+        float w = t * uTurbF + aSeed.y * 37.0;
+        vec3 turb = vec3(sin(w) + 0.45 * sin(w * 2.7 + 1.3),
+                         sin(w * 0.8 + 2.1) * 0.5,
+                         cos(w * 1.1 + 0.4) + 0.4 * sin(w * 2.1));
+        p += vec3(0.0, uRise * life + 0.9 * uRise * life * life, 0.0);
+        p += uWind * (uTravel * life * (0.45 + aSeed.w * 1.35));
+        p += uWind * (uGustWind * uGust * life);
+        p += turb * uTurbA * (0.25 + life * 1.4);
+        return p;
+      }
+
+      void main(){
+        float life, alive;
+        if (uCross > 0.5) {
+          // carried across the field, but only while a gust is running
+          float stagger = aSeed.x * 0.34;
+          float sits = step(0.46, hash11(uCycle + aSeed.y * 13.0));   // a different crowd each gust
+          life = (uPhase - stagger) / 0.52;
+          alive = step(0.0, life) * step(life, 1.0) * sits;
+        } else {
+          life = fract(uTime * (0.05 + aSeed.w * 0.07) + aSeed.x);
+          alive = 1.0;
+        }
+        life = clamp(life, 0.0, 1.0);
+        vLife = life;
+        vSeed = aSeed.y;
+
+        vec3 p0 = at(life, uTime);
+        vec3 p1 = at(min(life + 0.02, 1.0), uTime + 0.02);
+        vec4 mv = viewMatrix * vec4(p0, 1.0);
+        vec4 mv1 = viewMatrix * vec4(p1, 1.0);
+        vec2 d = mv1.xy - mv.xy;
+        float speed = length(d);
+        vec2 dir = speed > 1e-5 ? d / speed : vec2(1.0, 0.0);
+        vec2 perp = vec2(-dir.y, dir.x);
+
+        float fade = smoothstep(0.0, 0.06, life) * (1.0 - smoothstep(0.55, 1.0, life));
+        float sz = uSize * (0.35 + aSeed.z * 1.5) * fade * alive;
+        float len = sz * (1.0 + uStretch * min(speed * 34.0, 4.2));
+        mv.xy += dir * (position.x * len) + perp * (position.y * sz);
+
+        vUv = position.xy + 0.5;
+        vHeat = fade * alive;
+        vFog = -mv.z;
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `
+      uniform float uTime, uBright;
+      uniform vec3 uFogCol;
+      uniform float uFogNear, uFogFar;
+      varying vec2 vUv;
+      varying float vLife, vHeat, vFog, vSeed;
+      void main(){
+        float x = vUv.x;                       // 0 tail -> 1 head
+        float y = abs(vUv.y - 0.5) * 2.0;
+        float core = exp(-y * y * 11.0);
+        float tail = pow(x, 3.4) * core;
+        float head = exp(-pow(1.0 - x, 2.0) * 60.0) * exp(-y * y * 22.0);
+        float a = clamp(tail * 0.5 + head, 0.0, 1.0);
+        if (a < 0.005) discard;
+        // tumbling: a spark shows more or less of itself as it turns, and
+        // now and then it is edge-on and all but vanishes
+        float flick = 0.3 + 0.7 * abs(sin(uTime * (17.0 + vSeed * 31.0) + vSeed * 50.0));
+        flick *= step(0.16, fract(sin(floor(uTime * 7.0 + vSeed * 11.0) * 91.7) * 4379.0));
+        float cool = 1.0 - vLife;
+        vec3 col = mix(vec3(1.0, 0.075, 0.010), vec3(1.0, 0.40, 0.055), cool);
+        col = mix(col, vec3(1.0, 0.88, 0.62), head * (0.3 + 0.7 * cool));
+        float e = a * vHeat * uBright * (0.35 + 0.65 * flick);
+        float f = smoothstep(uFogNear, uFogFar, vFog);
+        gl_FragColor = vec4(col * e * (1.0 - f * 0.8), a * vHeat * (1.0 - f));
+      }`
+  });
+}
+
+const emberMats = [];
+function sowEmbers(opt) {
+  const geo = new THREE.InstancedBufferGeometry();
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(
+    [-0.5, -0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0, -0.5, 0.5, 0], 3));
+  geo.setIndex([0, 1, 2, 0, 2, 3]);
+  const N = opt.count;
+  const start = new Float32Array(N * 3), seed = new Float32Array(N * 4);
+  const rand = rng(opt.seed);
+  for (let i = 0; i < N; i++) {
+    const p = opt.spawn(rand, i);
+    start[i * 3] = p.x; start[i * 3 + 1] = p.y; start[i * 3 + 2] = p.z;
+    seed[i * 4] = rand();
+    seed[i * 4 + 1] = rand();
+    seed[i * 4 + 2] = Math.pow(rand(), 1.9);
+    seed[i * 4 + 3] = rand();
+  }
+  geo.setAttribute("aStart", new THREE.InstancedBufferAttribute(start, 3));
+  geo.setAttribute("aSeed", new THREE.InstancedBufferAttribute(seed, 4));
+  geo.instanceCount = N;
+  const mat = emberMaterial(opt);
+  emberMats.push(mat);
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.frustumCulled = false;
+  mesh.renderOrder = 3;
+  scene.add(mesh);
+  return mat;
+}
+
+// sparks climbing out of the two braziers
+sowEmbers({
+  count: 520, seed: 77123, travel: 1.6, rise: 2.9, turbA: 0.3, turbF: 2.1,
+  size: 0.05, stretch: 0.8, bright: 2.9, gustWind: 9.0, cross: false,
+  spawn: rand => {
+    const b = braziers[Math.floor(rand() * braziers.length)].at;
+    return { x: b.x + (rand() - .5) * 0.75, y: b.y + 0.05 + rand() * 0.25, z: b.z + (rand() - .5) * 0.75 };
+  }
+});
+// and the swarm the gust tears across the whole field
+const gustEmberMat = sowEmbers({
+  count: HEAVY_FX ? 2600 : 1000, seed: 5521, travel: 34, rise: 1.1, turbA: 0.95, turbF: 1.7,
+  size: 0.056, stretch: 0.85, bright: 2.5, gustWind: 0, cross: true,
+  spawn: rand => ({
+    x: -17 - rand() * 4,
+    y: 0.12 + Math.pow(rand(), 1.6) * 2.9,
+    z: -12 + rand() * 15
+  })
+});
+
+/* --- smoke: soft puffs with real internal structure, not a grey circle --- */
+function smokeAtlas() {
+  const CELL = 256, N = 2, S = CELL * N;
+  const cv = newCanvas(S, S), ctx = cv.getContext("2d");
+  const img = ctx.createImageData(S, S);
+  const hash = (x, y, s) => {
+    const n = Math.sin(x * 127.1 + y * 311.7 + s * 74.7) * 43758.5453;
+    return n - Math.floor(n);
+  };
+  const smooth = t => t * t * (3 - 2 * t);
+  function vnoise(x, y, s) {
+    const xi = Math.floor(x), yi = Math.floor(y);
+    const xf = smooth(x - xi), yf = smooth(y - yi);
+    const a = hash(xi, yi, s), b = hash(xi + 1, yi, s);
+    const c = hash(xi, yi + 1, s), d = hash(xi + 1, yi + 1, s);
+    return (a * (1 - xf) + b * xf) * (1 - yf) + (c * (1 - xf) + d * xf) * yf;
+  }
+  function fbm(x, y, s) {
+    let v = 0, amp = 0.5, f = 1;
+    for (let o = 0; o < 5; o++) { v += amp * vnoise(x * f, y * f, s + o * 17); amp *= 0.5; f *= 2.07; }
+    return v;
+  }
+  for (let cy = 0; cy < N; cy++) {
+    for (let cx = 0; cx < N; cx++) {
+      const s = (cy * N + cx) * 131 + 7;
+      for (let y = 0; y < CELL; y++) {
+        for (let x = 0; x < CELL; x++) {
+          const u = x / CELL - 0.5, v = y / CELL - 0.5;
+          const r = Math.sqrt(u * u + v * v) * 2;
+          const n = fbm(x * 0.028 + 10, y * 0.028 + 10, s);
+          const warp = fbm(x * 0.011, y * 0.011, s + 51) - 0.5;
+          const rr = Math.min(1.4, r * (1 + warp * 0.55));
+          let a = (1 - smooth(Math.min(1, rr))) * (0.3 + n * 1.25);
+          a = Math.max(0, Math.min(1, a * 1.25 - 0.1));
+          a *= 1 - smooth(Math.min(1, Math.max(0, (rr - 0.55) / 0.45)));
+          const i = ((cy * CELL + y) * S + (cx * CELL + x)) * 4;
+          img.data[i] = 255; img.data[i + 1] = 255; img.data[i + 2] = 255;
+          img.data[i + 3] = Math.round(a * 255);
+        }
+      }
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  const tex = new THREE.CanvasTexture(cv);
+  tex.anisotropy = maxAniso;
+  return tex;
+}
+
+const smokeMat = new THREE.ShaderMaterial({
+  transparent: true, depthWrite: false, blending: THREE.NormalBlending,
+  uniforms: {
+    uTime: { value: 0 }, uPhase: { value: 0 }, uCycle: { value: 0 },
+    uMap: { value: smokeAtlas() },
+    uWind: { value: WIND.clone() },
+    uLight: { value: KEY_DIR.clone() },
+    uEmberA: { value: braziers[0].at.clone() },
+    uEmberB: { value: braziers[1].at.clone() },
+    uFire: { value: 0 },
+    uFogCol: { value: new THREE.Color(0x0e1518) },
+    uFogNear: { value: 30 }, uFogFar: { value: 86 }
+  },
   vertexShader: `
-    attribute vec4 aSeed;   // phase, speed, drift, size
-    uniform float uTime; uniform float uScale;
-    varying float vLife;
+    attribute vec3 aStart;
+    attribute vec4 aSeed;   // stagger, cell, spin, size
+    uniform float uTime, uPhase, uCycle;
+    uniform vec3 uWind;
+    varying vec2 vUv;
+    varying float vA, vFog, vUp;
+    varying vec3 vW;
+    float hash11(float n){ return fract(sin(n * 127.1) * 43758.5453); }
     void main(){
-      float life = fract(uTime * aSeed.y + aSeed.x);
-      vec3 p = position;
-      float rise = life * (2.6 + aSeed.w * 2.4);
-      p.y += rise;
-      float w = uTime * 0.8 + aSeed.x * 24.0;
-      p.x += sin(w) * 0.42 * life + aSeed.z * life * 1.1;
-      p.z += cos(w * 0.83) * 0.38 * life;
-      vLife = (1.0 - life) * smoothstep(0.0, 0.07, life);
-      vec4 mv = modelViewMatrix * vec4(p, 1.0);
-      gl_PointSize = (0.5 + aSeed.w * 1.3) * uScale * (0.45 + 0.55 * (1.0 - life)) / max(0.001, -mv.z);
+      float stagger = aSeed.x * 0.38;
+      float life = (uPhase - stagger) / 0.56;
+      float sits = step(0.34, hash11(uCycle * 1.7 + aSeed.y * 23.0));
+      float alive = step(0.0, life) * step(life, 1.0) * sits;
+      life = clamp(life, 0.0, 1.0);
+
+      vec3 p = aStart;
+      p += uWind * (36.0 * life * (0.75 + aSeed.w * 0.5));
+      p.y += life * (0.5 + aSeed.w * 1.4);
+      float w = uTime * 0.35 + aSeed.x * 29.0;
+      p += vec3(sin(w) * 0.7, sin(w * 0.6 + 1.0) * 0.35, cos(w * 0.8) * 0.6) * (0.3 + life);
+
+      float scale = (1.25 + aSeed.w * 2.9) * (0.5 + life * 1.15);
+      float rot = aSeed.z * 6.2831 + uTime * (aSeed.z - 0.5) * 0.22;
+      vec3 right = vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
+      vec3 up    = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
+      vec2 q = vec2(position.x * cos(rot) - position.y * sin(rot),
+                    position.x * sin(rot) + position.y * cos(rot));
+      vec3 wp = p + right * (q.x * scale) + up * (q.y * scale);
+
+      float cell = floor(aSeed.y * 3.999);
+      vec2 base = vec2(mod(cell, 2.0), floor(cell / 2.0)) * 0.5;
+      vUv = base + (position.xy + 0.5) * 0.5;
+      vA = alive * smoothstep(0.0, 0.16, life) * (1.0 - smoothstep(0.52, 1.0, life));
+      vUp = position.y + 0.5;
+      vW = p;
+      vec4 mv = viewMatrix * vec4(wp, 1.0);
+      vFog = -mv.z;
       gl_Position = projectionMatrix * mv;
     }`,
   fragmentShader: `
-    varying float vLife;
+    uniform sampler2D uMap;
+    uniform vec3 uEmberA, uEmberB, uFogCol;
+    uniform float uFire, uFogNear, uFogFar;
+    varying vec2 vUv;
+    varying float vA, vFog, vUp;
+    varying vec3 vW;
     void main(){
-      vec2 d = gl_PointCoord - 0.5;
-      float r = length(d) * 2.0;
-      if (r > 1.0) discard;
-      float core = pow(1.0 - r, 2.6);
-      float flick = 0.7 + 0.3 * sin(vLife * 42.0);
-      vec3 hot = mix(vec3(1.0, 0.30, 0.04), vec3(1.0, 0.86, 0.52), core);
-      gl_FragColor = vec4(hot * (2.0 * core) * vLife * flick, core * vLife);
+      float a = texture2D(uMap, vUv).a * vA * 0.3;
+      if (a < 0.004) discard;
+      vec3 lit = mix(vec3(0.045, 0.048, 0.052), vec3(0.40, 0.43, 0.47), smoothstep(0.1, 0.95, vUp));
+      float dA = length(vW - uEmberA), dB = length(vW - uEmberB);
+      float fire = 3.0 / (1.0 + dA * dA * 0.5) + 2.2 / (1.0 + dB * dB * 0.5);
+      lit += vec3(1.0, 0.36, 0.1) * fire * 0.1 * uFire;
+      float f = smoothstep(uFogNear, uFogFar, vFog);
+      lit = mix(lit, uFogCol, f);
+      gl_FragColor = vec4(lit, a * (1.0 - f * 0.7));
     }`
 });
-(function lightEmbers() {
-  const N = 300;
-  const pos = new Float32Array(N * 3), seed = new Float32Array(N * 4);
-  const rand = rng(77123);
+
+(function sowSmoke() {
+  const geo = new THREE.InstancedBufferGeometry();
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(
+    [-0.5, -0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0, -0.5, 0.5, 0], 3));
+  geo.setIndex([0, 1, 2, 0, 2, 3]);
+  const N = HEAVY_FX ? 140 : 70;
+  const start = new Float32Array(N * 3), seed = new Float32Array(N * 4);
+  const rand = rng(8812);
   for (let i = 0; i < N; i++) {
-    const b = braziers[i % braziers.length].at;
-    pos[i * 3] = b.x + (rand() - .5) * 0.7;
-    pos[i * 3 + 1] = b.y - 0.55 + rand() * 0.3;
-    pos[i * 3 + 2] = b.z + (rand() - .5) * 0.7;
+    start[i * 3] = -19 - rand() * 6;
+    start[i * 3 + 1] = 0.25 + Math.pow(rand(), 1.4) * 2.6;
+    start[i * 3 + 2] = -13 + rand() * 13;
     seed[i * 4] = rand();
-    seed[i * 4 + 1] = 0.045 + rand() * 0.075;
-    seed[i * 4 + 2] = (rand() - .5) * 1.5 + (b.x > 0 ? -0.5 : 0.5);
+    seed[i * 4 + 1] = rand();
+    seed[i * 4 + 2] = rand();
     seed[i * 4 + 3] = rand();
   }
-  const g = new THREE.BufferGeometry();
-  g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-  g.setAttribute("aSeed", new THREE.BufferAttribute(seed, 4));
-  const pts = new THREE.Points(g, emberMat);
-  pts.frustumCulled = false;
-  scene.add(pts);
+  geo.setAttribute("aStart", new THREE.InstancedBufferAttribute(start, 3));
+  geo.setAttribute("aSeed", new THREE.InstancedBufferAttribute(seed, 4));
+  geo.instanceCount = N;
+  const mesh = new THREE.Mesh(geo, smokeMat);
+  mesh.frustumCulled = false;
+  mesh.renderOrder = 2;
+  scene.add(mesh);
 })();
 
 /* --- a little dust in the light, kept faint --- */
@@ -2242,6 +2561,16 @@ function restingTransform(c) {
       const i = hand.indexOf(c), n = hand.length;
       const t = n > 1 ? (i / (n - 1)) * 2 - 1 : 0;
       const conf = mine ? ZONE.youHand : ZONE.foeHand;
+      if (mine && narrow) {
+        // a strip, not a fan: the cards are big enough to read and run off both
+        // edges, and a sideways drag walks along them
+        const step = HAND_STEP;
+        const total = (n - 1) * step;
+        const x = i * step - total / 2 - ui.handScroll;
+        const a = clamp(x / 3.4, -1.25, 1.25);
+        const pos = new THREE.Vector3(x, conf.y - 0.09 * a * a, conf.z + 0.16 * a * a);
+        return { pos, quat: faceCamera(pos, -a * 0.09, false), scale: SCALE.handTall };
+      }
       const per = mine ? (narrow ? 0.062 : 0.075) : 0.055;
       const spread = Math.min(mine ? 0.46 : 0.36, n * per);
       const XR = mine ? (narrow ? 4.2 : 4.9) : 4.2;
@@ -2324,7 +2653,7 @@ function reflow(opts) {
     c.obj.visible = true;
     syncShadow(c);
     const t = restingTransform(c);
-    if (ui.hover === c && c.zone === "hand" && c.owner === "you") {
+    if (ui.hover === c && c.zone === "hand" && c.owner === "you" && !narrow) {
       t.pos.y += 0.6; t.pos.z += 0.14; t.scale *= 1.06;
     }
     if (dur === 0) snap(c, t);
@@ -2343,7 +2672,11 @@ const state = {
   you: seat("You"), foe: seat("The Sanguine Court"),
   turn: "you", phase: "idle", over: false, busy: false
 };
-const ui = { hover: null, held: null, drag: null, targeting: null, blockPick: null, pointerDown: null, pressTimer: null };
+const ui = {
+  hover: null, held: null, drag: null, targeting: null, blockPick: null,
+  pointerDown: null, pressTimer: null,
+  handScroll: 0, handVel: 0, scrolling: false, scrollLastX: 0, downAt: null
+};
 const other = s => (s === "you" ? "foe" : "you");
 
 /* --- mana --- */
@@ -2479,6 +2812,7 @@ function updateHUD() {
     }
   }
 
+  clampHandScroll();
   const labels = {
     idle: "—", main: "Your turn · main", combat: "Your turn · attackers",
     blocking: "Their attack · blockers", foe: "Their turn", over: "Finished"
@@ -3314,6 +3648,15 @@ function onCardClick(c) {
   holdCard(c);
 }
 
+function applyHandScroll(e) {
+  const dx = e.clientX - ui.scrollLastX;
+  ui.scrollLastX = e.clientX;
+  const perPx = (handHalfWidth * 2) / Math.max(1, window.innerWidth);
+  const m = handScrollMax();
+  ui.handScroll = clamp(ui.handScroll - dx * perPx, -m, m);
+  ui.handVel = -dx * perPx * 0.5;
+  reflowHand();
+}
 canvasEl.addEventListener("pointermove", e => {
   if (ui.drag) {
     const p = matPointAt(e);
@@ -3321,16 +3664,25 @@ canvasEl.addEventListener("pointermove", e => {
       const c = ui.drag;
       c.obj.position.set(p.x, 0.58, p.z);
       c.obj.quaternion.copy(flatQuat(true, false));
-      c.obj.scale.setScalar(SCALE.hand * .92);
+      c.obj.scale.setScalar((narrow ? SCALE.handTall : SCALE.hand) * .92);
     }
     return;
   }
+  if (ui.scrolling) { applyHandScroll(e); return; }
   if (ui.pointerDown && !ui.drag) {
-    const d = Math.abs(e.clientX - ui.pointerDown.x) + Math.abs(e.clientY - ui.pointerDown.y);
-    if (d > 10) {
+    const dx = e.clientX - ui.pointerDown.x, dy = e.clientY - ui.pointerDown.y;
+    const ax = Math.abs(dx), ay = Math.abs(dy);
+    if (ax + ay > 10) {
       clearTimeout(ui.pressTimer);
       const c = ui.pointerDown.card;
-      if (c && playable(c)) {
+      const sideways = narrow && ax > ay * 1.05 && handScrollMax() > 0.02;
+      if (sideways && (!c || c.zone === "hand")) {
+        ui.scrolling = true;
+        ui.handVel = 0;
+        ui.scrollLastX = ui.pointerDown.x;
+        if (ui.hover) { ui.hover = null; refreshGlows(); }
+        applyHandScroll(e);
+      } else if (c && playable(c)) {
         ui.drag = c;
         stopTweens(c);
         c.front.castShadow = false;
@@ -3339,6 +3691,18 @@ canvasEl.addEventListener("pointermove", e => {
       } else ui.pointerDown = null;
     }
     return;
+  }
+  // a long press that turns into a sideways drag should still walk the hand
+  if (ui.held && ui.downAt && narrow) {
+    const dx = e.clientX - ui.downAt.x, dy = e.clientY - ui.downAt.y;
+    if (Math.abs(dx) > 14 && Math.abs(dx) > Math.abs(dy) && handScrollMax() > 0.02) {
+      releaseHold(true);
+      ui.scrolling = true;
+      ui.handVel = 0;
+      ui.scrollLastX = ui.downAt.x;
+      applyHandScroll(e);
+      return;
+    }
   }
   if (ui.held || state.busy) return;
   const c = pickCardAt(e);
@@ -3356,6 +3720,8 @@ canvasEl.addEventListener("pointerdown", e => {
   if (ui.held) { releaseHold(); return; }
   const c = pickCardAt(e);
   ui.pointerDown = { x: e.clientX, y: e.clientY, card: c };
+  ui.downAt = { x: e.clientX, y: e.clientY, card: c };
+  ui.handVel = 0;
   if (c) {
     clearTimeout(ui.pressTimer);
     ui.pressTimer = setTimeout(() => {
@@ -3368,6 +3734,8 @@ window.addEventListener("pointerup", async e => {
   clearTimeout(ui.pressTimer);
   const down = ui.pointerDown;
   ui.pointerDown = null;
+  ui.downAt = null;
+  if (ui.scrolling) { ui.scrolling = false; return; }
   if (ui.drag) {
     const c = ui.drag;
     ui.drag = null;
@@ -3568,6 +3936,11 @@ function frame() {
   const t = clock.elapsedTime;
   updateTweens(dt);
 
+  // one gust clock: the grass, the sparks and the smoke all read from it
+  GUST.phase = (t / GUST.emberPeriod) % 1;
+  GUST.cycle = Math.floor(t / GUST.emberPeriod);
+  GUST.strength = Math.exp(-Math.pow((GUST.phase - 0.3) / 0.17, 2));
+
   // motes drift and wrap
   const arr = moteGeo.attributes.position.array;
   for (let i = 0; i < moteCount; i++) {
@@ -3595,6 +3968,7 @@ function frame() {
   for (const gm of grassMats) {
     gm.uniforms.uTime.value = t;
     gm.uniforms.uEmber.value.x = ember;
+    gm.uniforms.uGust.value = GUST.strength;
   }
   for (const cm of clothMats) cm.userData.uTime.value = t;
   for (const cm of coalMats) cm.emissiveIntensity = 2.0 + Math.sin(t * 6.1) * 0.5 + Math.sin(t * 13.3) * 0.3;
@@ -3602,8 +3976,16 @@ function frame() {
     ml.tex.offset.x = t * ml.sp;
     ml.tex.offset.y = Math.sin(t * 0.02) * 0.05;
   }
-  emberMat.uniforms.uTime.value = t;
-  emberMat.uniforms.uScale.value = window.innerHeight * 0.5;
+  for (const em of emberMats) {
+    em.uniforms.uTime.value = t;
+    em.uniforms.uGust.value = GUST.strength;
+    em.uniforms.uPhase.value = GUST.phase;
+    em.uniforms.uCycle.value = GUST.cycle;
+  }
+  smokeMat.uniforms.uTime.value = t;
+  smokeMat.uniforms.uPhase.value = (t / GUST.smokePeriod) % 1;
+  smokeMat.uniforms.uCycle.value = Math.floor(t / GUST.smokePeriod);
+  smokeMat.uniforms.uFire.value = ember;
 
   for (const c of allCards) {
     const want = c.glowTone;
@@ -3612,6 +3994,14 @@ function frame() {
     if (want != null) c.glow.material.color.setHex(want);
     c.glow.material.opacity += (target - c.glow.material.opacity) * Math.min(1, dt * 12);
     c.glow.visible = c.glow.material.opacity > 0.01;
+  }
+  if (!ui.scrolling && Math.abs(ui.handVel) > 0.0008) {
+    const m = handScrollMax();
+    const next = clamp(ui.handScroll + ui.handVel, -m, m);
+    if (next === ui.handScroll) ui.handVel = 0;
+    ui.handScroll = next;
+    ui.handVel *= 0.915;
+    reflowHand();
   }
   if (ui.held) { for (const [, b] of badges) b.sprite.visible = false; }
   else updateBadges();
