@@ -1530,8 +1530,10 @@ function applyLayout() {
     PILE.youDeck = [-2.95, 1.3]; PILE.youYard = [-2.95, 0.05];
     PILE.foeDeck = [2.95, -1.3]; PILE.foeYard = [2.95, -0.05];
     if (avatars) {
-      avatars.you.sprite.position.set(2.42, 0.42, 2.92); avatars.you.sprite.scale.set(1.0, 1.3, 1);
-      avatars.foe.sprite.position.set(-2.42, 0.42, -2.92); avatars.foe.sprite.scale.set(1.0, 1.3, 1);
+      // in portrait the hand comes a long way up the screen, so the seats sit
+      // between the creature row and the lands where nothing covers them
+      avatars.you.sprite.position.set(2.62, 0.5, 2.05); avatars.you.sprite.scale.set(0.95, 1.24, 1);
+      avatars.foe.sprite.position.set(-2.62, 0.5, -2.05); avatars.foe.sprite.scale.set(0.95, 1.24, 1);
     }
   } else {
     LAY.landX0 = -3.45; LAY.landStep = 0.4; LAY.unitX = 0.55; LAY.unitSpan = 6.9;
