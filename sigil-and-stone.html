@@ -2193,9 +2193,11 @@ function makeGrassField(opt) {
     // nothing is allowed to creep back over the kerb onto the playing stone
     const cr = Math.max(opt.rMin, r + (rand() - .5) * clump * 2.2);
     const near = clamp(1 - Math.abs(cr - ARENA_R) / 4.2, 0, 1);
-    // the first metre of grass is cut short: a full-length blade leaning on
-    // the wind reaches back over the kerb and saws through the stone
-    const fringe = clamp((cr - (ARENA_R + 0.7)) / 1.15, 0.3, 1);
+    // The sward runs right up to the kerb, but the first stretch of it is cut
+    // to a fifth height. A blade's sway and its lean on the gust both scale
+    // with its height, so a fringe this short cannot reach back over the
+    // stone however hard the wind blows, and there is no bald ring either.
+    const fringe = clamp((cr - (ARENA_R + 0.3)) / 1.5, 0.22, 1);
     off[k * 3] = Math.cos(ca) * cr;
     off[k * 3 + 1] = -0.14;
     off[k * 3 + 2] = Math.sin(ca) * cr;
@@ -2224,7 +2226,7 @@ const GRASS = (window.innerWidth / Math.max(1, window.innerHeight) < 1.05) ? 0.6
 // the sward against the stone
 if (Q.grassA) makeGrassField({
   count: Math.round(Q.grassA * GRASS), seed: 5150, halfW: 0.023,
-  rMin: ARENA_R + 0.95, rMax: 12, bias: 1.3,
+  rMin: ARENA_R + 0.42, rMax: 12, bias: 1.3,
   hMin: 0.085, hVar: 0.17, lush: 1.0
 });
 // and the field it stands in, running out to the trees
@@ -3202,7 +3204,9 @@ function makeAvatar(kind, x, y, z) {
   const tex = new THREE.CanvasTexture(cv);
   tex.encoding = THREE.sRGBEncoding;
   tex.anisotropy = maxAniso;
-  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, toneMapped: false, depthTest: true }));
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: tex, transparent: true, toneMapped: false, depthTest: true, depthWrite: false
+  }));
   sp.material.color.setScalar(1.45);
   sp.scale.set(1.24, 1.6, 1);
   sp.position.set(x, y, z);
@@ -3927,7 +3931,7 @@ function updateHUD() {
   clampHandScroll();
   if (!ui.targeting) refreshGlows();
   const labels = {
-    idle: "—", main: "Your turn · main", combat: "Your turn · attackers",
+    idle: "—", main: "Your turn · main", main2: "Your turn · second main", combat: "Your turn · attackers",
     blocking: "Their attack · blockers", strike: "Your attack · resolving", foe: "Their turn", over: "Finished"
   };
   dom.phase.textContent = labels[state.phase] || "—";
@@ -3937,6 +3941,8 @@ function updateHUD() {
     label = state.you.board.some(c => c.attacking) ? "Attack" : "End turn";
   } else if (state.phase === "main") {
     label = state.you.board.some(canAttackWith) ? "Declare attackers" : "End turn";
+  } else if (state.phase === "main2") {
+    label = "End turn";
   } else if (state.phase === "blocking") {
     label = state.foe.board.some(c => c.attacking && !blockersOf(c).length) ? "Take the damage" : "Confirm blocks";
     on = !state.busy;
@@ -3961,6 +3967,11 @@ function nothingToDo() {
       && !activatables("you").length
       && !state.you.board.some(canAttackWith);
   }
+  if (state.phase === "main2") {
+    return !state.you.hand.some(playable)
+      && !state.you.impulse.some(playable)
+      && !activatables("you").length;
+  }
   if (state.phase === "combat") {
     return !state.you.board.some(c => c.attacking)
       && !state.you.board.some(canAttackWith)
@@ -3980,10 +3991,12 @@ function hideBanner() { dom.banner.hidden = true; }
 
 /* a yes/no the player answers in the banner */
 let askResolve = null;
-function askYesNo(text) {
+function askYesNo(text, yesLabel, noLabel) {
   return new Promise(resolve => {
     dom.bannerText.textContent = text;
     dom.bannerCancel.hidden = true;
+    dom.bannerYes.textContent = yesLabel || "Yes";
+    dom.bannerNo.textContent = noLabel || "No";
     dom.bannerYes.hidden = false;
     dom.bannerNo.hidden = false;
     dom.banner.hidden = false;
@@ -4063,7 +4076,9 @@ function badgeFor(c) {
     const cv = newCanvas(256, 104);
     const tex = new THREE.CanvasTexture(cv);
     tex.encoding = THREE.sRGBEncoding;
-    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false, toneMapped: false }));
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: tex, transparent: true, depthTest: false, depthWrite: false, toneMapped: false
+    }));
     sp.material.color.setScalar(1.5);
     sp.scale.set(0.66, 0.27, 1);
     sp.renderOrder = 6;
@@ -4320,7 +4335,7 @@ function playable(c) {
   if (c.zone === "impulse") { if (c.impulseTurn !== state.turnCount) return false; }
   else if (c.zone !== "hand") return false;
   const d = c.def;
-  const sorceryTime = state.turn === "you" && state.phase === "main";
+  const sorceryTime = state.turn === "you" && (state.phase === "main" || state.phase === "main2");
   const instantTime = sorceryTime || state.phase === "combat" || state.phase === "blocking" || state.phase === "strike";
   if (d.type === "Land") return sorceryTime && !state.you.playedLand;
   if (isFast(d)) { if (!instantTime) return false; }
@@ -4358,7 +4373,7 @@ function abilityUsable(c, side) {
   if (a.fromYard) { if (c.zone !== "yard") return false; }
   else if (c.zone !== "board" && c.zone !== "perms") return false;
   if (state.turn !== side) return false;
-  const sorceryTime = state.phase === "main" || (side === "foe" && state.phase === "foe");
+  const sorceryTime = state.phase === "main" || state.phase === "main2" || (side === "foe" && state.phase === "foe");
   if (a.fromYard || a.sorceryOnly) { if (!sorceryTime) return false; }
   else if (!(sorceryTime || state.phase === "combat" || state.phase === "strike")) return false;
   if (a.once && c.usedOnce) return false;
@@ -4375,7 +4390,8 @@ function loyaltyUsable(c, d) {
   if (state.over) return false;
   if (c.owner === "you" && (state.busy || ui.targeting || !dom.chooser.hidden)) return false;
   if (c.zone !== "perms" || c.def.type !== "Planeswalker") return false;
-  if (state.turn !== c.owner || !(state.phase === "main" || (c.owner === "foe" && state.phase === "foe"))) return false;
+  if (state.turn !== c.owner) return false;
+  if (!(state.phase === "main" || state.phase === "main2" || (c.owner === "foe" && state.phase === "foe"))) return false;
   if (c.usedLoyalty) return false;
   if (d.d < 0 && c.loyalty < -d.d) return false;
   if (d.fx.target && !legalTargets(c.owner, d.fx, c).length && !d.fx.optional) return false;
@@ -5279,7 +5295,14 @@ async function declareMyAttack() {
   strikeResolve = null;
   state.busy = true; updateHUD();
   await fight("you");
-  await endTurn("you");
+  if (checkEnd()) return;
+  // combat is over but the turn is not: holding a creature back until now
+  // keeps the mana open during combat and leaves them guessing about blockers
+  state.phase = "main2";
+  state.busy = false;
+  hideBanner();
+  say("Combat is over. You can still play cards.");
+  refreshGlows(); updateHUD();
 }
 
 async function foeDeclareAttack(attackers) {
@@ -5353,7 +5376,8 @@ async function startTurn(side) {
   say(side === "you" ? "Your turn." : state.foe.name + " takes the turn.");
   updateHUD(); refreshGlows();
   await reflow({ dur: 0.3 });
-  await drawCards(side, 1);
+  // whoever is on the play does not draw on the first turn of the game
+  if (state.turnCount !== 1) await drawCards(side, 1);
   if (checkEnd()) return;
   if (side === "you") {
     state.busy = false;
@@ -5408,22 +5432,33 @@ function foeWalkerPlan(c) {
   const minus = opts.filter(d => d.d < 0);
   const big = minus.find(d => d.fx.emblem || d.fx.opponentKeepsOne);
   if (big) return big;
-  const kill = minus.find(d => d.fx.destroy || d.fx.divideDamage || d.fx.eachSacrifices);
+  // only point a removal ability at the board if there is something of the
+  // player's for it to hit — Vivien was blowing up her own enchantment
+  const hitsThem = d => !d.fx.target || legalTargets("foe", d.fx, c).some(t => t.owner === "you");
+  const kill = minus.find(d => (d.fx.destroy || d.fx.divideDamage || d.fx.eachSacrifices) && hitsThem(d));
   if (kill && state.you.board.length) return kill;
   const token = minus.find(d => d.fx.token);
   if (token && c.loyalty > 4) return token;
   return opts.find(d => d.d > 0) || opts[0];
 }
-async function foeTurn() {
-  state.busy = true; updateHUD();
-  await wait(420);
+/* Before combat the far seat only plays what will change the attack — a land,
+   something hasty, a lord, removal for a blocker, a planeswalker. The rest
+   waits until after the swing, which is where it belongs: the mana stays open
+   through combat and the board it leaves behind is a surprise. */
+function castsBeforeCombat(d) {
+  if (d.type === "Land") return true;
+  if (d.type === "Planeswalker") return true;
+  if (d.lord) return true;
+  if (d.aura) return true;
+  if (d.type === "Creature") return (d.kw || []).indexOf("haste") >= 0;
+  if (d.spell && (d.spell.destroy || d.spell.exile || d.spell.damage || d.spell.bounce)) return true;
+  return false;
+}
+async function foeCast(early) {
   const s = state.foe;
-
-  const land = s.hand.find(c => c.def.type === "Land");
-  if (land && !s.playedLand) { await playFromHand("foe", land); await wait(220); }
-
   for (let guard = 0; guard < 10; guard++) {
     const options = s.hand.filter(c => {
+      if (early && !castsBeforeCombat(c.def)) return false;
       const d = c.def;
       if (d.type === "Land" || d.type === "Instant") return false;
       if (!canPay("foe", effCost("foe", d))) return false;
@@ -5452,13 +5487,14 @@ async function foeTurn() {
     await wait(280);
     if (checkEnd()) return;
   }
-
+}
+async function foeUseAbilities() {
+  const s = state.foe;
   for (const c of s.perms.slice()) {
     if (c.def.type !== "Planeswalker" || c.usedLoyalty) continue;
     const plan = foeWalkerPlan(c);
     if (plan) { await useLoyalty("foe", c, plan); await wait(240); if (checkEnd()) return; }
   }
-
   for (const c of s.board.concat(s.perms, s.yard).slice()) {
     const a = c.def.ability;
     if (!a || a.needsAttackers) continue;
@@ -5467,6 +5503,21 @@ async function foeTurn() {
     await wait(220);
     if (checkEnd()) return;
   }
+}
+async function foeTurn() {
+  state.busy = true; updateHUD();
+  await wait(420);
+  const s = state.foe;
+
+  const land = s.hand.find(c => c.def.type === "Land");
+  if (land && !s.playedLand) { await playFromHand("foe", land); await wait(220); }
+
+  // with nothing able to attack there is no reason to hold anything back
+  const swinging = s.board.some(canAttackWith);
+  await foeCast(swinging);
+  if (checkEnd()) return;
+  await foeUseAbilities();
+  if (checkEnd()) return;
 
   await runBeginCombat("foe");
   await checkDeaths();
@@ -5483,9 +5534,16 @@ async function foeTurn() {
   if (attackers.length) {
     await foeDeclareAttack(attackers);
     if (checkEnd()) return;
+    state.busy = true; updateHUD();
+    await wait(260);
   } else {
     say(s.name + " holds back.");
   }
+  // second main: everything that was waiting on the swing
+  await foeCast(false);
+  if (checkEnd()) return;
+  await foeUseAbilities();
+  if (checkEnd()) return;
   await endTurn("foe");
 }
 
@@ -5947,6 +6005,11 @@ dom.action.addEventListener("click", async () => {
   if (state.phase === "combat") {
     if (state.you.board.some(c => c.attacking)) await declareMyAttack();
     else { state.busy = true; updateHUD(); hideBanner(); await endTurn("you"); }
+    return;
+  }
+  if (state.phase === "main2") {
+    state.busy = true; updateHUD(); hideBanner();
+    await endTurn("you");
   }
 });
 
@@ -6178,6 +6241,83 @@ function frame() {
   requestAnimationFrame(frame);
 }
 
+/* ---------- mulligans ----------------------------------------------
+ * The London rule: a mulligan is always a fresh seven, and you put one card
+ * on the bottom for each one you have taken. Without it a no-land hand is a
+ * dead game, which is exactly what the far seat kept drawing. */
+async function handBackToLibrary(side) {
+  const s = state[side];
+  for (const c of s.hand.slice()) { moveTo(c, "library"); c.obj.visible = false; }
+  shuffle(s.library);
+}
+async function dealOpening(side, n) {
+  const s = state[side];
+  for (let i = 0; i < n && s.library.length; i++) {
+    const c = s.library[s.library.length - 1];
+    snap(c, restingTransform(c));
+    c.obj.visible = true;
+    moveTo(c, "hand");
+  }
+  updateHUD();
+  await reflow({ dur: 0.34 });
+}
+function toBottom(side, c) {
+  moveTo(c, "library");
+  const lib = state[side].library;
+  lib.unshift(lib.pop());
+  c.obj.visible = false;
+}
+function foeWantsMulligan(taken) {
+  if (taken >= 3) return false;                 // digging further costs more
+  const hand = state.foe.hand;
+  const lands = hand.filter(c => c.def.type === "Land").length;
+  const sources = lands + hand.filter(c => c.def.manaAbility && costTotal(c.def.cost) <= 2).length;
+  return sources < 2 || lands > 5;
+}
+function foeBottom(n) {
+  const s = state.foe;
+  for (let i = 0; i < n && s.hand.length; i++) {
+    const lands = s.hand.filter(c => c.def.type === "Land");
+    const pick = lands.length > 3
+      ? lands[0]
+      : s.hand.slice().sort((a, b) => costTotal(b.def.cost) - costTotal(a.def.cost))[0];
+    toBottom("foe", pick);
+  }
+}
+async function mulliganPhase() {
+  let theirs = 0;
+  while (foeWantsMulligan(theirs)) {
+    theirs++;
+    await handBackToLibrary("foe");
+    await dealOpening("foe", 7);
+  }
+  if (theirs) say(state.foe.name + " mulligans to " + (7 - theirs) + ".");
+  foeBottom(theirs);
+
+  let mine = 0;
+  while (mine < 6) {
+    const keep = await askYesNo(
+      mine === 0 ? "Keep this hand?"
+        : "Keep these seven and put " + mine + " back?",
+      "Keep", "Mulligan to " + (6 - mine));
+    if (keep) break;
+    mine++;
+    await handBackToLibrary("you");
+    await dealOpening("you", 7);
+    say("You mulligan to " + (7 - mine) + ".");
+  }
+  for (let i = 0; i < mine; i++) {
+    const c = await chooseCard(state.you.hand.slice(),
+      "Put a card on the bottom of your library (" + (i + 1) + " of " + mine + ")", false)
+      || state.you.hand[0];
+    toBottom("you", c);
+    await reflow({ dur: 0.26 });
+  }
+  hideBanner();
+  updateHUD();
+  await reflow({ dur: 0.3 });
+}
+
 /* ---------- boot ---------- */
 const chosen = { pack: null, you: null, foe: null };
 
@@ -6334,8 +6474,12 @@ async function prepare() {
 el("backBtn").addEventListener("click", renderPacks);
 el("startBtn").addEventListener("click", async () => {
   dom.veil.classList.add("gone");
-  say("Seven cards each. You are on the play.");
+  say("Seven cards each.");
   await wait(340);
+  state.busy = true; updateHUD();
+  await mulliganPhase();
+  state.busy = false;
+  say("You are on the play.");
   await startTurn("you");
 });
 el("againBtn").addEventListener("click", () => location.reload());
