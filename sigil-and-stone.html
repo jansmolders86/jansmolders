@@ -2193,11 +2193,14 @@ function makeGrassField(opt) {
     // nothing is allowed to creep back over the kerb onto the playing stone
     const cr = Math.max(opt.rMin, r + (rand() - .5) * clump * 2.2);
     const near = clamp(1 - Math.abs(cr - ARENA_R) / 4.2, 0, 1);
+    // the first metre of grass is cut short: a full-length blade leaning on
+    // the wind reaches back over the kerb and saws through the stone
+    const fringe = clamp((cr - (ARENA_R + 0.7)) / 1.15, 0.3, 1);
     off[k * 3] = Math.cos(ca) * cr;
     off[k * 3 + 1] = -0.14;
     off[k * 3 + 2] = Math.sin(ca) * cr;
     par[k * 4] = rand() * TAU;
-    par[k * 4 + 1] = (opt.hMin + rand() * opt.hVar) * (0.7 + near * 0.55);
+    par[k * 4 + 1] = (opt.hMin + rand() * opt.hVar) * (0.7 + near * 0.55) * fringe;
     par[k * 4 + 2] = rand() * TAU;
     par[k * 4 + 3] = Math.pow(rand(), 2.0);
   }
@@ -2221,7 +2224,7 @@ const GRASS = (window.innerWidth / Math.max(1, window.innerHeight) < 1.05) ? 0.6
 // the sward against the stone
 if (Q.grassA) makeGrassField({
   count: Math.round(Q.grassA * GRASS), seed: 5150, halfW: 0.023,
-  rMin: ARENA_R + 0.52, rMax: 12, bias: 1.3,
+  rMin: ARENA_R + 0.95, rMax: 12, bias: 1.3,
   hMin: 0.085, hVar: 0.17, lush: 1.0
 });
 // and the field it stands in, running out to the trees
@@ -3605,7 +3608,7 @@ const ui = {
   hover: null, held: null, drag: null, targeting: null, blockPick: null,
   pointerDown: null, pressTimer: null,
   handScroll: 0, handVel: 0, scrolling: false, scrollLastX: 0, downAt: null,
-  preview: null
+  preview: null, dragFrom: null, dragArmed: false, flickV: 0, flickAt: null
 };
 const other = s => (s === "you" ? "foe" : "you");
 const nonlands = side => state[side].board.concat(state[side].perms);
@@ -4160,6 +4163,7 @@ function refreshGlows() {
     ui.hover.glowTone = playable(ui.hover) ? TONE.ok : TONE.bad;
     ui.hover.glowSoft = false;
   }
+  if (ui.drag && ui.dragArmed) { ui.drag.glowTone = TONE.ok; ui.drag.glowSoft = false; }
 }
 
 /* ---------- the line from a blocker to what it is blocking ---------- */
@@ -5630,6 +5634,118 @@ function onCardClick(c) {
   holdCard(c);
 }
 
+/* --- playing a card by lifting it out of the hand -------------------
+ * The old rule was literal: let go with the pointer over your half of the
+ * circle or the card goes back. On a phone that is a long, careful drag for
+ * something that should be a flick. Now the card commits as soon as it has
+ * been lifted clear of the hand — about a tenth of the screen — or dropped
+ * anywhere on the stone, and once it has, it leaves your finger and slides to
+ * the slot it is going to land in, so you can see the play before you let go.
+ * A fast upward flick counts even if it was short. */
+function dropTarget(c) {
+  const d = c.def, s = state.you;
+  if (d.type === "Land") {
+    const i = s.lands.length;
+    return {
+      pos: new THREE.Vector3(LAY.landX0 + i * LAY.landStep, 0.05 + i * 0.014,
+        ZONE.youLands),
+      quat: flatQuat(true, !!d.entersTapped), scale: SCALE.land
+    };
+  }
+  if (d.type === "Creature") {
+    const n = s.board.length + 1, i = n - 1;
+    const step = Math.min(CARD_W * SCALE.table + 0.28, LAY.unitSpan / n);
+    return {
+      pos: new THREE.Vector3(LAY.unitX + (i - (n - 1) / 2) * step, 0.062 + i * 0.014, ZONE.youUnits),
+      quat: flatQuat(true, !!d.entersTapped), scale: SCALE.table
+    };
+  }
+  if (d.type === "Planeswalker" || (d.type === "Enchantment" && !d.aura) || d.type === "Artifact") {
+    const i = s.perms.length;
+    return {
+      pos: new THREE.Vector3(LAY.permX0 + i * LAY.permStep, 0.056 + i * 0.014, ZONE.youPerm),
+      quat: flatQuat(true, false), scale: SCALE.land * (d.type === "Planeswalker" ? 1.08 : 0.9)
+    };
+  }
+  if (d.aura) {   // it will end up on a creature; hover over the row meanwhile
+    return {
+      pos: new THREE.Vector3(LAY.unitX, 0.5, ZONE.youUnits + 0.5),
+      quat: flatQuat(true, false), scale: SCALE.table * 0.9
+    };
+  }
+  const p = new THREE.Vector3(2.4, 1.6, 1.4);
+  return { pos: p, quat: faceCamera(p, 0, false), scale: 0.92 };
+}
+function dragLift(e) { return ui.dragFrom ? ui.dragFrom.y - e.clientY : 0; }
+/* The hand floats above the near half of the circle, so "is the pointer over
+   the stone" is true the moment you touch a card and is no test at all. How
+   far the card has been lifted is, and it is the gesture people actually make:
+   a short pull upward out of the fan, from anywhere, at any angle. */
+function dragWouldPlay(e) {
+  return dragLift(e) >= clamp(window.innerHeight * 0.07, 40, 88);
+}
+function trackFlick(e) {
+  const now = e.timeStamp || performance.now();
+  const last = ui.flickAt;
+  if (last && now - last.t > 0) {
+    ui.flickV = ui.flickV * 0.4 + ((last.y - e.clientY) / (now - last.t)) * 0.6;
+  }
+  ui.flickAt = { y: e.clientY, t: now };
+}
+function setDragArmed(armed) {
+  if (armed === ui.dragArmed) return;
+  const c = ui.drag;
+  ui.dragArmed = armed;
+  if (!c) return;
+  stopTweens(c);
+  if (armed) {
+    c.glowTone = TONE.ok; c.glowSoft = false;
+    animate(c, dropTarget(c), 0.15);
+    showBanner("Let go to play " + c.def.name, true, null);
+  } else {
+    c.glowTone = null;
+    showBanner("Lift it clear of your hand to play it", true);
+  }
+}
+function beginDrag(c, from) {
+  ui.drag = c;
+  ui.dragFrom = { x: from.x, y: from.y };
+  ui.dragArmed = false;
+  ui.flickV = 0;
+  ui.flickAt = null;
+  stopTweens(c);
+  c.front.castShadow = false;
+  if (ui.hover === c) ui.hover = null;
+  showBanner("Lift it clear of your hand to play it", true);
+}
+function endDrag() {
+  const c = ui.drag;
+  ui.drag = null;
+  ui.dragArmed = false;
+  ui.dragFrom = null;
+  ui.flickV = 0;
+  ui.flickAt = null;
+  hideBanner();
+  if (c) c.glowTone = null;
+  return c;
+}
+/* why a card would not go down, said plainly — there is no hover tooltip on a phone */
+function whyNot(c) {
+  const d = c.def;
+  if (state.over) return "The duel is over.";
+  if (state.turn !== "you") return "It is not your turn.";
+  if (d.type === "Land") {
+    if (state.phase !== "main") return "Lands go down in your main phase.";
+    if (state.you.playedLand) return "You have already played a land this turn.";
+  }
+  if (!isFast(d) && state.phase !== "main") return d.name + " can only be cast in your main phase.";
+  if (!canPay("you", effCost("you", d))) return "Not enough mana for " + d.name + ".";
+  if (d.spell && d.spell.target && !legalTargets("you", d.spell, c).length)
+    return "There is nothing for " + d.name + " to aim at.";
+  if (d.aura && !auraHosts("you", d).length) return d.name + " has nothing to enchant.";
+  return "You cannot play " + d.name + " right now.";
+}
+
 function applyHandScroll(e) {
   const dx = e.clientX - ui.scrollLastX;
   ui.scrollLastX = e.clientX;
@@ -5642,12 +5758,16 @@ function applyHandScroll(e) {
 canvasEl.addEventListener("pointermove", e => {
   if (ui.drag) {
     setPreview(null);
-    const p = matPointAt(e);
-    if (p) {
+    trackFlick(e);
+    setDragArmed(dragWouldPlay(e));
+    if (!ui.dragArmed) {
+      const p = matPointAt(e);
       const c = ui.drag;
-      c.obj.position.set(p.x, 0.58, p.z);
-      c.obj.quaternion.copy(flatQuat(true, false));
-      c.obj.scale.setScalar((narrow ? SCALE.handTall : SCALE.hand) * .92);
+      if (p) {
+        c.obj.position.set(p.x, 0.58, p.z);
+        c.obj.quaternion.copy(flatQuat(true, false));
+        c.obj.scale.setScalar((narrow ? SCALE.handTall : SCALE.hand) * .92);
+      }
     }
     return;
   }
@@ -5658,20 +5778,25 @@ canvasEl.addEventListener("pointermove", e => {
     if (ax + ay > 10) {
       clearTimeout(ui.pressTimer);
       const c = ui.pointerDown.card;
-      const sideways = narrow && ax > ay * 1.05 && handScrollMax() > 0.02;
+      // a clearly sideways swipe walks the hand; anything with upward intent
+      // picks the card up
+      const sideways = narrow && ax > ay * 1.15 && handScrollMax() > 0.02;
+      const from = ui.pointerDown;
       if (sideways && (!c || c.zone === "hand")) {
         ui.scrolling = true;
         ui.handVel = 0;
-        ui.scrollLastX = ui.pointerDown.x;
+        ui.scrollLastX = from.x;
         if (ui.hover) { ui.hover = null; refreshGlows(); }
         applyHandScroll(e);
       } else if (c && playable(c)) {
-        ui.drag = c;
-        stopTweens(c);
-        c.front.castShadow = false;
-        if (ui.hover === c) ui.hover = null;
-        showBanner("Drop it on your half of the circle", true);
-      } else ui.pointerDown = null;
+        ui.pointerDown = null;
+        beginDrag(c, from);
+        trackFlick(e);
+        setDragArmed(dragWouldPlay(e));
+      } else {
+        if (c && (c.zone === "hand" || c.zone === "impulse") && c.owner === "you" && dy < -10) say(whyNot(c));
+        ui.pointerDown = null;
+      }
     }
     return;
   }
@@ -5723,11 +5848,10 @@ window.addEventListener("pointerup", async e => {
   ui.downAt = null;
   if (ui.scrolling) { ui.scrolling = false; return; }
   if (ui.drag) {
-    const c = ui.drag;
-    ui.drag = null;
-    hideBanner();
-    const p = matPointAt(e);
-    const ok = p && p.z > 0.05 && Math.hypot(p.x, p.z) < ARENA_R + 0.6 && playable(c);
+    const flick = ui.flickV > 0.25 && dragLift(e) > 16;
+    const armed = ui.dragArmed || flick;
+    const c = endDrag();
+    const ok = armed && playable(c);
     if (ok) {
       state.busy = true; updateHUD();
       await playFromHand("you", c);
@@ -5736,6 +5860,7 @@ window.addEventListener("pointerup", async e => {
       if (checkEnd()) return;
     } else {
       syncShadow(c);
+      stopTweens(c);
       animate(c, restingTransform(c), 0.3);
     }
     return;
@@ -5769,8 +5894,14 @@ dom.chooserSkip.addEventListener("click", () => { if (chooserResolve) chooserRes
 
 dom.bannerCancel.addEventListener("click", () => {
   if (ui.targeting) finishTarget(null);
-  else if (ui.drag) { const c = ui.drag; ui.drag = null; hideBanner(); syncShadow(c); animate(c, restingTransform(c), .3); }
+  else if (ui.drag) { const c = endDrag(); syncShadow(c); stopTweens(c); animate(c, restingTransform(c), .3); }
   else hideBanner();
+});
+// a cancelled touch (the browser taking the gesture, a call coming in) must
+// not leave a card stranded over the board
+canvasEl.addEventListener("pointercancel", () => {
+  ui.pointerDown = null; ui.downAt = null; ui.scrolling = false;
+  if (ui.drag) { const c = endDrag(); syncShadow(c); stopTweens(c); animate(c, restingTransform(c), .3); }
 });
 dom.closeBtn.addEventListener("click", () => releaseHold());
 dom.playBtn.addEventListener("click", async () => {
