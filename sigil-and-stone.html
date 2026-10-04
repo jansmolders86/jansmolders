@@ -218,6 +218,216 @@ button.tile.adv{border-color:rgba(200,162,74,.42)}
   100%{opacity:0;transform:translate(-50%,-50%) scale(1.03)}
 }
 
+/* ---------- the clash: a modal look at one attack resolving ----------
+ * Nothing here decides anything.  dealPass has already worked the pass out and
+ * handed over a list of beats; this only shows them. */
+#clash{
+  position:fixed;inset:0;z-index:7;overflow:hidden;
+  background:radial-gradient(130% 120% at 50% 48%,rgba(6,7,12,.9),rgba(1,2,4,.985));
+  backdrop-filter:blur(9px) saturate(.72);
+  opacity:0;transition:opacity .2s ease;
+}
+#clash.on{opacity:1}
+#clash.off{display:none}
+#clashFx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#clashFlash{
+  position:absolute;inset:0;pointer-events:none;opacity:0;
+  background:radial-gradient(60% 60% at var(--fx,50%) 50%,#fff,rgba(255,240,210,.35) 45%,transparent 72%);
+}
+#clashFlash.go{animation:cflash .26s ease-out}
+@keyframes cflash{0%{opacity:0}12%{opacity:.92}100%{opacity:0}}
+
+.cstage{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  gap:clamp(8px,4.5vw,66px);padding:0 4vw;
+  --cw:clamp(118px,23vw,252px);
+}
+.cstage.shake{animation:cshake .4s cubic-bezier(.36,.07,.19,.97)}
+@keyframes cshake{
+  0%,100%{transform:translate(0,0) rotate(0)}
+  9%{transform:translate(-11px,5px) rotate(-.55deg)}
+  22%{transform:translate(10px,-6px) rotate(.45deg)}
+  36%{transform:translate(-7px,-4px) rotate(-.3deg)}
+  52%{transform:translate(6px,5px) rotate(.2deg)}
+  68%{transform:translate(-4px,2px)}
+  84%{transform:translate(3px,-2px)}
+}
+.cslot{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;flex:0 0 auto}
+.cfan{position:relative;display:flex;align-items:flex-end;justify-content:center}
+.cfan .ccard+.ccard{margin-left:calc(var(--cw) * -0.44)}
+
+.ccard{
+  position:relative;width:var(--cw);flex:0 0 auto;--tint:rgba(200,162,74,.85);
+  filter:drop-shadow(0 18px 42px rgba(0,0,0,.82));
+  transform:translate3d(var(--ox,0),0,0) scale(.94);opacity:0;
+  transition:transform .3s cubic-bezier(.2,.9,.25,1),opacity .24s ease,filter .34s ease;
+}
+.ccard img{width:100%;display:block;border-radius:4.6%/3.3%;background:#0b0c10}
+.ccard .rim{
+  position:absolute;inset:-5% -4%;border-radius:7%/5%;pointer-events:none;opacity:0;
+  box-shadow:0 0 0 2px var(--tint),0 0 40px 10px var(--tint);transition:opacity .2s ease;
+}
+.ccard .crack{
+  position:absolute;inset:0;border-radius:4.6%/3.3%;pointer-events:none;opacity:0;
+  background:
+    linear-gradient(118deg,transparent 47.4%,rgba(255,242,224,.8) 48.2%,transparent 49.2%),
+    linear-gradient(64deg,transparent 57.2%,rgba(255,224,196,.6) 58%,transparent 58.9%),
+    linear-gradient(150deg,transparent 31%,rgba(255,236,212,.5) 31.7%,transparent 32.5%);
+  mix-blend-mode:screen;transition:opacity .16s ease;
+}
+#clash.in .ccard{transform:translate3d(0,0,0) scale(1);opacity:1}
+#clash.charge .cslot.atk .ccard{transform:translate3d(-7%,0,0) rotate(-5deg) scale(1.06)}
+#clash.charge .cslot.atk .rim{opacity:1}
+#clash.charge .cslot.def .ccard{transform:scale(.962)}
+#clash.hit .cslot.atk .ccard{
+  transform:translate3d(var(--reach,22%),0,0) rotate(4.5deg) scale(1.03);
+  transition:transform .12s cubic-bezier(.4,0,.9,.2);
+}
+#clash.hit .cslot.def .ccard{
+  transform:translate3d(6.5%,0,0) rotate(5deg) scale(.965);
+  transition:transform .13s ease-out;
+}
+#clash.rest .ccard{transform:translate3d(0,0,0) scale(1);transition:transform .4s cubic-bezier(.18,1.5,.4,1)}
+.cstage.flip{flex-direction:row-reverse}
+#clash.charge .cstage.flip .cslot.atk .ccard{transform:translate3d(7%,0,0) rotate(5deg) scale(1.06)}
+#clash.hit .cstage.flip .cslot.atk .ccard{
+  transform:translate3d(var(--reach,-22%),0,0) rotate(-4.5deg) scale(1.03);
+  transition:transform .12s cubic-bezier(.4,0,.9,.2);
+}
+#clash.hit .cstage.flip .cslot.def .ccard{transform:translate3d(-6.5%,0,0) rotate(-5deg) scale(.965)}
+.cstage.flip .cspill{right:auto;left:clamp(12px,3vw,30px)}
+.ccard.dying{
+  filter:grayscale(.9) brightness(.5) drop-shadow(0 8px 20px rgba(0,0,0,.95));
+  transform:translate3d(0,22%,0) rotate(var(--fall,9deg)) scale(.9)!important;opacity:0;
+  transition:transform .62s cubic-bezier(.5,0,.8,.6) .14s,opacity .5s ease .22s,filter .3s ease;
+}
+.ccard.dying .crack{opacity:1}
+
+.cnum{
+  position:absolute;left:50%;top:34%;font-family:var(--display);font-weight:700;
+  font-size:clamp(28px,5.6vw,56px);line-height:1;white-space:nowrap;pointer-events:none;
+  color:#ffdccf;text-shadow:0 0 20px rgba(214,60,34,.95),0 2px 9px rgba(0,0,0,.9);
+  opacity:0;transform:translate(-50%,-50%) scale(.5);
+}
+.cnum.heal{color:#d6f7cf;text-shadow:0 0 20px rgba(90,210,120,.9),0 2px 9px rgba(0,0,0,.9)}
+.cnum.go{animation:cnum .95s cubic-bezier(.2,.8,.3,1) forwards}
+.cnum.down.go{animation:cnumdown .95s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes cnumdown{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.45)}
+  20%{opacity:1;transform:translate(-50%,10%) scale(1.2)}
+  58%{opacity:1;transform:translate(-50%,52%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,102%) scale(.94)}
+}
+@keyframes cnum{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.45)}
+  20%{opacity:1;transform:translate(-50%,-86%) scale(1.26)}
+  58%{opacity:1;transform:translate(-50%,-128%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-178%) scale(.94)}
+}
+
+.cplate{
+  font-family:var(--data);font-size:clamp(9.5px,1.4vw,12px);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);text-align:center;line-height:1.6;
+  max-width:calc(var(--cw) * 1.5);opacity:0;transition:opacity .22s ease .06s;
+}
+#clash.in .cplate{opacity:1}
+.cplate b{
+  display:block;font-family:var(--display);font-weight:700;letter-spacing:.03em;
+  text-transform:none;font-size:clamp(12px,1.9vw,16px);color:#f1e5c6;
+}
+.cplate .pt{color:#e9dcbd;transition:color .3s ease}
+.cplate .ptrow{display:block}
+.cplate .pt.hurt{color:#f0a292}
+.cplate .pt.gone{color:#b3675a;text-decoration:line-through}
+
+.cvs{
+  font-family:var(--display);font-size:clamp(13px,2.2vw,20px);letter-spacing:.3em;
+  text-transform:uppercase;color:rgba(200,162,74,.5);opacity:0;transition:opacity .2s ease;
+  flex:0 0 auto;align-self:center;
+}
+#clash.in .cvs{opacity:1}
+#clash.hit .cvs,#clash.rest .cvs{opacity:0}
+
+/* the defending seat: a player's life, or a planeswalker's loyalty */
+.cseat{display:flex;flex-direction:column;align-items:center;gap:11px;flex:0 0 auto}
+.cseat .ring{
+  position:relative;width:clamp(94px,15vw,146px);aspect-ratio:1;border-radius:50%;
+  display:grid;place-items:center;transform:scale(.9);opacity:0;
+  background:radial-gradient(circle at 50% 34%,rgba(44,39,31,.96),rgba(9,10,14,.97));
+  border:2px solid rgba(200,162,74,.55);
+  box-shadow:0 0 30px rgba(0,0,0,.8) inset,0 12px 34px rgba(0,0,0,.65);
+  transition:transform .3s cubic-bezier(.2,1.3,.4,1),opacity .24s ease,border-color .25s,box-shadow .25s;
+}
+#clash.in .cseat .ring{transform:scale(1);opacity:1}
+.cseat .ring b{
+  font-family:var(--display);font-weight:700;font-size:clamp(26px,4.6vw,44px);
+  color:#f3e7ca;text-shadow:0 2px 10px rgba(0,0,0,.8);
+}
+.cseat .ring i{
+  position:absolute;bottom:14%;font-style:normal;font-family:var(--data);
+  font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);
+}
+.cseat .ring img{position:absolute;inset:6%;border-radius:50%;object-fit:cover;opacity:.3}
+.cseat.hurt .ring{
+  border-color:rgba(214,60,34,.92);
+  box-shadow:0 0 52px rgba(214,60,34,.5),0 0 30px rgba(0,0,0,.8) inset;
+}
+
+/* trample and spill: a small seat in the corner that takes what gets past */
+.cspill{
+  position:absolute;top:clamp(12px,3vw,30px);right:clamp(12px,3vw,30px);
+  display:flex;align-items:center;gap:9px;padding:7px 12px 7px 9px;border-radius:40px;
+  background:rgba(10,11,16,.82);border:1px solid var(--glass-edge);backdrop-filter:blur(5px);
+  opacity:0;transform:translateY(-8px);transition:opacity .22s,transform .22s,border-color .25s;
+}
+#clash.in .cspill{opacity:1;transform:none}
+.cspill.hurt{border-color:rgba(214,60,34,.85);box-shadow:0 0 26px rgba(214,60,34,.35)}
+.cspill b{font-family:var(--display);font-weight:700;font-size:clamp(15px,2.4vw,21px);color:#f3e7ca}
+.cspill span{font-family:var(--data);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint)}
+
+.ckws{
+  position:absolute;left:50%;transform:translateX(-50%);bottom:clamp(58px,11vh,104px);
+  display:flex;gap:7px;flex-wrap:wrap;justify-content:center;max-width:86vw;pointer-events:none;
+}
+.ckw{
+  font-family:var(--data);font-size:clamp(8.5px,1.25vw,10.5px);letter-spacing:.2em;
+  text-transform:uppercase;padding:4px 10px;border-radius:2px;white-space:nowrap;
+  color:#1a1409;background:linear-gradient(to bottom,#e8cd85,#c29b3f);
+  opacity:0;transform:translateY(9px) scale(.9);
+}
+.ckw.go{animation:ckwin .46s cubic-bezier(.2,1.5,.35,1) forwards}
+@keyframes ckwin{to{opacity:1;transform:none}}
+.ckw.venom{background:linear-gradient(to bottom,#9fd97a,#3f7a34);color:#06120a}
+.ckw.life{background:linear-gradient(to bottom,#c6f2cc,#4aa06a);color:#06120a}
+.ckw.burst{background:linear-gradient(to bottom,#f3c198,#b9693a);color:#190c05}
+.ckw.cold{background:linear-gradient(to bottom,#bcdcf5,#4a86b4);color:#05101a}
+
+.ctitle{
+  position:absolute;left:50%;transform:translateX(-50%);top:clamp(16px,5vh,56px);
+  font-family:var(--data);font-size:clamp(9.5px,1.5vw,11.5px);letter-spacing:.3em;
+  text-transform:uppercase;color:var(--ink-faint);text-align:center;
+  opacity:0;transition:opacity .25s ease;pointer-events:none;
+}
+#clash.in .ctitle{opacity:1}
+#clashSkip{
+  position:absolute;right:clamp(12px,3vw,26px);bottom:clamp(12px,3vw,24px);
+  font-size:10.5px;padding:6px 12px;letter-spacing:.16em;opacity:.0;transition:opacity .3s ease .5s;
+}
+#clash.on #clashSkip{opacity:.62}
+#clashSkip:hover{opacity:1}
+
+@media (orientation:portrait) and (max-width:720px){
+  .cstage{--cw:clamp(108px,40vw,208px);gap:clamp(5px,2.4vw,18px);padding:0 2.5vw}
+  /* the corner badge keeps the top-right, so the title drops clear of it */
+  .ctitle{top:clamp(66px,9vh,94px)}
+  .cvs{display:none}
+  .ckws{bottom:clamp(74px,13vh,120px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .cstage.shake{animation:none}
+  .ccard,.cnum,.cplate,.cseat .ring,.cspill{transition-duration:.01ms!important;animation-duration:.01ms!important}
+}
+
 #veil{
   position:fixed;inset:0;display:grid;place-items:center;padding:24px;
   background:radial-gradient(120% 90% at 50% 40%,rgba(10,12,18,.66),rgba(3,4,6,.97));
@@ -296,6 +506,15 @@ button.tile.adv{border-color:rgba(200,162,74,.42)}
   </div>
 </div>
 
+<div id="clash" class="off">
+  <canvas id="clashFx"></canvas>
+  <div id="clashFlash"></div>
+  <div class="ctitle" id="clashTitle"></div>
+  <div class="cstage" id="clashStage"></div>
+  <div class="ckws" id="clashKws"></div>
+  <button id="clashSkip" class="btn ghost">Skip</button>
+</div>
+
 <div id="chooser" hidden>
   <div id="chooserTitle"></div>
   <div id="chooserList"></div>
@@ -313,6 +532,12 @@ button.tile.adv{border-color:rgba(200,162,74,.42)}
       <button class="btn ghost" data-q="low">Bare</button>
       <button class="btn ghost" data-q="mid">Some</button>
       <button class="btn ghost" data-q="high">Full</button>
+    </div>
+    <div class="qpick" id="cpick">
+      <span>Combat</span>
+      <button class="btn ghost" data-c="full">Cinematic</button>
+      <button class="btn ghost" data-c="brief">Brisk</button>
+      <button class="btn ghost" data-c="off">None</button>
     </div>
     <p class="fineprint">Prototype. Card images and rules text are Wizards of the Coast's; the board, the engine and the opponent are not.</p>
   </div>
@@ -3852,6 +4077,8 @@ const dom = {
   inspect: el("inspect"), playBtn: el("playBtn"), abilityBtn: el("abilityBtn"), closeBtn: el("closeBtn"),
   loyalRow: el("loyalRow"),
   chooser: el("chooser"), chooserTitle: el("chooserTitle"), chooserList: el("chooserList"), chooserSkip: el("chooserSkip"),
+  clash: el("clash"), clashStage: el("clashStage"), clashKws: el("clashKws"),
+  clashTitle: el("clashTitle"), clashFlash: el("clashFlash"), clashSkipBtn: el("clashSkip"),
   yardBtn: el("yardBtn"), lifeChip: el("lifeChip"),
   preview: el("preview"), previewImg: el("preview").querySelector("img"),
   previewNote: el("preview").querySelector(".pnote"),
@@ -5112,6 +5339,7 @@ function strikesIn(c, first) {
   const ds = kwHas(c, "doubleStrike");
   return first ? (ds || kwHas(c, "firstStrike")) : (ds || !kwHas(c, "firstStrike"));
 }
+let combatBeats = [];
 function dealPass(attackSide, first) {
   const defSide = other(attackSide);
   const alive = c => c.zone === "board" && !isDead(c);
@@ -5123,12 +5351,32 @@ function dealPass(attackSide, first) {
   const connected = [];
   let lifeLoss = 0;
 
+  /* a running account of the pass, so the clash overlay can replay exactly
+   * what the rules worked out rather than guessing at it a second time */
+  const beats = new Map();
+  const beatFor = a => {
+    let b = beats.get(a);
+    if (!b) {
+      b = { atk: a, atkSide: attackSide, defSide: defSide, first: first,
+            power: 0, foes: [], back: 0, spill: 0, target: null, gain: 0 };
+      beats.set(a, b);
+    }
+    return b;
+  };
+  const foeIn = (bt, c) => {
+    let f = bt.foes.find(x => x.card === c);
+    if (!f) { f = { card: c, dmg: 0, deals: 0 }; bt.foes.push(f); }
+    return f;
+  };
+
   const through = (a, n) => {
     if (n <= 0) return;
     const t = a.attackTarget;
-    if (t && t.zone === "perms") pwHits.set(t, (pwHits.get(t) || 0) + n);
+    const bt = beatFor(a);
+    bt.spill += n;
+    if (t && t.zone === "perms") { pwHits.set(t, (pwHits.get(t) || 0) + n); bt.target = t; }
     else { lifeLoss += n; connected.push(a); }
-    if (kwHas(a, "lifelink")) gain[attackSide] += n;
+    if (kwHas(a, "lifelink")) { gain[attackSide] += n; bt.gain += n; }
   };
 
   for (const a of state[attackSide].board.slice()) {
@@ -5139,19 +5387,33 @@ function dealPass(attackSide, first) {
     if (ap <= 0) continue;
     if (!bl.length) {
       if (a.blocked) continue;             // blocked once, blocked for good
+      beatFor(a).power = ap;
       through(a, ap);
       if (kwHas(a, "sacAfterDamage")) a.sacrificed = true;
       continue;
     }
+    const bt = beatFor(a);
+    bt.power = ap;
     let left = ap;
     const dt = kwHas(a, "deathtouch");
     for (const b of bl) {
       const need = dt ? 1 : Math.max(0, effStats(b)[1] - b.damage);
       const give = Math.min(left, need);
-      if (give > 0) { hit(b, give); if (dt) slain.add(b); }
+      const f = foeIn(bt, b);
+      if (give > 0) { hit(b, give); if (dt) slain.add(b); f.dmg += give; }
+      f.lethalTouch = dt && give > 0;
       left -= give;
     }
-    if (kwHas(a, "lifelink")) gain[attackSide] += ap - left;
+    // all of an attacker's damage has to go somewhere: whatever is left over
+    // after each blocker has taken a lethal share piles onto the last of them,
+    // unless it tramples past instead
+    if (left > 0 && !kwHas(a, "trample")) {
+      const last = bl[bl.length - 1];
+      hit(last, left);
+      foeIn(bt, last).dmg += left;
+      left = 0;
+    }
+    if (kwHas(a, "lifelink")) { gain[attackSide] += ap - left; bt.gain += ap - left; }
     if (left > 0 && kwHas(a, "trample")) through(a, left);
     if (kwHas(a, "sacAfterDamage")) a.sacrificed = true;
   }
@@ -5164,7 +5426,11 @@ function dealPass(attackSide, first) {
       const bp = effStats(b)[0];
       if (bp <= 0) continue;
       hit(b.blocking, bp);
-      if (kwHas(b, "deathtouch")) slain.add(b.blocking);
+      const bt = beatFor(b.blocking);
+      bt.back += bp;
+      const f = foeIn(bt, b);
+      f.deals += bp;
+      if (kwHas(b, "deathtouch")) { slain.add(b.blocking); f.venom = true; }
       if (kwHas(b, "lifelink")) gain[side] += bp;
       if (kwHas(b, "sacAfterDamage")) b.sacrificed = true;
     }
@@ -5176,12 +5442,19 @@ function dealPass(attackSide, first) {
     pw.loyalty -= n;
     say(pw.def.name + " loses " + n + " loyalty.");
   }
+  combatBeats = Array.from(beats.values()).filter(b => b.power > 0 || b.back > 0);
+  for (const b of combatBeats) {
+    b.atkDies = isDead(b.atk) || b.atk.sacrificed;
+    for (const f of b.foes) f.dies = isDead(f.card) || f.card.sacrificed;
+    if (b.target) b.loyAfter = b.target.loyalty;
+  }
   for (const side of ["you", "foe"]) if (gain[side] > 0) gainLife(side, gain[side]);
   if (lifeLoss > 0) {
     loseLife(defSide, lifeLoss);
     say(does(defSide, "take", "takes") + " " + lifeLoss + " damage.");
     flashHit(defSide);
   }
+  for (const b of combatBeats) if (b.spill > 0 && !b.target) b.lifeAfter = state[defSide].life;
   // Kaito and friends: a creature of yours connected with a player
   if (connected.length) {
     for (const o of state[attackSide].perms) {
@@ -5197,6 +5470,486 @@ function flashHit(side) {
   const sx = a.sprite.scale.x, sy = a.sprite.scale.y;
   a.sprite.scale.set(sx * 1.16, sy * 1.16, 1);
   setTimeout(() => a.sprite.scale.set(sx, sy, 1), 200);
+}
+
+
+/* ---------- the clash: one attack, close up ----------
+ * dealPass has already worked the pass out and left its account in
+ * combatBeats.  Nothing below decides anything; it only shows what happened. */
+const CLASH = {
+  mode: (function pickClash() {
+    const forced = (location.search.match(/[?&]clash=(full|brief|off)/) || [])[1];
+    if (forced) return forced;
+    try {
+      const saved = localStorage.getItem("sigil.clash");
+      if (saved === "full" || saved === "brief" || saved === "off") return saved;
+    } catch (err) { /* nothing to do */ }
+    return "full";
+  })(),
+  fx: QUALITY === "high" ? 1 : QUALITY === "mid" ? 0.62 : 0.24,
+  // a plain stretch on every duration, for anyone who wants to linger over it
+  rate: Math.max(0.25, Math.min(10, parseFloat((location.search.match(/[?&]clashrate=([\d.]+)/) || [])[1]) || 1)),
+  skip: false, running: false
+};
+
+/* a small additive particle layer, awake only while something is on it */
+const CFX = { cv: null, ctx: null, parts: [], rings: [], raf: 0, w: 0, h: 0, dpr: 1 };
+function cfxInit() {
+  if (CFX.ctx) return;
+  CFX.cv = dom.clash.querySelector("#clashFx");
+  CFX.ctx = CFX.cv.getContext("2d");
+  // a full-screen blur is the one expensive thing here; an older phone gets a
+  // flat dark sheet instead, which reads almost the same
+  if (QUALITY === "low") {
+    dom.clash.style.backdropFilter = "none";
+    dom.clash.style.webkitBackdropFilter = "none";
+    dom.clash.style.background = "radial-gradient(130% 120% at 50% 48%,rgba(5,6,10,.96),rgba(1,2,4,.995))";
+  }
+}
+function cfxSize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, QUALITY === "high" ? 2 : 1.5);
+  CFX.w = CFX.cv.clientWidth || window.innerWidth;
+  CFX.h = CFX.cv.clientHeight || window.innerHeight;
+  CFX.dpr = dpr;
+  CFX.cv.width = Math.max(2, Math.round(CFX.w * dpr));
+  CFX.cv.height = Math.max(2, Math.round(CFX.h * dpr));
+}
+function cfxTick() {
+  const ctx = CFX.ctx, dt = 1 / 60;
+  ctx.setTransform(CFX.dpr, 0, 0, CFX.dpr, 0, 0);
+  ctx.clearRect(0, 0, CFX.w, CFX.h);
+  ctx.globalCompositeOperation = "lighter";
+  for (const p of CFX.parts) {
+    p.age += dt;
+    p.vy += p.grav * dt;
+    p.vx *= p.drag; p.vy *= p.drag;
+    p.x += p.vx * dt; p.y += p.vy * dt;
+    const k = 1 - p.age / p.life;
+    if (k <= 0) continue;
+    ctx.globalAlpha = Math.max(0, Math.min(1, k * k));
+    ctx.strokeStyle = p.col; ctx.fillStyle = p.col;
+    if (p.trail) {
+      ctx.lineWidth = Math.max(0.5, p.size * k); ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(p.x - p.vx * 0.024, p.y - p.vy * 0.024);
+      ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(0.4, p.size * k), 0, TAU); ctx.fill();
+    }
+  }
+  for (const r of CFX.rings) {
+    r.age += dt;
+    const k = r.age / r.life;
+    if (k >= 1) continue;
+    const e = 1 - (1 - k) * (1 - k);
+    ctx.globalAlpha = (1 - k) * (1 - k) * r.a;
+    ctx.strokeStyle = r.col;
+    ctx.lineWidth = Math.max(0.6, r.w * (1 - k));
+    ctx.beginPath();
+    ctx.arc(r.x, r.y, r.r0 + (r.r1 - r.r0) * e, 0, TAU);
+    ctx.stroke();
+  }
+  CFX.parts = CFX.parts.filter(p => p.age < p.life);
+  CFX.rings = CFX.rings.filter(r => r.age < r.life);
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = "source-over";
+  if (CFX.parts.length || CFX.rings.length) CFX.raf = requestAnimationFrame(cfxTick);
+  else { CFX.raf = 0; ctx.clearRect(0, 0, CFX.w, CFX.h); }
+}
+function cfxWake() { if (!CFX.raf && CFX.ctx) CFX.raf = requestAnimationFrame(cfxTick); }
+function cfxClear() {
+  CFX.parts.length = 0; CFX.rings.length = 0;
+  if (CFX.raf) { cancelAnimationFrame(CFX.raf); CFX.raf = 0; }
+  if (CFX.ctx) CFX.ctx.clearRect(0, 0, CFX.w, CFX.h);
+}
+function cfxBurst(x, y, n, opt) {
+  opt = opt || {};
+  n = Math.round(n * CLASH.fx);
+  if (n <= 0 || !CFX.ctx) return;
+  const spread = opt.spread === undefined ? TAU : opt.spread;
+  const dir = opt.dir || 0;
+  const cols = opt.cols || ["rgba(255,236,196,1)"];
+  for (let i = 0; i < n; i++) {
+    const a = dir + (Math.random() - 0.5) * spread;
+    const sp = (opt.speed || 440) * (0.32 + Math.random() * 1.0);
+    CFX.parts.push({
+      x: x, y: y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, age: 0,
+      life: (opt.life || 0.6) * (0.5 + Math.random() * 0.85),
+      size: (opt.size || 3.2) * (0.5 + Math.random()),
+      grav: opt.grav === undefined ? 760 : opt.grav,
+      drag: opt.drag === undefined ? 0.972 : opt.drag,
+      col: cols[(Math.random() * cols.length) | 0],
+      trail: opt.trail !== false
+    });
+  }
+  cfxWake();
+}
+function cfxRing(x, y, opt) {
+  if (!CFX.ctx || CLASH.fx < 0.3) return;
+  CFX.rings.push({
+    x: x, y: y, r0: opt.r0 || 4, r1: opt.r1 || 80, age: 0,
+    life: opt.life || 0.44, col: opt.col || "rgba(255,230,180,.95)",
+    w: opt.w || 4, a: opt.a === undefined ? 1 : opt.a
+  });
+  cfxWake();
+}
+
+const CLASH_TINT = {
+  W: "rgba(246,236,206,.9)", U: "rgba(118,186,236,.9)", B: "rgba(168,126,208,.9)",
+  R: "rgba(234,106,62,.9)", G: "rgba(126,204,108,.9)"
+};
+function clashTint(def) {
+  const c = (def.color || "").charAt(0);
+  return CLASH_TINT[c] || "rgba(200,162,74,.88)";
+}
+function cardArt(def) { return previewSrc(def) || ""; }
+
+function clashCardNode(card, ox) {
+  const wrap = document.createElement("div");
+  wrap.className = "ccard";
+  wrap.style.setProperty("--tint", clashTint(card.def));
+  wrap.style.setProperty("--ox", ox);
+  wrap.style.setProperty("--fall", (Math.random() * 18 - 9).toFixed(1) + "deg");
+  const img = document.createElement("img");
+  img.src = cardArt(card.def);
+  img.alt = card.def.name;
+  img.draggable = false;
+  wrap.appendChild(img);
+  const rim = document.createElement("div"); rim.className = "rim"; wrap.appendChild(rim);
+  const crack = document.createElement("div"); crack.className = "crack"; wrap.appendChild(crack);
+  return wrap;
+}
+function clashPlateNode(card, toughBefore) {
+  const p = document.createElement("div");
+  p.className = "cplate";
+  const nm = document.createElement("b"); nm.textContent = card.def.name; p.appendChild(nm);
+  const pt = document.createElement("span"); pt.className = "pt";
+  if (card.def.type === "Creature") pt.textContent = effStats(card)[0] + " / " + Math.max(0, toughBefore);
+  else pt.textContent = card.def.type.toLowerCase();
+  p.appendChild(pt);
+  return { node: p, pt: pt };
+}
+function clashSlot(cards, role, befores, ox) {
+  const slot = document.createElement("div");
+  slot.className = "cslot " + role;
+  const fan = document.createElement("div");
+  fan.className = "cfan";
+  const nodes = [], plates = [];
+  cards.forEach((c, i) => {
+    const n = clashCardNode(c, ox);
+    fan.appendChild(n);
+    nodes.push(n);
+  });
+  slot.appendChild(fan);
+  cards.forEach((c, i) => {
+    const pl = clashPlateNode(c, befores[i]);
+    plates.push(pl);
+    if (cards.length === 1) slot.appendChild(pl.node);
+  });
+  if (cards.length > 1) {
+    // the art carries the names; the line underneath carries the numbers, one
+    // span per blocker so each can be struck through as it falls
+    const head = document.createElement("div");
+    head.className = "cplate";
+    const nm = document.createElement("b");
+    nm.textContent = cards.length + " blockers";
+    head.appendChild(nm);
+    const row = document.createElement("span");
+    row.className = "ptrow";
+    plates.forEach((pl, i) => {
+      if (i) row.appendChild(document.createTextNode(" · "));
+      row.appendChild(pl.pt);
+    });
+    head.appendChild(row);
+    slot.appendChild(head);
+  }
+  return { node: slot, cards: nodes, plates: plates };
+}
+function clashSeat(beat) {
+  const wrap = document.createElement("div");
+  wrap.className = "cseat";
+  const ring = document.createElement("div");
+  ring.className = "ring";
+  const num = document.createElement("b");
+  const lab = document.createElement("i");
+  const pw = beat.target;
+  const from = pw ? beat.loyAfter + beat.spill : (beat.lifeAfter === undefined ? state[beat.defSide].life : beat.lifeAfter + beat.spill);
+  const to = pw ? beat.loyAfter : (beat.lifeAfter === undefined ? state[beat.defSide].life : beat.lifeAfter);
+  num.textContent = String(from);
+  lab.textContent = pw ? "loyalty" : "life";
+  if (pw) {
+    const img = document.createElement("img");
+    img.src = cardArt(pw.def); img.alt = "";
+    ring.appendChild(img);
+  }
+  ring.appendChild(num); ring.appendChild(lab);
+  wrap.appendChild(ring);
+  const plate = document.createElement("div");
+  plate.className = "cplate";
+  const nm = document.createElement("b");
+  nm.textContent = pw ? pw.def.name : (beat.defSide === "you" ? "You" : state[beat.defSide].name);
+  plate.appendChild(nm);
+  const sub = document.createElement("span");
+  sub.className = "pt";
+  sub.textContent = pw ? "planeswalker" : "undefended";
+  plate.appendChild(sub);
+  wrap.appendChild(plate);
+  return { node: wrap, hitNode: ring, num: num, from: from, to: to };
+}
+function clashSpill(beat) {
+  const wrap = document.createElement("div");
+  wrap.className = "cspill";
+  const num = document.createElement("b");
+  const lab = document.createElement("span");
+  const pw = beat.target;
+  const from = pw ? beat.loyAfter + beat.spill : (beat.lifeAfter === undefined ? state[beat.defSide].life : beat.lifeAfter + beat.spill);
+  const to = pw ? beat.loyAfter : (beat.lifeAfter === undefined ? state[beat.defSide].life : beat.lifeAfter);
+  num.textContent = String(from);
+  lab.textContent = pw ? pw.def.name : (beat.defSide === "you" ? "your life" : "their life");
+  wrap.appendChild(num); wrap.appendChild(lab);
+  return { node: wrap, hitNode: wrap, num: num, from: from, to: to };
+}
+/* the number hangs off the slot, not off the card: a card that is busy being
+ * knocked over and faded out would drag its own damage number down with it */
+function popNum(host, over, text, cls, opt) {
+  opt = opt || {};
+  const n = document.createElement("div");
+  n.className = "cnum" + (cls ? " " + cls : "");
+  n.textContent = text;
+  let left = null;
+  if (over && over !== host) {
+    const hr = host.getBoundingClientRect(), cr = over.getBoundingClientRect();
+    if (hr.width) left = cr.left + cr.width / 2 - hr.left;
+  }
+  if (opt.dx) left = (left === null ? host.clientWidth / 2 : left) + opt.dx;
+  if (left !== null) n.style.left = Math.round(left) + "px";
+  if (opt.top) n.style.top = opt.top;
+  host.appendChild(n);
+  const fire = () => { void n.offsetWidth; n.classList.add("go"); };
+  if (opt.delay) setTimeout(fire, opt.delay); else fire();
+  setTimeout(() => { if (n.parentNode) n.parentNode.removeChild(n); }, 1250 + (opt.delay || 0));
+}
+function countTo(node, from, to, ms) {
+  if (from === to) { node.textContent = String(to); return; }
+  const t0 = performance.now();
+  const step = () => {
+    const k = Math.min(1, (performance.now() - t0) / Math.max(1, ms));
+    node.textContent = String(Math.round(from + (to - from) * k));
+    if (k < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+function clashChip(text, kind, delay) {
+  const c = document.createElement("div");
+  c.className = "ckw" + (kind ? " " + kind : "");
+  c.textContent = text;
+  dom.clashKws.appendChild(c);
+  setTimeout(() => c.classList.add("go"), delay);
+}
+function clashImpact(x, y, beat, flip) {
+  const heavy = Math.min(9, Math.max(beat.power, beat.back, 1));
+  const gold = ["rgba(255,228,160,1)", "rgba(255,192,112,1)", "rgba(255,247,226,1)"];
+  const red = ["rgba(255,152,112,1)", "rgba(226,86,50,1)", "rgba(255,214,182,1)"];
+  const venom = ["rgba(154,230,122,1)", "rgba(96,190,90,1)", "rgba(216,248,196,1)"];
+  const poisoned = beat.foes.some(f => f.venom || f.lethalTouch) || kwHas(beat.atk, "deathtouch");
+  const cols = poisoned ? venom.concat(gold) : gold.concat(red);
+  cfxRing(x, y, { r0: 6, r1: 62 + heavy * 17, col: "rgba(255,234,190,.95)", w: 5, life: 0.44 });
+  if (CLASH.fx > 0.8) {
+    cfxRing(x, y, { r0: 10, r1: 128 + heavy * 22, col: poisoned ? "rgba(150,226,120,.6)" : "rgba(255,158,104,.62)", w: 2.6, life: 0.62, a: 0.75 });
+  }
+  cfxBurst(x, y, 30 + heavy * 7, { cols: cols, speed: 540 + heavy * 54, life: 0.62, size: 3.6 });
+  cfxBurst(x, y, 12, {
+    cols: ["rgba(255,250,236,1)"], dir: flip ? Math.PI : 0, spread: 0.52,
+    speed: 1600, life: 0.2, size: 2.4, grav: 0, drag: 0.9
+  });
+  if (beat.gain > 0) {
+    cfxBurst(x, y, 16, {
+      cols: ["rgba(180,246,186,1)", "rgba(96,210,128,1)"], dir: flip ? 0 : Math.PI,
+      spread: 0.9, speed: 480, life: 0.8, size: 3, grav: -120, drag: 0.985
+    });
+  }
+}
+
+async function playClash(beats, first) {
+  if (CLASH.mode === "off" || CLASH.running || !beats || !beats.length) return;
+  const list = beats.filter(b => b.power > 0 || b.back > 0);
+  if (!list.length) return;
+  CLASH.running = true;
+  CLASH.skip = false;
+  const root = dom.clash;
+  cfxInit();
+  root.className = "on";
+  cfxSize();
+  const onSkip = () => { CLASH.skip = true; };
+  root.addEventListener("pointerdown", onSkip);
+  window.addEventListener("keydown", onSkip);
+  dom.clashSkipBtn.onclick = onSkip;
+  const rate = (CLASH.mode === "brief" ? 0.5 : list.length > 3 ? 0.76 : 1) * CLASH.rate;
+  // the show must never be able to hold the game up: if anything here goes
+  // wrong, tear the overlay down and let combat carry on
+  try {
+    for (let i = 0; i < list.length; i++) {
+      if (CLASH.skip) break;
+      await playClashBeat(list[i], first, rate, i + 1, list.length);
+    }
+  } catch (err) {
+    say("(the close-up stumbled)");
+  }
+  root.classList.remove("in", "charge", "hit", "rest");
+  root.classList.remove("on");
+  root.removeEventListener("pointerdown", onSkip);
+  window.removeEventListener("keydown", onSkip);
+  dom.clashSkipBtn.onclick = null;
+  await wait(200);
+  root.className = "off";
+  dom.clashStage.className = "cstage";
+  dom.clashStage.innerHTML = "";
+  dom.clashKws.innerHTML = "";
+  dom.clashTitle.textContent = "";
+  cfxClear();
+  CLASH.running = false;
+}
+
+async function playClashBeat(beat, first, rate, idx, total) {
+  const root = dom.clash, stage = dom.clashStage;
+  const T = ms => Math.max(1, Math.round(ms * rate));
+  const flip = beat.atkSide === "foe";
+  root.className = "on";
+  stage.className = "cstage" + (flip ? " flip" : "");
+  stage.innerHTML = "";
+  dom.clashKws.innerHTML = "";
+
+  const mine = beat.atkSide === "you";
+  const bits = [];
+  if (first) bits.push("First strike");
+  bits.push(mine ? "Your attack" : state[beat.atkSide].name + " attacks");
+  if (total > 1) bits.push(idx + " of " + total);
+  dom.clashTitle.textContent = bits.join("  ·  ");
+
+  const atkBefore = effStats(beat.atk)[1] - beat.atk.damage + beat.back;
+  const atkSlot = clashSlot([beat.atk], "atk", [atkBefore], flip ? "70%" : "-70%");
+  stage.appendChild(atkSlot.node);
+
+  const vs = document.createElement("div");
+  vs.className = "cvs";
+  vs.textContent = beat.foes.length ? "vs" : "→";
+  stage.appendChild(vs);
+
+  let defSlot = null, seat = null, spill = null;
+  if (beat.foes.length) {
+    const shown = beat.foes.slice(0, 3);
+    defSlot = clashSlot(
+      shown.map(f => f.card), "def",
+      shown.map(f => effStats(f.card)[1] - f.card.damage + f.dmg),
+      flip ? "-70%" : "70%"
+    );
+    stage.appendChild(defSlot.node);
+    if (beat.spill > 0) { spill = clashSpill(beat); stage.appendChild(spill.node); }
+  } else if (beat.spill > 0) {
+    seat = clashSeat(beat);
+    stage.appendChild(seat.node);
+  } else {
+    const none = document.createElement("div");
+    none.className = "cplate";
+    none.innerHTML = "<b>No damage</b>";
+    stage.appendChild(none);
+  }
+
+  void stage.offsetWidth;
+  root.classList.add("in");
+  await wait(T(220));
+  if (CLASH.skip) return;
+
+  const target = defSlot ? defSlot.cards[0] : seat ? seat.hitNode : null;
+  const ar = atkSlot.cards[0].getBoundingClientRect();
+  if (target) {
+    const tr = target.getBoundingClientRect();
+    const reach = (tr.left + tr.width / 2) - (ar.left + ar.width / 2) - (flip ? -1 : 1) * ar.width * 0.4;
+    root.style.setProperty("--reach", Math.round(reach) + "px");
+  } else {
+    root.style.setProperty("--reach", "0px");
+  }
+
+  root.classList.add("charge");
+  await wait(T(240));
+  if (CLASH.skip) return;
+  root.classList.remove("charge");
+  root.classList.add("hit");
+  await wait(T(115));
+
+  const tr = target ? target.getBoundingClientRect() : ar;
+  const cx = tr.left + tr.width / 2 - (flip ? -1 : 1) * tr.width * 0.16;
+  const cy = tr.top + tr.height * 0.44;
+  clashImpact(cx, cy, beat, flip);
+  stage.classList.add("shake");
+  dom.clashFlash.style.setProperty("--fx", Math.round(cx / Math.max(1, window.innerWidth) * 100) + "%");
+  dom.clashFlash.classList.remove("go");
+  void dom.clashFlash.offsetWidth;
+  dom.clashFlash.classList.add("go");
+
+  await wait(T(110));
+  root.classList.remove("hit");
+  root.classList.add("rest");
+
+  /* what it came to */
+  let anyDeath = false;
+  if (defSlot) {
+    beat.foes.slice(0, 3).forEach((f, k) => {
+      const node = defSlot.cards[k];
+      if (f.dmg > 0) popNum(defSlot.node, node, "-" + f.dmg);
+      if (defSlot.plates[k] && f.card.def.type === "Creature") {
+        const left = Math.max(0, effStats(f.card)[1] - f.card.damage);
+        defSlot.plates[k].pt.textContent = effStats(f.card)[0] + " / " + left;
+        defSlot.plates[k].pt.className = "pt " + (f.dies ? "gone" : f.dmg > 0 ? "hurt" : "");
+      }
+      if (f.dies) { anyDeath = true; setTimeout(() => node.classList.add("dying"), T(300)); }
+    });
+  }
+  if (beat.back > 0) popNum(atkSlot.node, atkSlot.cards[0], "-" + beat.back);
+  if (beat.gain > 0) {
+    popNum(atkSlot.node, atkSlot.cards[0], "+" + beat.gain, "heal",
+      { dx: beat.back > 0 ? atkSlot.cards[0].offsetWidth * 0.42 : 0, delay: T(230) });
+  }
+  if (beat.atk.def.type === "Creature") {
+    const left = Math.max(0, effStats(beat.atk)[1] - beat.atk.damage);
+    atkSlot.plates[0].pt.textContent = effStats(beat.atk)[0] + " / " + left;
+    atkSlot.plates[0].pt.className = "pt " + (beat.atkDies ? "gone" : beat.back > 0 ? "hurt" : "");
+  }
+  if (beat.atkDies) { anyDeath = true; setTimeout(() => atkSlot.cards[0].classList.add("dying"), T(340)); }
+
+  const hitSeat = seat || spill;
+  if (hitSeat) {
+    hitSeat.node.classList.add("hurt");
+    popNum(hitSeat.hitNode, null, "-" + beat.spill, spill ? "down" : "");
+    countTo(hitSeat.num, hitSeat.from, hitSeat.to, T(440));
+  }
+
+  /* the words for it */
+  let d = T(90);
+  const chip = (text, kind) => { clashChip(text, kind, d); d += T(95); };
+  if (first) chip(kwHas(beat.atk, "doubleStrike") ? "double strike" : "first strike", "cold");
+  else if (kwHas(beat.atk, "doubleStrike")) chip("double strike", "cold");
+  if (kwHas(beat.atk, "deathtouch")) chip("deathtouch", "venom");
+  if (beat.spill > 0 && beat.foes.length && kwHas(beat.atk, "trample")) chip("trample · " + beat.spill + " past them", "burst");
+  if (!beat.foes.length && beat.spill > 0) {
+    chip(kwHas(beat.atk, "flying") ? "flying · unblocked" : "unblocked", "");
+  }
+  for (const f of beat.foes) if (f.venom) chip(f.card.def.name + " · deathtouch", "venom");
+  if (beat.gain > 0) chip("lifelink +" + beat.gain, "life");
+  if (beat.atkDies && beat.foes.some(f => f.dies)) chip("a trade", "");
+  else if (beat.atkDies) chip(beat.atk.def.name + " falls", "");
+  else if (beat.foes.length && beat.foes.every(f => f.dies)) chip("the line breaks", "");
+  else if (beat.foes.length && !beat.foes.some(f => f.dies) && !beat.atkDies) chip("both hold", "");
+
+  const hold = anyDeath ? 820 : hitSeat ? 620 : 520;
+  for (let w = 0; w < hold; w += 60) {
+    if (CLASH.skip) break;
+    await wait(T(60));
+  }
+  stage.classList.remove("shake");
+  root.classList.remove("in");
+  await wait(T(160));
 }
 
 async function fight(attackSide) {
@@ -5216,11 +5969,14 @@ async function fight(attackSide) {
 
   if (inCombat.some(c => kwHas(c, "firstStrike") || kwHas(c, "doubleStrike"))) {
     dealPass(attackSide, true);
+    await playClash(combatBeats, true);
     updateHUD();
     await checkDeaths();
   }
   const any = dealPass(attackSide, false);
+  const beats = combatBeats;
   if (!any && !inCombat.length) say("Nothing gets through.");
+  await playClash(beats, false);
   updateHUD();
 
   for (const c of state[attackSide].board) { c.attacking = false; c.blocked = false; c.attackTarget = null; }
@@ -6380,6 +7136,20 @@ function renderQuality() {
     };
   }
 }
+function renderClashPick() {
+  const box = el("cpick");
+  for (const b of box.querySelectorAll("button")) {
+    b.setAttribute("aria-pressed", b.dataset.c === CLASH.mode ? "true" : "false");
+    b.title = { full: "Every attack plays out in close-up",
+                brief: "The same close-up, at double speed",
+                off: "Combat resolves on the board, with no close-up" }[b.dataset.c];
+    b.onclick = () => {
+      CLASH.mode = b.dataset.c;
+      try { localStorage.setItem("sigil.clash", b.dataset.c); } catch (err) { /* nothing to do */ }
+      renderClashPick();
+    };
+  }
+}
 function renderPacks() {
   const box = el("packList");
   box.innerHTML = "";
@@ -6390,6 +7160,7 @@ function renderPacks() {
     box.appendChild(b);
   }
   renderQuality();
+  renderClashPick();
   showPlate("platePacks");
 }
 function pickPack(key) {
