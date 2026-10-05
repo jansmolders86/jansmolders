@@ -5438,23 +5438,43 @@ function dealPass(attackSide, first) {
 
   for (const [c, n] of pending) c.damage += n;
   for (const c of slain) c.damage = 999;
-  for (const [pw, n] of pwHits) {
-    pw.loyalty -= n;
-    say(pw.def.name + " loses " + n + " loyalty.");
-  }
+
   combatBeats = Array.from(beats.values()).filter(b => b.power > 0 || b.back > 0);
   for (const b of combatBeats) {
     b.atkDies = isDead(b.atk) || b.atk.sacrificed;
     for (const f of b.foes) f.dies = isDead(f.card) || f.card.sacrificed;
-    if (b.target) b.loyAfter = b.target.loyalty;
+  }
+  /* The pass settles everything at once, but the overlay shows it one attacker
+   * at a time, so each beat needs the figure as it stood when that attacker
+   * struck — not the total at the end of the pass, which would have every beat
+   * restate the same two numbers.  Counted off here in the order they are
+   * shown, before the real totals are applied. */
+  const loyLeft = new Map();
+  for (const b of combatBeats) {
+    if (b.spill <= 0 || !b.target) continue;
+    if (!loyLeft.has(b.target)) loyLeft.set(b.target, b.target.loyalty);
+    b.loyFrom = loyLeft.get(b.target);
+    b.loyAfter = b.loyFrom - b.spill;
+    loyLeft.set(b.target, b.loyAfter);
+  }
+
+  for (const [pw, n] of pwHits) {
+    pw.loyalty -= n;
+    say(pw.def.name + " loses " + n + " loyalty.");
   }
   for (const side of ["you", "foe"]) if (gain[side] > 0) gainLife(side, gain[side]);
   if (lifeLoss > 0) {
+    let lifeLeft = state[defSide].life;
+    for (const b of combatBeats) {
+      if (b.spill <= 0 || b.target) continue;
+      b.lifeFrom = lifeLeft;
+      lifeLeft -= b.spill;
+      b.lifeAfter = lifeLeft;
+    }
     loseLife(defSide, lifeLoss);
     say(does(defSide, "take", "takes") + " " + lifeLoss + " damage.");
     flashHit(defSide);
   }
-  for (const b of combatBeats) if (b.spill > 0 && !b.target) b.lifeAfter = state[defSide].life;
   // Kaito and friends: a creature of yours connected with a player
   if (connected.length) {
     for (const o of state[attackSide].perms) {
@@ -5666,6 +5686,15 @@ function clashSlot(cards, role, befores, ox) {
   }
   return { node: slot, cards: nodes, plates: plates };
 }
+/* where the counter stood as this attacker struck, and where it was left */
+function clashFrom(beat) {
+  if (beat.target) return beat.loyFrom === undefined ? beat.target.loyalty + beat.spill : beat.loyFrom;
+  return beat.lifeFrom === undefined ? state[beat.defSide].life + beat.spill : beat.lifeFrom;
+}
+function clashTo(beat) {
+  if (beat.target) return beat.loyAfter === undefined ? beat.target.loyalty : beat.loyAfter;
+  return beat.lifeAfter === undefined ? state[beat.defSide].life : beat.lifeAfter;
+}
 function clashSeat(beat) {
   const wrap = document.createElement("div");
   wrap.className = "cseat";
@@ -5674,8 +5703,7 @@ function clashSeat(beat) {
   const num = document.createElement("b");
   const lab = document.createElement("i");
   const pw = beat.target;
-  const from = pw ? beat.loyAfter + beat.spill : (beat.lifeAfter === undefined ? state[beat.defSide].life : beat.lifeAfter + beat.spill);
-  const to = pw ? beat.loyAfter : (beat.lifeAfter === undefined ? state[beat.defSide].life : beat.lifeAfter);
+  const from = clashFrom(beat), to = clashTo(beat);
   num.textContent = String(from);
   lab.textContent = pw ? "loyalty" : "life";
   if (pw) {
@@ -5703,8 +5731,7 @@ function clashSpill(beat) {
   const num = document.createElement("b");
   const lab = document.createElement("span");
   const pw = beat.target;
-  const from = pw ? beat.loyAfter + beat.spill : (beat.lifeAfter === undefined ? state[beat.defSide].life : beat.lifeAfter + beat.spill);
-  const to = pw ? beat.loyAfter : (beat.lifeAfter === undefined ? state[beat.defSide].life : beat.lifeAfter);
+  const from = clashFrom(beat), to = clashTo(beat);
   num.textContent = String(from);
   lab.textContent = pw ? pw.def.name : (beat.defSide === "you" ? "your life" : "their life");
   wrap.appendChild(num); wrap.appendChild(lab);
@@ -5733,12 +5760,17 @@ function popNum(host, over, text, cls, opt) {
 function countTo(node, from, to, ms) {
   if (from === to) { node.textContent = String(to); return; }
   const t0 = performance.now();
+  let done = false;
   const step = () => {
+    if (done) return;
     const k = Math.min(1, (performance.now() - t0) / Math.max(1, ms));
     node.textContent = String(Math.round(from + (to - from) * k));
-    if (k < 1) requestAnimationFrame(step);
+    if (k < 1) requestAnimationFrame(step); else done = true;
   };
   requestAnimationFrame(step);
+  // frames can be starved — on a loaded phone, a background tab — so make sure
+  // the figure lands on its final value whether or not the tween ever finishes
+  setTimeout(() => { done = true; node.textContent = String(to); }, ms + 40);
 }
 function clashChip(text, kind, delay) {
   const c = document.createElement("div");
