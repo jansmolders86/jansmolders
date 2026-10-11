@@ -7,7 +7,7 @@
 (function (global) {
   'use strict';
 
-  var KEY = 'reijn-cms-demo-v5';
+  var KEY = 'reijn-cms-demo-v6';
 
   /* Vangnet: normaal zet brand.js dit in de <head>. Mocht dat bestand
      ontbreken, dan valt alles terug op white label in plaats van te breken. */
@@ -239,6 +239,14 @@
         status:'voorstel', verstuurd:over(-5), gewijzigd:over(-5), variant:'Ziekenhuis',
         notitie:'Tweede profiel voor dezelfde vraag; Marieke vergelijkt.',
         historie:[{status:'voorstel',datum:over(-5)}] },
+
+      /* Emma ligt bij twee klanten tegelijk op tafel. Ze heeft nog 8 uur
+         vrij, dus hier kan er maar een van doorgaan. */
+      { id:'v16', pagina:'emma-visser', klant:'Provincie Maastricht', contact:'Bram Nijssen',
+        rol:'Communicatieadviseur omgevingsbeleid', uren:8, tarief:98, start:over(45),
+        status:'voorstel', verstuurd:over(-3), gewijzigd:over(-3), variant:'Gemeente',
+        notitie:'Tweede lopende vraag voor Emma. Ze heeft nog 8 uur vrij, dus deze en Radboudumc kunnen niet allebei doorgaan.',
+        historie:[{status:'voorstel',datum:over(-3)}] },
 
       { id:'v9', pagina:'isa-verhoeven', klant:'Gemeente Arnhem', contact:'Joris Kleijn',
         rol:'Adviseur digitalisering', uren:20, tarief:95, start:over(50),

@@ -25,6 +25,9 @@ img{max-width:100%;display:block}
 .sb-brand img{height:30px;width:auto}
 .sb-brand .wm{font-family:var(--display);font-weight:800;font-size:21px}
 .sb-brand .tag{font-family:var(--mono);font-size:9px;letter-spacing:.18em;color:var(--petrol-deep);background:var(--paper-2);text-transform:uppercase;font-weight:700;padding:3px 8px;border-radius:7px;margin-left:auto;line-height:1.4}
+/* Het beeldmerk van Syno zelf. De huisstijl eromheen wisselt per klant,
+   dit merk niet: het staat voor het gereedschap, niet voor de afzender. */
+.sb-brand .syno{margin-left:auto;height:15px;width:auto;display:block}
 .sb-nav{display:flex;flex-direction:column;gap:3px}
 .sb-nav a{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;color:rgba(246,242,236,.75);font-weight:600;font-size:14.5px}
 .sb-nav a svg{width:19px;height:19px;opacity:.85;flex:0 0 auto}
@@ -384,6 +387,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   .mobile-top img.lg{height:26px;width:auto}
   .mobile-top .wm{font-family:var(--display);font-weight:800;font-size:18px}
   .mobile-top .tag{font-family:var(--mono);font-size:9px;letter-spacing:.18em;color:var(--petrol-deep);background:var(--paper-2);text-transform:uppercase;font-weight:700;padding:3px 8px;border-radius:7px;line-height:1.4}
+  .mobile-top .syno{height:13px;width:auto}
   .mobile-top .mu{margin-left:auto;width:34px;height:34px;border-radius:50%;overflow:hidden;flex:0 0 auto}
   .mobile-top .mu img{width:100%;height:100%;object-fit:cover;object-position:center 20%}
   .mobile-nav{display:flex;gap:6px;overflow-x:auto;padding:10px 16px;background:var(--petrol-deep)}

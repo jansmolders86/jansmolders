@@ -243,6 +243,11 @@
     /* woordmerk — weglaten als het logo de naam al toont */
     Array.prototype.forEach.call(document.querySelectorAll('.wm'), function (el) {
       if (merk.naamInLogo) { el.style.display = 'none'; return; }
+      /* Zonder huisstijl heet de afzender net als het gereedschap. Staat het
+         beeldmerk van Syno er al naast, dan zou de naam er twee keer staan. */
+      if (!merk.logo && el.parentNode && el.parentNode.querySelector('img.syno')) {
+        el.style.display = 'none'; return;
+      }
       el.style.display = '';
       el.textContent = merk.naam;
     });

@@ -30,6 +30,9 @@
   .st-balk .merk{display:flex;align-items:center;gap:11px}
   .st-balk .merk img{height:40px;width:auto}
   .st-balk .merk .wm{font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:-.02em}
+  .st-balk .merk .scheid{width:1px;height:30px;background:var(--line);margin:0 4px}
+  .st-balk .merk .syno{height:52px;width:auto}
+  @media(max-width:560px){.st-balk .merk .syno{height:40px}}
   .st-merk{margin-left:auto;display:flex;gap:6px;background:var(--surface);border:1px solid var(--line);
     border-radius:999px;padding:5px}
   .st-merk a{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:7px 13px;
@@ -96,7 +99,7 @@
 <div class="start">
 
   <header class="st-balk">
-    <span class="merk"><img class="brand-logo" src="reijn-logo.png" alt=""><span class="wm">Reijn</span><span class="tag">Syno</span></span>
+    <span class="merk"><img class="brand-logo" src="reijn-logo.png" alt=""><span class="wm">Reijn</span><span class="scheid" aria-hidden="true"></span><img class="syno" src="syno-logo.png" alt="Syno — People Process Progress"></span>
     <nav class="st-merk" aria-label="Huisstijl" data-merkvast>
       <a href="start.html" data-brandkeuze="whitelabel"><i style="background:#3B6FD4"></i>White label</a>
       <a href="start.html?brand=reijn" data-brandkeuze="reijn"><i style="background:#E8641E"></i>Reijn</a>
