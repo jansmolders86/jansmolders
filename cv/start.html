@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Visueel CV — demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="cms.css">
+<style>
+  body{background:var(--paper)}
+  .start{max-width:1140px;margin:0 auto;padding:clamp(28px,5vw,64px) clamp(18px,4vw,40px) 64px}
+
+  /* ---------- kop ---------- */
+  .st-kop{display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:clamp(26px,4vw,44px)}
+  .st-kop .merk{display:flex;align-items:center;gap:12px}
+  .st-kop .merk img{height:44px;width:auto}
+  .st-kop .merk .wm{font-family:var(--display);font-weight:800;font-size:30px;letter-spacing:-.02em}
+  .st-kop h1{font-family:var(--display);font-weight:800;font-size:clamp(26px,3.4vw,38px);letter-spacing:-.025em;margin:16px 0 6px}
+  .st-kop p{margin:0;color:var(--ink-soft);font-size:16px;max-width:60ch}
+  .st-merk{margin-left:auto;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+  .st-merk .klein{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+  .st-merk .knoppen{display:flex;gap:6px}
+  .st-merk a{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:var(--surface);
+    border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600}
+  .st-merk a:hover{border-color:var(--tangerine)}
+  .st-merk a.on{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+  .st-merk a i{width:11px;height:11px;border-radius:50%;display:inline-block}
+
+  /* ---------- de drie ingangen ---------- */
+  .st-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:stretch}
+  .poort{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);
+    border-radius:22px;padding:24px 24px 20px;position:relative;overflow:hidden}
+  .poort::before{content:"";position:absolute;inset:0 0 auto;height:4px}
+  .poort.p1::before{background:var(--petrol)}
+  .poort.p2::before{background:var(--tangerine)}
+  .poort.p3::before{background:var(--teal)}
+  .poort .ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;color:#fff;margin-bottom:16px}
+  .poort .ic svg{width:23px;height:23px}
+  .poort h2{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-.02em;margin:0 0 6px}
+  .poort .uitleg{color:var(--ink-soft);font-size:14.5px;margin:0 0 18px;line-height:1.5}
+  .poort .wie{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-soft);background:var(--paper-2);padding:4px 9px;border-radius:6px;align-self:flex-start;margin-bottom:14px}
+  .deuren{display:flex;flex-direction:column;gap:9px;margin-top:auto}
+  .deur{display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:var(--paper);
+    border-radius:13px;padding:13px 14px}
+  .deur:hover{border-color:var(--tangerine);background:#fff}
+  .deur .tx{flex:1;min-width:0}
+  .deur .tx strong{display:block;font-size:14.5px}
+  .deur .tx span{font-size:12.5px;color:var(--ink-soft)}
+  .deur .pijl{color:var(--ink-soft);font-family:var(--mono);font-size:15px}
+  .deur:hover .pijl{color:var(--accent-ink,var(--tangerine))}
+  @media(max-width:900px){.st-grid{grid-template-columns:1fr}.st-merk{margin-left:0;align-items:flex-start}}
+
+  /* ---------- onderaan ---------- */
+  .st-voet{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:26px;padding-top:20px;
+    border-top:1px solid var(--line);font-size:13px;color:var(--ink-soft)}
+  .st-voet .grow{flex:1}
+</style>
+<link rel="stylesheet" href="brand.css">
+<script src="brand.js"></script>
+</head>
+<body>
+
+<div class="start">
+
+  <header class="st-kop">
+    <div>
+      <div class="merk"><img class="brand-logo" src="reijn-logo.png" alt=""><span class="wm">Reijn</span><span class="tag">CMS</span></div>
+      <h1>Het visuele CV, van begin tot eind</h1>
+      <p>Drie ingangen: zo ziet een klant het profiel, zo houdt het team het bij, en zo zie je wat het oplevert.
+         Alles in deze demo werkt met voorbeelddata.</p>
+    </div>
+    <div class="st-merk">
+      <span class="klein">Huisstijl</span>
+      <div class="knoppen">
+        <a href="start.html" data-brandkeuze="whitelabel"><i style="background:#3B6FD4"></i>White label</a>
+        <a href="start.html?brand=reijn" data-brandkeuze="reijn"><i style="background:#E8641E"></i>Reijn</a>
+        <a href="start.html?brand=aag" data-brandkeuze="aag"><i style="background:#F8AF5F"></i>AAG</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="st-grid">
+
+    <!-- ---------- PROFIEL ---------- -->
+    <section class="poort p1">
+      <span class="ic" style="background:var(--petrol)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+      </span>
+      <h2>Profiel</h2>
+      <p class="uitleg">De pagina die een opdrachtgever te zien krijgt. In twee lengtes, plus het gesprek waarmee de consultant hem bijhoudt.</p>
+      <span class="wie">Voor de opdrachtgever</span>
+      <div class="deuren">
+        <a class="deur" href="index.html">
+          <span class="tx"><strong>Volledig profiel</strong><span>Videoheader, fotogalerij, tijdlijn</span></span>
+          <span class="pijl">→</span></a>
+        <a class="deur" href="compact.html?id=gijs-wassenberg">
+          <span class="tx"><strong>Compact profiel</strong><span>Eén scherm, met beschikbaarheid</span></span>
+          <span class="pijl">→</span></a>
+        <a class="deur" href="gijs-wassenberg-edit.html">
+          <span class="tx"><strong>Profiel bewerken</strong><span>Blokken slepen, foto's uploaden</span></span>
+          <span class="pijl">→</span></a>
+        <a class="deur" href="bijwerken.html">
+          <span class="tx"><strong>Bijwerken met de assistent</strong><span>De consultant praat zijn profiel bij</span></span>
+          <span class="pijl">→</span></a>
+      </div>
+    </section>
+
+    <!-- ---------- BEHEER ---------- -->
+    <section class="poort p2">
+      <span class="ic" style="background:var(--tangerine)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+      </span>
+      <h2>Beheer</h2>
+      <p class="uitleg">Het werk van de relatiebeheerder: profielen klaarzetten, reviewen, versturen en bijhouden wie waar zit.</p>
+      <span class="wie">Voor het team</span>
+      <div class="deuren">
+        <a class="deur" href="dashboard.html">
+          <span class="tx"><strong>Dashboard</strong><span>Wat vandaag je aandacht vraagt</span></span>
+          <span class="pijl">→</span></a>
+        <a class="deur" href="paginas.html">
+          <span class="tx"><strong>Pagina's</strong><span>Alle profielen en varianten</span></span>
+          <span class="pijl">→</span></a>
+        <a class="deur" href="inzet.html">
+          <span class="tx"><strong>Inzet</strong><span>Wie zit waar, en tot wanneer</span></span>
+          <span class="pijl">→</span></a>
+        <a class="deur" href="berichten.html">
+          <span class="tx"><strong>Berichten</strong><span>Profielen delen met klanten</span></span>
+          <span class="pijl">→</span></a>
+      </div>
+    </section>
+
+    <!-- ---------- ANALYSE ---------- -->
+    <section class="poort p3">
+      <span class="ic" style="background:var(--teal)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>
+      </span>
+      <h2>Analyse</h2>
+      <p class="uitleg">Wat er met een gedeeld profiel gebeurt: wie kijkt, hoe lang, waar ze afhaken en wat het oplevert.</p>
+      <span class="wie">Voor de onderbouwing</span>
+      <div class="deuren">
+        <a class="deur" href="analytics.html">
+          <span class="tx"><strong>Analyse</strong><span>Weergaven, bronnen, conversie</span></span>
+          <span class="pijl">→</span></a>
+        <a class="deur" href="analytics.html#aandacht">
+          <span class="tx"><strong>Aandacht per sectie</strong><span>Waar haken bezoekers af?</span></span>
+          <span class="pijl">→</span></a>
+        <a class="deur" href="analytics.html#funnel">
+          <span class="tx"><strong>Van link naar gesprek</strong><span>Wat een verstuurd profiel oplevert</span></span>
+          <span class="pijl">→</span></a>
+        <a class="deur" href="instellingen.html">
+          <span class="tx"><strong>Instellingen</strong><span>Huisstijl, team, integraties</span></span>
+          <span class="pijl">→</span></a>
+      </div>
+    </section>
+  </div>
+
+  <div class="st-voet">
+    <span>Alle data in deze demo is verzonnen. Wijzigingen blijven bewaard in je browser.</span>
+    <div class="grow"></div>
+    <button class="btn line sm" data-demo-reset>Demo resetten</button>
+  </div>
+</div>
+
+<script src="cms.js"></script>
+</body>
+</html>

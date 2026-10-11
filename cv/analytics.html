@@ -28,12 +28,16 @@
 <aside class="sidebar">
   <div class="sb-brand"><img src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><span class="tag">CMS</span></div>
   <nav class="sb-nav">
+    <div class="sb-groep">Beheer</div>
     <a href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
-    <a href="paginas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>Pagina's <span class="badge" data-badge="pages">47</span></a>
+    <a href="paginas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>Pagina's <span class="badge" data-badge="pages">3</span></a>
     <a href="inzet.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/><path d="M12 15v3"/></svg>Inzet <span class="badge" data-badge="inzet">3</span></a>
-    <a class="active" href="analytics.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>Analytics</a>
-    <a href="berichten.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>Berichten <span class="badge" data-badge="mail">2</span></a>
+    <a href="berichten.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>Berichten <span class="badge" data-badge="mail">3</span></a>
+    <div class="sb-groep">Analyse</div>
+    <a class="active" href="analytics.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>Analyse</a>
+    <div class="sb-groep">Systeem</div>
     <a href="instellingen.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1L14.5 2h-5l-.4 2.6a7 7 0 0 0-1.7 1l-2.3-1-2 3.4L3 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1l.4 2.6h5l.4-2.6a7 7 0 0 0 1.7-1l2.3 1 2-3.4-2-1.5a7 7 0 0 0 .1-1z"/></svg>Instellingen</a>
+    <a class="sb-terug" href="start.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Terug naar de start</a>
   </nav>
   <div class="sb-user"><img src="lieve.jpg" alt=""><div><div class="nm">Lieve van der Weijde</div><div class="rl">Relatiebeheerder</div></div></div>
 </aside>
@@ -43,15 +47,14 @@
   <span class="mu"><img src="lieve.jpg" alt=""></span>
 </div>
 <nav class="mobile-nav">
-  <a href="dashboard.html">Dashboard</a><a href="paginas.html">Pagina's</a>
-  <a href="inzet.html">Inzet</a><a class="active" href="analytics.html">Analytics</a><a href="berichten.html">Berichten</a><a href="instellingen.html">Instellingen</a>
+  <a href="start.html">← Start</a><a href="dashboard.html">Dashboard</a><a href="paginas.html">Pagina's</a><a href="inzet.html">Inzet</a><a href="berichten.html">Berichten</a><a class="active" href="analytics.html">Analyse</a><a href="instellingen.html">Instellingen</a>
 </nav>
 
 <main class="main">
   <div class="topbar">
     <div class="greet">
-      <div class="crumbs"><a href="dashboard.html">Dashboard</a> › <span>Analytics</span></div>
-      <h1>Analytics</h1>
+      <div class="crumbs"><a href="start.html">Start</a> › <span>Analyse</span></div>
+      <h1>Analyse</h1>
       <p>Wat doen bezoekers op de visuele CV's — en waar haken ze af?</p>
     </div>
     <div class="grow"></div>
@@ -72,6 +75,17 @@
     <div class="kpi c-mustard"><div class="lbl">Gem. leestijd</div><div class="val" id="kTijd">3:04</div><div class="sub"><span class="up">▲ 22 sec</span> mediaan 2:41</div></div>
     <div class="kpi c-tangerine"><div class="lbl">Contactaanvragen</div><div class="val" id="kLeads">41</div><div class="sub"><span class="up">▲ 9</span> conversie 1,9%</div></div>
   </section>
+
+  <!-- analyse zonder opvolging is vrijblijvend: dit is de weg terug -->
+  <a class="brug" href="dashboard.html" style="margin-bottom:22px">
+    <span class="bk">Vraagt om actie</span>
+    <span class="scheid"></span>
+    <span class="cijfer"><b id="bRev">3</b><span>wachten op review</span></span>
+    <span class="cijfer"><b id="bAfloop">3</b><span>opdrachten lopen af</span></span>
+    <span class="cijfer"><b id="bMail">2</b><span>nieuwe berichten</span></span>
+    <span class="grow"></span>
+    <span class="btn line sm">Naar het beheerscherm →</span>
+  </a>
 
   <div class="grid stretch" style="margin-bottom:22px;align-items:stretch">
     <div>
@@ -145,7 +159,7 @@
   </div>
 
   <div class="grid third" style="margin-bottom:22px">
-    <section class="card">
+    <section class="card" id="aandacht">
       <div class="card-head"><div><h2>Aandacht per sectie</h2><p class="card-sub" id="heatSub">Gijs Wassenberg · Ziekenhuis</p></div></div>
       <div class="heat-row"><span class="hl">Videoheader</span><div class="heat-track"><div class="heat-fill" style="width:96%;background:var(--teal)"></div></div><span class="hv">96%</span></div>
       <div class="heat-row"><span class="hl">Introtekst</span><div class="heat-track"><div class="heat-fill" style="width:88%;background:var(--teal)"></div></div><span class="hv">88%</span></div>
@@ -174,7 +188,7 @@
       </div>
     </section>
 
-    <section class="card">
+    <section class="card" id="funnel">
       <div class="card-head"><div><h2>Van link naar gesprek</h2><p class="card-sub">Deze periode, alle verstuurde links</p></div></div>
       <div class="funnel">
         <div class="fstep"><div class="fbar" style="background:var(--petrol);width:100%">128</div><div class="flbl"><b>Links verstuurd</b><span>naar 46 opdrachtgevers</span></div></div>
@@ -386,6 +400,16 @@
       return '<div class="ev"><div class="ic" style="background:'+e[1]+'">'+Reijn.ICON[e[0]]+'</div>'+
         '<div class="tx">'+e[2]+'</div><div class="tm">'+e[3]+'</div></div>';
     }).join('');
+  })();
+
+  /* ---------- de brug naar het beheerwerk ---------- */
+  (function(){
+    var rev = data.pages.filter(function(p){ return p.status === 'rev'; }).length;
+    var af = data.pages.filter(function(p){ return p.status !== 'arch' && Reijn.inzetInfo(p).loopAf; }).length;
+    var mail = data.mails.filter(function(m){ return m.ongelezen && m.map !== 'verzonden'; }).length;
+    document.getElementById('bRev').textContent = rev;
+    document.getElementById('bAfloop').textContent = af;
+    document.getElementById('bMail').textContent = mail;
   })();
 
   tekenChart();

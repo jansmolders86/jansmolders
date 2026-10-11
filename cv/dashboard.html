@@ -37,6 +37,17 @@ a{color:inherit;text-decoration:none}
 .sb-nav a.active svg{opacity:1}
 .sb-nav .badge{margin-left:auto;font-family:var(--mono);font-size:11px;background:rgba(246,242,236,.16);padding:2px 8px;border-radius:999px}
 .sb-nav a.active .badge{background:rgba(255,255,255,.25)}
+.sb-groep{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(246,242,236,.42);padding:16px 12px 6px}
+.sb-nav .sb-groep:first-child{padding-top:2px}
+.sb-terug{display:flex;align-items:center;gap:9px;margin-top:14px;padding:9px 12px;border-radius:11px;font-size:13px;font-weight:600;color:rgba(246,242,236,.6);border:1px solid rgba(246,242,236,.16)}
+.sb-terug:hover{color:#fff;background:rgba(246,242,236,.08)}
+.brug{display:flex;align-items:center;gap:clamp(14px,3vw,30px);flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 20px;margin-bottom:22px}
+.brug .bk{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.brug .cijfer b{display:block;font-family:var(--display);font-weight:800;font-size:25px;line-height:1.05}
+.brug .cijfer span{font-size:12px;color:var(--ink-soft)}
+.brug .grow{flex:1}
+.brug .scheid{width:1px;align-self:stretch;background:var(--line)}
+@media(max-width:700px){.brug .scheid{display:none}.brug{gap:16px}}
 .sb-user{margin-top:auto;display:flex;align-items:center;gap:11px;padding:12px 8px 4px;border-top:1px solid rgba(246,242,236,.12)}
 .sb-user img{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:center 20%}
 .sb-user .nm{font-weight:700;font-size:14px;line-height:1.1}
@@ -215,12 +226,16 @@ a{color:inherit;text-decoration:none}
     <span class="tag">CMS</span>
   </div>
   <nav class="sb-nav">
+    <div class="sb-groep">Beheer</div>
     <a class="active" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
-    <a href="paginas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>Pagina's <span class="badge" data-badge="pages">47</span></a>
+    <a href="paginas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>Pagina's <span class="badge" data-badge="pages">3</span></a>
     <a href="inzet.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/><path d="M12 15v3"/></svg>Inzet <span class="badge" data-badge="inzet">3</span></a>
-    <a href="analytics.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>Analytics</a>
-    <a href="berichten.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>Berichten <span class="badge" data-badge="mail">2</span></a>
+    <a href="berichten.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>Berichten <span class="badge" data-badge="mail">3</span></a>
+    <div class="sb-groep">Analyse</div>
+    <a href="analytics.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>Analyse</a>
+    <div class="sb-groep">Systeem</div>
     <a href="instellingen.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1L14.5 2h-5l-.4 2.6a7 7 0 0 0-1.7 1l-2.3-1-2 3.4L3 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1l.4 2.6h5l.4-2.6a7 7 0 0 0 1.7-1l2.3 1 2-3.4-2-1.5a7 7 0 0 0 .1-1z"/></svg>Instellingen</a>
+    <a class="sb-terug" href="start.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Terug naar de start</a>
   </nav>
   <div class="sb-user">
     <img src="lieve.jpg" alt="">
@@ -236,17 +251,14 @@ a{color:inherit;text-decoration:none}
   <span class="mu"><img src="lieve.jpg" alt="Lieve van der Weijde"></span>
 </div>
 <nav class="mobile-nav">
-  <a class="active" href="dashboard.html">Dashboard</a>
-  <a href="paginas.html">Pagina's</a>
-  <a href="inzet.html">Inzet</a><a href="analytics.html">Analytics</a>
-  <a href="berichten.html">Berichten</a>
-  <a href="instellingen.html">Instellingen</a>
+  <a href="start.html">← Start</a><a class="active" href="dashboard.html">Dashboard</a><a href="paginas.html">Pagina's</a><a href="inzet.html">Inzet</a><a href="berichten.html">Berichten</a><a href="analytics.html">Analyse</a><a href="instellingen.html">Instellingen</a>
 </nav>
 
 <!-- ============ MAIN ============ -->
 <main class="main">
   <div class="topbar">
     <div class="greet">
+      <div class="crumbs"><a href="start.html">Start</a> › <span>Beheer</span></div>
       <h1>Goedemiddag, Lieve 👋</h1>
       <p>Je hebt <b>3 pagina's</b> die wachten op review.</p>
     </div>
@@ -260,10 +272,21 @@ a{color:inherit;text-decoration:none}
   <!-- KPIs -->
   <section class="kpis">
     <div class="kpi"><div class="lbl">Actieve pagina's</div><div class="val" id="kActief">47</div><div class="sub" id="kActiefSub">over 41 consultants</div></div>
-    <div class="kpi"><div class="lbl">Gepubliceerd</div><div class="val" id="kPub">39</div><div class="sub"><span class="up">▲ 4</span> deze week</div></div>
+    <div class="kpi"><div class="lbl">Gepubliceerd</div><div class="val" id="kPub">39</div><div class="sub">live bij klanten</div></div>
     <div class="kpi"><div class="lbl">In review</div><div class="val" id="kRev">3</div><div class="sub">wachten op jou</div></div>
-    <div class="kpi"><div class="lbl">Weergaven · 30d</div><div class="val" id="kViews">2.148</div><div class="sub"><span class="up">▲ 18%</span> t.o.v. vorige maand</div></div>
+    <div class="kpi"><div class="lbl">Inzet loopt af</div><div class="val" id="kAfloop">3</div><div class="sub">binnen 60 dagen</div></div>
   </section>
+
+  <!-- de enige analyse op dit scherm: een samenvatting met een doorstap -->
+  <a class="brug" href="analytics.html">
+    <span class="bk">Laatste 30 dagen</span>
+    <span class="scheid"></span>
+    <span class="cijfer"><b id="bViews">2.148</b><span>weergaven</span></span>
+    <span class="cijfer"><b id="bTijd">3:04</b><span>gem. leestijd</span></span>
+    <span class="cijfer"><b id="bLeads">41</b><span>contactaanvragen</span></span>
+    <span class="grow"></span>
+    <span class="btn line sm">Open de analyse →</span>
+  </a>
 
   <div class="grid">
     <!-- LEFT COLUMN -->
@@ -279,7 +302,7 @@ a{color:inherit;text-decoration:none}
 
       <!-- pages table -->
       <section class="card">
-        <div class="card-head"><h2>Alle pagina's</h2><a class="btn ghost sm" href="paginas.html">Volledig overzicht →</a></div>
+        <div class="card-head"><div><h2>Recent bijgewerkt</h2><p class="card-sub" style="margin:0">De acht pagina's waar het laatst aan gewerkt is</p></div><a class="btn ghost sm" href="paginas.html">Alle pagina's →</a></div>
         <div class="tabs">
           <div class="tab active" data-f="all">Alle</div>
           <div class="tab" data-f="pub">Gepubliceerd</div>
@@ -292,33 +315,6 @@ a{color:inherit;text-decoration:none}
 
     <!-- RIGHT COLUMN -->
     <div>
-      <section class="card" style="margin-bottom:22px">
-        <div class="card-head"><div><h2>Prestaties</h2><p class="card-sub" style="margin:0">Gijs Wassenberg · 30 dagen</p></div><a class="btn ghost sm" href="analytics.html">Analytics →</a></div>
-        <div class="spark">
-          <div class="bar" style="height:38%" data-v="61 weergaven"></div><div class="bar" style="height:52%" data-v="84 weergaven"></div>
-          <div class="bar" style="height:44%" data-v="71 weergaven"></div><div class="bar" style="height:66%" data-v="106 weergaven"></div>
-          <div class="bar" style="height:58%" data-v="93 weergaven"></div><div class="bar hi" style="height:88%" data-v="142 weergaven"></div>
-          <div class="bar" style="height:72%" data-v="116 weergaven"></div><div class="bar" style="height:80%" data-v="129 weergaven"></div>
-        </div>
-        <div class="spark-x"><span>wk 18</span><span>wk 21</span><span>wk 25</span></div>
-      </section>
-
-      <!-- heatmap teaser -->
-      <section class="card" style="margin-bottom:22px">
-        <div class="card-head"><h2>Aandacht-heatmap</h2><a class="btn ghost sm" href="analytics.html">Meer →</a></div>
-        <p class="heat-note">Hoeveel van de bezoekers ziet elke sectie — Gijs Wassenberg, variant Ziekenhuis.</p>
-        <div class="heat-row"><span class="hl">Videoheader</span><div class="heat-track"><div class="heat-fill" style="width:96%;background:var(--teal)"></div></div><span class="hv">96%</span></div>
-        <div class="heat-row"><span class="hl">Introtekst</span><div class="heat-track"><div class="heat-fill" style="width:88%;background:var(--teal)"></div></div><span class="hv">88%</span></div>
-        <div class="heat-row"><span class="hl">Fotogalerij</span><div class="heat-track"><div class="heat-fill" style="width:38%;background:var(--clay)"></div></div><span class="hv">38%</span></div>
-        <div class="heat-row"><span class="hl">Tijdlijn</span><div class="heat-track"><div class="heat-fill" style="width:64%;background:var(--mustard)"></div></div><span class="hv">64%</span></div>
-        <div class="heat-row"><span class="hl">Reviews</span><div class="heat-track"><div class="heat-fill" style="width:52%;background:var(--mustard)"></div></div><span class="hv">52%</span></div>
-        <div class="heat-row"><span class="hl">Contact</span><div class="heat-track"><div class="heat-fill" style="width:41%;background:var(--clay)"></div></div><span class="hv">41%</span></div>
-        <div class="heat-flag">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
-          <span><b>62% scrollt langs de fotogalerij.</b> Overweeg deze hoger te plaatsen of te vervangen door een tekstblok.</span>
-        </div>
-      </section>
-
       <!-- inzet die afloopt -->
       <section class="card" style="margin-bottom:22px">
         <div class="card-head"><div><h2>Inzet loopt af</h2><p class="card-sub" style="margin:0">Binnen 60 dagen</p></div><a class="btn ghost sm" href="inzet.html">Alle inzet \u2192</a></div>
@@ -362,7 +358,10 @@ a{color:inherit;text-decoration:none}
     document.getElementById('kActiefSub').textContent = 'over ' + actief.length + ' consultants';
     document.getElementById('kPub').textContent = pub.length;
     document.getElementById('kRev').textContent = rev.length;
-    document.getElementById('kViews').textContent = Reijn.nf(data.pages.reduce(function(a,p){return a+p.views},0));
+    document.getElementById('kAfloop').textContent =
+      data.pages.filter(function(p){ return p.status !== 'arch' && Reijn.inzetInfo(p).loopAf; }).length;
+    document.getElementById('bViews').textContent = Reijn.nf(data.pages.reduce(function(a,p){return a+p.views},0));
+    document.getElementById('bLeads').textContent = data.pages.reduce(function(a,p){return a+(p.leads||0)},0);
     document.querySelector('.greet p').innerHTML = rev.length
       ? 'Je hebt <b>' + rev.length + ' pagina' + (rev.length===1?'':'\u2019s') + '</b> die wachten op review.'
       : 'Alles is bijgewerkt \u2014 geen reviews open.';

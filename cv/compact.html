@@ -73,6 +73,21 @@ a{color:inherit;text-decoration:none}
   .kop-cijfers{gap:10px}
 }
 
+/* voorstellen: de persoonlijke tekst, compact naast elkaar */
+.voorstel{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(20px,4vw,48px);align-items:start}
+.voorstel .lead{font-family:var(--display);font-weight:500;font-size:clamp(19px,2.4vw,25px);
+  line-height:1.3;letter-spacing:-.01em;margin:12px 0 0}
+.voorstel .hl{background:linear-gradient(transparent 62%,color-mix(in srgb,var(--tangerine) 32%,transparent) 62%);padding:0 .04em}
+.voorstel .tekst{color:var(--ink-soft);font-size:15.5px}
+.voorstel .tekst p{margin:0 0 .9em}
+.voorstel .tekst p:last-child{margin-bottom:0}
+.buiten{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.buiten .rij{display:flex;flex-wrap:wrap;gap:8px}
+.buiten .rij span{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);
+  background:var(--surface);border-radius:999px;padding:6px 13px;font-size:13.5px}
+.buiten .rij span i{font-style:normal;font-size:14px}
+@media(max-width:760px){.voorstel{grid-template-columns:1fr;gap:14px}}
+
 /* ---------- SECTIES ---------- */
 section.blok{padding:clamp(34px,5vw,56px) 0;border-bottom:1px solid var(--line)}
 .sec-kop{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
@@ -175,7 +190,7 @@ section.blok{padding:clamp(34px,5vw,56px) 0;border-bottom:1px solid var(--line)}
         <span class="eyebrow"><span class="chip"></span><span id="eyebrow">Compact profiel</span></span>
         <h1 id="naam">—</h1>
         <div class="rol" id="rol">—</div>
-        <p class="pitch" id="pitch">—</p>
+        <p class="pitch" id="pitch">Verbinder tussen mens en organisatie. Ik help publieke organisaties groeien — met aandacht, lef en een flinke dosis nieuwsgierigheid.</p>
         <div class="beschikbaar" id="beschikbaar"><span class="stip"></span><span id="beschikbaarTx">—</span></div>
       </div>
       <div class="kop-cijfers">
@@ -186,6 +201,30 @@ section.blok{padding:clamp(34px,5vw,56px) 0;border-bottom:1px solid var(--line)}
     </div>
   </div>
 </header>
+
+<!-- ============ EVEN VOORSTELLEN ============ -->
+<section class="blok">
+  <div class="wrap voorstel">
+    <div>
+      <span class="eyebrow"><span class="chip"></span>Even voorstellen</span>
+      <p class="lead">Ik geloof dat goede HR begint bij <span class="hl">échte aandacht</span> — voor mensen, voor verhalen en voor wat een organisatie uniek maakt.</p>
+    </div>
+    <div class="tekst">
+      <p>Al negen jaar beweeg ik me in de wereld van HRM, het grootste deel daarvan in de publieke sector. Ik werk graag dáár waar strategie en uitvoering elkaar raken: ik vertaal beleid naar werkbare praktijk en houd ondertussen scherp oog voor de mensen die het werk doen.</p>
+      <p>Mijn kracht zit in verbinden. Ik schakel net zo makkelijk met een bestuurder als met een nieuwe collega op de werkvloer, en ik durf het ongemakkelijke gesprek aan te gaan als dat de boel verder helpt.</p>
+      <div class="buiten">
+        <div class="klein">Buiten het werk</div>
+        <div class="rij">
+          <span><i>🎪</i>Festivals</span>
+          <span><i>⛷️</i>Skiën</span>
+          <span><i>🏃</i>Obstacle runs</span>
+          <span><i>✈️</i>Reizen</span>
+          <span><i>🍳</i>Koken</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- ============ AANPAK — drie compacte blokken ============ -->
 <section class="blok">
@@ -238,6 +277,11 @@ section.blok{padding:clamp(34px,5vw,56px) 0;border-bottom:1px solid var(--line)}
         <div class="chips">
           <span>Strategisch HR-advies</span><span>Verandermanagement</span>
           <span>Verzuim &amp; vitaliteit</span><span>Werving &amp; selectie</span><span>Personeelsplanning</span>
+        </div>
+        <div class="klein" style="margin-top:24px">Hoe collega's mij omschrijven</div>
+        <div class="chips">
+          <span>Verbinder</span><span>Nieuwsgierig</span><span>Rustig &amp; scherp</span>
+          <span>Eerlijk</span><span>Doortastend</span>
         </div>
       </div>
       <div>
@@ -318,8 +362,7 @@ section.blok{padding:clamp(34px,5vw,56px) 0;border-bottom:1px solid var(--line)}
   document.getElementById('rol').textContent = p.functie;
   document.getElementById('eyebrow').textContent = 'Compact profiel · ' + p.functie;
   document.getElementById('ctaNaam').textContent = p.naam.split(' ')[0];
-  document.getElementById('pitch').textContent =
-    'Verbinder tussen mens en organisatie. Werkt het liefst daar waar strategie en uitvoering elkaar raken.';
+  // dezelfde pitch als op het volledige profiel
 
   /* De demo-data heeft geen portretfoto per consultant; daarom initialen in
      de eigen kleur. Zodra er een foto is, kan hier het pad in. */

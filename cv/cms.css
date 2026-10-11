@@ -33,6 +33,24 @@ img{max-width:100%;display:block}
 .sb-nav a.active svg{opacity:1}
 .sb-nav .badge{margin-left:auto;font-family:var(--mono);font-size:11px;background:rgba(246,242,236,.16);padding:2px 8px;border-radius:999px}
 .sb-nav a.active .badge{background:rgba(255,255,255,.25)}
+/* het menu in groepen: beheren en analyseren zijn twee soorten werk */
+.sb-groep{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(246,242,236,.42);padding:16px 12px 6px}
+.sb-nav .sb-groep:first-child{padding-top:2px}
+.sb-terug{display:flex;align-items:center;gap:9px;margin-top:14px;padding:9px 12px;border-radius:11px;
+  font-size:13px;font-weight:600;color:rgba(246,242,236,.6);border:1px solid rgba(246,242,236,.16)}
+.sb-terug:hover{color:#fff;background:rgba(246,242,236,.08)}
+
+/* bruggetje tussen beheer en analyse */
+.brug{display:flex;align-items:center;gap:clamp(14px,3vw,30px);flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 20px;margin-bottom:22px}
+.brug .bk{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.brug .cijfer b{display:block;font-family:var(--display);font-weight:800;font-size:25px;line-height:1.05}
+.brug .cijfer span{font-size:12px;color:var(--ink-soft)}
+.brug .grow{flex:1}
+.brug .scheid{width:1px;align-self:stretch;background:var(--line)}
+@media(max-width:700px){.brug .scheid{display:none}.brug{gap:16px}}
+
 .sb-user{margin-top:auto;display:flex;align-items:center;gap:11px;padding:12px 8px 4px;border-top:1px solid rgba(246,242,236,.12)}
 .sb-user img{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:center 20%}
 .sb-user .nm{font-weight:700;font-size:14px;line-height:1.1}
