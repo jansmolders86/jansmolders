@@ -7,7 +7,7 @@
 (function (global) {
   'use strict';
 
-  var KEY = 'reijn-cms-demo-v3';
+  var KEY = 'reijn-cms-demo-v5';
 
   /* Vangnet: normaal zet brand.js dit in de <head>. Mocht dat bestand
      ontbreken, dan valt alles terug op white label in plaats van te breken. */
@@ -28,70 +28,83 @@
     return [
       { id: 'gijs-wassenberg', naam: 'Gijs Wassenberg', functie: 'HRM-consultant', init: 'GW', kleur: 'var(--petrol)',
         status: 'pub', varianten: ['Ziekenhuis', 'Gemeente'], views: 342, leads: 7, tijd: '3:12', bijgewerkt: '2 dagen geleden',
-        beheerder: 'Lieve van der Weijde', aangemaakt: '14 apr 2025', sjabloon: 'Visueel CV — compleet', inzet: { status:'ingezet', klant:'Radboudumc', rol:'Projectleider HR-transitie',
-        start:'2026-02-01', eind:'2026-11-30', uren:32, tarief:118, verlenging:'optie tot 1 mrt 2027',
-        contact:'Marieke Doornbos',
-        eerder:[{klant:'Gemeente Nijmegen', rol:'Adviseur duurzame inzetbaarheid', start:'2025-03-01', eind:'2026-01-31'}] } },
+        beheerder: 'Lieve van der Weijde', aangemaakt: '14 apr 2025', inzet: { capaciteit: 36, opdrachten: [
+        { klant:'Radboudumc', rol:'Projectleider HR-transitie', uren:16, start:over(-206), eind:over(96),
+          tarief:118, verlenging:'optie tot 1 mrt 2027', contact:'Marieke Doornbos' },
+        { klant:'Gemeente Helmond', rol:'Adviseur strategische personeelsplanning', uren:8, start:over(-110), eind:over(170),
+          tarief:112, verlenging:'optie 6 maanden', contact:'Joris Kleijn' }
+      ], beschikbaarVanaf:null,
+      eerder:[{klant:'Gemeente Nijmegen', rol:'Adviseur duurzame inzetbaarheid', uren:24, start:over(-580), eind:over(-250)}] }, sjabloon: 'Visueel CV — compleet' },
       { id: 'sanne-de-vries', naam: 'Sanne de Vries', functie: 'Financieel adviseur', init: 'SdV', kleur: 'var(--plum)',
         status: 'rev', varianten: ['Ziekenhuis'], views: 88, leads: 2, tijd: '2:41', bijgewerkt: '5 uur geleden',
-        beheerder: 'Lieve van der Weijde', aangemaakt: '2 jun 2025', inzet: { status:'binnenkort', klant:'Zorggroep Helmond', rol:'Interim financieel adviseur',
-        start:'2026-01-15', eind:'2026-09-30', uren:24, tarief:105, verlenging:'nog niet besproken',
-        contact:'Marc de Wit',
-        eerder:[{klant:'Amphia', rol:'Business control', start:'2024-09-01', eind:'2025-12-31'}] } },
+        beheerder: 'Lieve van der Weijde', aangemaakt: '2 jun 2025', inzet: { capaciteit: 24, opdrachten: [
+        { klant:'Zorggroep Helmond', rol:'Interim financieel adviseur', uren:24, start:over(-250), eind:over(35),
+          tarief:105, verlenging:'nog niet besproken', contact:'Marc de Wit' }
+      ], beschikbaarVanaf:null,
+      eerder:[{klant:'Amphia', rol:'Business control', uren:32, start:over(-760), eind:over(-280)}] } },
       { id: 'fatima-el-amrani', naam: 'Fatima El Amrani', functie: 'Beleidsadviseur', init: 'FE', kleur: 'var(--clay)',
         status: 'pub', varianten: ['Ziekenhuis', 'Gemeente', 'Onderwijs'], views: 511, leads: 12, tijd: '3:48', bijgewerkt: '6 dagen geleden',
-        beheerder: 'Lieve van der Weijde', aangemaakt: '9 feb 2025', inzet: { status:'ingezet', klant:'Gemeente Arnhem', rol:'Projectleider omgevingsplan',
-        start:'2026-04-01', eind:'2027-03-31', uren:36, tarief:112, verlenging:'optie 6 maanden',
-        contact:'Joris Kleijn',
-        eerder:[{klant:'Gemeente Nijmegen', rol:'Beleidsadviseur', start:'2025-01-06', eind:'2026-03-27'}] } },
+        beheerder: 'Lieve van der Weijde', aangemaakt: '9 feb 2025', inzet: { capaciteit: 36, opdrachten: [
+        { klant:'Gemeente Arnhem', rol:'Projectleider omgevingsplan', uren:28, start:over(-150), eind:over(240),
+          tarief:112, verlenging:'optie 6 maanden', contact:'Joris Kleijn' },
+        { klant:'ROC Rijnmond', rol:'Adviseur onderwijshuisvesting', uren:8, start:over(-40), eind:over(140),
+          tarief:104, verlenging:null, contact:'Sandra Beek' }
+      ], beschikbaarVanaf:null,
+      eerder:[{klant:'Gemeente Nijmegen', rol:'Beleidsadviseur', uren:36, start:over(-640), eind:over(-190)}] } },
       { id: 'thomas-bakker', naam: 'Thomas Bakker', functie: 'IT-projectleider', init: 'TB', kleur: 'var(--mustard)',
         status: 'rev', varianten: ['Basis'], views: 21, leads: 0, tijd: '1:52', bijgewerkt: '2 dagen geleden',
-        beheerder: 'Joost Reijnders', aangemaakt: '17 jun 2025', inzet: { status:'beschikbaar', klant:null, rol:null, start:null, eind:null, uren:36,
-        tarief:98, verlenging:null, contact:null, beschikbaarVanaf:'2026-08-01',
-        eerder:[{klant:'ROC Rijnmond', rol:'Projectleider ICT', start:'2025-05-01', eind:'2026-07-31'}] } },
+        beheerder: 'Joost Reijnders', aangemaakt: '17 jun 2025', inzet: { capaciteit: 36, opdrachten: [], beschikbaarVanaf:over(-70),
+      eerder:[{klant:'ROC Rijnmond', rol:'Projectleider ICT', uren:32, start:over(-500), eind:over(-72)}] } },
       { id: 'isa-verhoeven', naam: 'Isa Verhoeven', functie: 'Adviseur digitalisering', init: 'IV', kleur: 'var(--ink-soft)',
         status: 'draft', varianten: [], views: 0, leads: 0, tijd: '—', bijgewerkt: '3 dagen geleden',
-        beheerder: 'Lieve van der Weijde', aangemaakt: '15 jun 2025', inzet: { status:'beschikbaar', klant:null, rol:null, start:null, eind:null, uren:32,
-        tarief:95, verlenging:null, contact:null, beschikbaarVanaf:'2026-09-15', eerder:[] } },
+        beheerder: 'Lieve van der Weijde', aangemaakt: '15 jun 2025', inzet: { capaciteit: 32, opdrachten: [], beschikbaarVanaf:over(14), eerder:[] } },
       { id: 'daan-mulder', naam: 'Daan Mulder', functie: 'Recruiter', init: 'DM', kleur: 'var(--teal)',
         status: 'pub', varianten: ['Basis'], views: 176, leads: 4, tijd: '2:05', bijgewerkt: '1 week geleden',
-        beheerder: 'Joost Reijnders', aangemaakt: '3 mrt 2025', sjabloon: 'Compact profiel', inzet: { status:'ingezet', klant:'Waterschap Rivierenland', rol:'Recruiter techniek',
-        start:'2026-06-01', eind:'2027-05-31', uren:32, tarief:92, verlenging:'optie tot 2028',
-        contact:'Hugo Bergsma', eerder:[] } },
+        beheerder: 'Joost Reijnders', aangemaakt: '3 mrt 2025', inzet: { capaciteit: 32, opdrachten: [
+        { klant:'Waterschap Rivierenland', rol:'Recruiter techniek', uren:24, start:over(-130), eind:over(230),
+          tarief:92, verlenging:'optie tot 2028', contact:'Hugo Bergsma' },
+        { klant:'Gemeente Helmond', rol:'Recruiter sociaal domein', uren:8, start:over(-60), eind:over(120),
+          tarief:92, verlenging:null, contact:'Joris Kleijn' }
+      ], beschikbaarVanaf:null, eerder:[] }, sjabloon: 'Compact profiel' },
       { id: 'emma-visser', naam: 'Emma Visser', functie: 'Communicatieadviseur', init: 'EV', kleur: 'var(--mustard)',
         status: 'rev', varianten: ['Gemeente', 'Zorg'], views: 63, leads: 1, tijd: '2:58', bijgewerkt: '1 dag geleden',
-        beheerder: 'Lieve van der Weijde', aangemaakt: '21 mei 2025', inzet: { status:'binnenkort', klant:'Gemeente Arnhem', rol:'Communicatieadviseur participatie',
-        start:'2025-11-01', eind:'2026-10-15', uren:28, tarief:96, verlenging:'klant beslist in september',
-        contact:'Joris Kleijn', eerder:[] } },
+        beheerder: 'Lieve van der Weijde', aangemaakt: '21 mei 2025', inzet: { capaciteit: 28, opdrachten: [
+        { klant:'Gemeente Arnhem', rol:'Communicatieadviseur participatie', uren:20, start:over(-345), eind:over(50),
+          tarief:96, verlenging:'klant beslist deze maand', contact:'Joris Kleijn' }
+      ], beschikbaarVanaf:null, eerder:[] } },
       { id: 'noor-jansen', naam: 'Noor Jansen', functie: 'Organisatieadviseur', init: 'NJ', kleur: 'var(--teal)',
         status: 'pub', varianten: ['Gemeente'], views: 204, leads: 5, tijd: '3:01', bijgewerkt: '4 dagen geleden',
-        beheerder: 'Lieve van der Weijde', aangemaakt: '28 jan 2025', sjabloon: 'Visueel CV — compleet', inzet: { status:'ingezet', klant:'ROC Rijnmond', rol:'Organisatieadviseur onderwijsteams',
-        start:'2026-03-01', eind:'2027-02-28', uren:24, tarief:104, verlenging:'optie 12 maanden',
-        contact:'Sandra Beek', eerder:[] } },
+        beheerder: 'Lieve van der Weijde', aangemaakt: '28 jan 2025', inzet: { capaciteit: 24, opdrachten: [
+        { klant:'ROC Rijnmond', rol:'Organisatieadviseur onderwijsteams', uren:24, start:over(-225), eind:over(140),
+          tarief:104, verlenging:'optie 12 maanden', contact:'Sandra Beek' }
+      ], beschikbaarVanaf:null, eerder:[] }, sjabloon: 'Visueel CV — compleet' },
       { id: 'pieter-hoogendijk', naam: 'Pieter Hoogendijk', functie: 'Interim-manager', init: 'PH', kleur: 'var(--petrol)',
         status: 'pub', varianten: ['Ziekenhuis', 'Basis'], views: 289, leads: 9, tijd: '4:07', bijgewerkt: '3 dagen geleden',
-        beheerder: 'Joost Reijnders', aangemaakt: '11 dec 2024', inzet: { status:'binnenkort', klant:'Waterschap Rivierenland', rol:'Interim-manager bedrijfsvoering',
-        start:'2025-09-01', eind:'2026-09-15', uren:36, tarief:135, verlenging:'gesprek gepland 3 sep',
-        contact:'Hugo Bergsma',
-        eerder:[{klant:'Radboudumc', rol:'Interim afdelingshoofd', start:'2024-04-01', eind:'2025-08-29'}] } },
+        beheerder: 'Joost Reijnders', aangemaakt: '11 dec 2024', inzet: { capaciteit: 36, opdrachten: [
+        { klant:'Waterschap Rivierenland', rol:'Interim-manager bedrijfsvoering', uren:36, start:over(-405), eind:over(20),
+          tarief:135, verlenging:'gesprek gepland', contact:'Hugo Bergsma' }
+      ], beschikbaarVanaf:null,
+      eerder:[{klant:'Radboudumc', rol:'Interim afdelingshoofd', uren:32, start:over(-910), eind:over(-410)}] } },
       { id: 'yara-bouzid', naam: 'Yara Bouzid', functie: 'Data-analist', init: 'YB', kleur: 'var(--plum)',
         status: 'pub', varianten: ['Onderwijs'], views: 132, leads: 3, tijd: '2:22', bijgewerkt: '5 dagen geleden',
-        beheerder: 'Lieve van der Weijde', aangemaakt: '7 mrt 2025', sjabloon: 'Compact profiel', inzet: { status:'ingezet', klant:'ROC Rijnmond', rol:'Data-analist studentsucces',
-        start:'2026-05-01', eind:'2026-12-31', uren:32, tarief:99, verlenging:'optie tot juni 2027',
-        contact:'Sandra Beek', eerder:[] } },
+        beheerder: 'Lieve van der Weijde', aangemaakt: '7 mrt 2025', inzet: { capaciteit: 32, opdrachten: [
+        { klant:'ROC Rijnmond', rol:'Data-analist studentsucces', uren:16, start:over(-165), eind:over(81),
+          tarief:99, verlenging:'optie tot juni 2027', contact:'Sandra Beek' },
+        { klant:'Onderwijsgroep Brabant', rol:'Analist kwaliteitszorg', uren:8, start:over(-20), eind:over(160),
+          tarief:99, verlenging:null, contact:'Sanne Jansen' }
+      ], beschikbaarVanaf:null, eerder:[] }, sjabloon: 'Compact profiel' },
       { id: 'milan-de-groot', naam: 'Milan de Groot', functie: 'Projectleider Zorg', init: 'MG', kleur: 'var(--ink-soft)',
         status: 'draft', varianten: [], views: 0, leads: 0, tijd: '—', bijgewerkt: '9 uur geleden',
-        beheerder: 'Joost Reijnders', aangemaakt: '18 jun 2025', inzet: { status:'beschikbaar', klant:null, rol:null, start:null, eind:null, uren:36,
-        tarief:101, verlenging:null, contact:null, beschikbaarVanaf:'2026-08-26', eerder:[] } },
+        beheerder: 'Joost Reijnders', aangemaakt: '18 jun 2025', inzet: { capaciteit: 36, opdrachten: [], beschikbaarVanaf:over(-2), eerder:[] } },
       { id: 'kim-vermeer', naam: 'Kim Vermeer', functie: 'Trainer & coach', init: 'KV', kleur: 'var(--mustard)',
         status: 'pub', varianten: ['Basis', 'Onderwijs'], views: 97, leads: 2, tijd: '2:36', bijgewerkt: '1 week geleden',
-        beheerder: 'Lieve van der Weijde', aangemaakt: '2 apr 2025', inzet: { status:'ingezet', klant:'Onderwijsgroep Brabant', rol:'Trainer leiderschap',
-        start:'2026-01-08', eind:'2026-10-31', uren:20, tarief:110, verlenging:'optie tot maart 2027',
-        contact:'Sanne Jansen', eerder:[] } },
+        beheerder: 'Lieve van der Weijde', aangemaakt: '2 apr 2025', inzet: { capaciteit: 20, opdrachten: [
+        { klant:'Onderwijsgroep Brabant', rol:'Trainer leiderschap', uren:20, start:over(-275), eind:over(55),
+          tarief:110, verlenging:'optie tot maart 2027', contact:'Sanne Jansen' }
+      ], beschikbaarVanaf:null, eerder:[] } },
       { id: 'ruben-aarts', naam: 'Ruben Aarts', functie: 'Financieel adviseur', init: 'RA', kleur: 'var(--ink-soft)',
         status: 'arch', varianten: ['Basis'], views: 44, leads: 0, tijd: '1:48', bijgewerkt: '2 maanden geleden',
-        beheerder: 'Joost Reijnders', aangemaakt: '19 sep 2024', inzet: { status:'beschikbaar', klant:null, rol:null, start:null, eind:null, uren:0,
-        tarief:0, verlenging:null, contact:null, beschikbaarVanaf:null, eerder:[] } }
+        beheerder: 'Joost Reijnders', aangemaakt: '19 sep 2024', inzet: { capaciteit: 0, opdrachten: [], beschikbaarVanaf:null, eerder:[] } }
     ];
   }
 
@@ -175,6 +188,66 @@
     ];
   }
 
+  /* De salesflow: elk verstuurd profiel wordt een kaart die van 'Voorstel'
+     naar 'Akkoord' schuift — of onderweg afvalt. */
+  function seedVoorstellen() {
+    return [
+      { id:'v1', pagina:'gijs-wassenberg', klant:'Radboudumc', contact:'Marieke Doornbos',
+        rol:'Projectleider HR-transitie', uren:16, tarief:118, start:over(30),
+        status:'akkoord', verstuurd:over(-24), gewijzigd:over(-3), variant:'Ziekenhuis',
+        notitie:'Akkoord na het tweede gesprek. Startdatum in overleg met de afdeling.',
+        historie:[{status:'voorstel',datum:over(-24)},{status:'wachten',datum:over(-17)},{status:'akkoord',datum:over(-3)}] },
+
+      { id:'v2', pagina:'fatima-el-amrani', klant:'Gemeente Arnhem', contact:'Joris Kleijn',
+        rol:'Projectleider participatietraject', uren:12, tarief:112, start:over(45),
+        status:'wachten', verstuurd:over(-11), gewijzigd:over(-4), variant:'Gemeente',
+        notitie:'Joris legt het voor aan het MT. Hij belt deze week terug.',
+        historie:[{status:'voorstel',datum:over(-11)},{status:'wachten',datum:over(-4)}] },
+
+      { id:'v3', pagina:'yara-bouzid', klant:'ROC Rijnmond', contact:'Sandra Beek',
+        rol:'Data-analist onderwijskwaliteit', uren:8, tarief:99, start:over(21),
+        status:'wachten', verstuurd:over(-26), gewijzigd:over(-19), variant:'Onderwijs',
+        notitie:'Sandra wil eerst het budget rondkrijgen.',
+        historie:[{status:'voorstel',datum:over(-26)},{status:'wachten',datum:over(-19)}] },
+
+      { id:'v4', pagina:'thomas-bakker', klant:'Waterschap Rivierenland', contact:'Hugo Bergsma',
+        rol:'Projectleider ICT-migratie', uren:32, tarief:98, start:over(14),
+        status:'voorstel', verstuurd:over(-3), gewijzigd:over(-3), variant:'Basis',
+        notitie:'Profiel gisteren verstuurd, nog geen reactie.',
+        historie:[{status:'voorstel',datum:over(-3)}] },
+
+      { id:'v5', pagina:'milan-de-groot', klant:'Zorggroep Helmond', contact:'Marc de Wit',
+        rol:'Projectleider zorgtransformatie', uren:24, tarief:101, start:over(28),
+        status:'voorstel', verstuurd:over(-1), gewijzigd:over(-1), variant:'Zorg',
+        notitie:'Marc vroeg expliciet om iemand uit de care.',
+        historie:[{status:'voorstel',datum:over(-1)}] },
+
+      { id:'v6', pagina:'pieter-hoogendijk', klant:'Gemeente Helmond', contact:'Joris Kleijn',
+        rol:'Interim-manager bedrijfsvoering', uren:36, tarief:135, start:over(60),
+        status:'afgewezen', verstuurd:over(-40), gewijzigd:over(-19), variant:'Gemeente',
+        notitie:'Tarief lag boven het plafond van de aanbesteding.',
+        historie:[{status:'voorstel',datum:over(-40)},{status:'wachten',datum:over(-31)},{status:'afgewezen',datum:over(-19)}] },
+
+      { id:'v7', pagina:'noor-jansen', klant:'Onderwijsgroep Brabant', contact:'Sanne Jansen',
+        rol:'Organisatieadviseur teamontwikkeling', uren:16, tarief:104, start:over(35),
+        status:'akkoord', verstuurd:over(-33), gewijzigd:over(-9), variant:'Onderwijs',
+        notitie:'Akkoord voor een half jaar, met optie tot verlenging.',
+        historie:[{status:'voorstel',datum:over(-33)},{status:'wachten',datum:over(-22)},{status:'akkoord',datum:over(-9)}] },
+
+      { id:'v8', pagina:'emma-visser', klant:'Radboudumc', contact:'Marieke Doornbos',
+        rol:'Communicatieadviseur patientparticipatie', uren:8, tarief:96, start:over(40),
+        status:'voorstel', verstuurd:over(-5), gewijzigd:over(-5), variant:'Ziekenhuis',
+        notitie:'Tweede profiel voor dezelfde vraag; Marieke vergelijkt.',
+        historie:[{status:'voorstel',datum:over(-5)}] },
+
+      { id:'v9', pagina:'isa-verhoeven', klant:'Gemeente Arnhem', contact:'Joris Kleijn',
+        rol:'Adviseur digitalisering', uren:20, tarief:95, start:over(50),
+        status:'afgewezen', verstuurd:over(-26), gewijzigd:over(-12), variant:'Gemeente',
+        notitie:'Ze kozen voor een kandidaat met meer ervaring in het sociaal domein.',
+        historie:[{status:'voorstel',datum:over(-26)},{status:'wachten',datum:over(-20)},{status:'afgewezen',datum:over(-12)}] }
+    ];
+  }
+
   function seedActivity() {
     return [
       { ic: 'check', kleur: 'var(--teal)', tekst: '<b>Noor Jansen</b> — variant Gemeente gepubliceerd', tijd: '2 u' },
@@ -187,7 +260,8 @@
 
   /* ---------------- store ---------------- */
   function fresh() {
-    return { pages: seedPages(), mails: seedMails().concat(seedConsultantMails()), activity: seedActivity(), v: 2 };
+    return { pages: seedPages(), mails: seedMails().concat(seedConsultantMails()),
+             voorstellen: seedVoorstellen(), activity: seedActivity(), v: 5 };
   }
 
   function load() {
@@ -196,6 +270,7 @@
       if (!raw) { var f = fresh(); save(f); return f; }
       var data = JSON.parse(raw);
       if (!data || !data.pages) { var g = fresh(); save(g); return g; }
+      if (!data.voorstellen) data.voorstellen = seedVoorstellen();
       return data;
     } catch (e) { return fresh(); }
   }
@@ -261,13 +336,28 @@
     return m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : null;
   }
 
-  /* ---------------- inzet: hoe lang loopt een opdracht nog? ----------------
-     De demo rekent met een vast 'vandaag', zodat de cijfers niet verschuiven
-     als je de demo over een half jaar nog eens laat zien. */
-  var VANDAAG = new Date(2026, 7, 26);          // 26 augustus 2026
+  /* ---------------- inzet: uren, looptijden en ruimte ----------------
+     Een consultant kan bij meerdere opdrachtgevers tegelijk zitten. Daarom
+     rekenen we met een contractomvang (capaciteit) en een lijst opdrachten;
+     wat niet bezet is, is de ruimte die je nog kunt verkopen. */
+  var VANDAAG = (function () {
+    var n = new Date();
+    return new Date(n.getFullYear(), n.getMonth(), n.getDate());
+  })();
   var DAG = 24 * 60 * 60 * 1000;
-
   var MAANDEN = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+
+  /* De demo-data wordt rond 'vandaag' gezaaid, zodat de looptijden kloppen
+     wanneer je de demo ook laat zien. */
+  function iso(d) {
+    var m = d.getMonth() + 1, dag = d.getDate();
+    return d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (dag < 10 ? '0' : '') + dag;
+  }
+  function over(dagen) {
+    var d = new Date(VANDAAG);
+    d.setDate(d.getDate() + dagen);
+    return iso(d);
+  }
 
   function datum(txt) {
     if (!txt) return null;
@@ -289,44 +379,96 @@
     if (dagen < 0) return 'afgelopen';
     if (dagen === 0) return 'loopt vandaag af';
     if (dagen < 14) return dagen + (dagen === 1 ? ' dag' : ' dagen');
-    if (dagen < 60) {
-      var w = Math.round(dagen / 7);
-      return w + ' weken';
-    }
+    if (dagen < 60) return Math.round(dagen / 7) + ' weken';
     var m = Math.floor(dagen / 30.44);
     var rest = Math.round((dagen - m * 30.44) / 7);
     return m + (m === 1 ? ' maand' : ' maanden') + (rest > 0 ? ' en ' + rest + ' wk' : '');
   }
 
-  /* alles wat een scherm over een inzet wil weten, op één plek */
-  function inzetInfo(p) {
-    var i = p.inzet || { status: 'beschikbaar', eerder: [] };
-    var dagen = i.eind ? dagenTot(i.eind) : null;
-    var totaal = (i.start && i.eind) ? Math.round((datum(i.eind) - datum(i.start)) / DAG) : null;
+  function verrijkOpdracht(o) {
+    var dagen = dagenTot(o.eind);
+    var totaal = (o.start && o.eind) ? Math.round((datum(o.eind) - datum(o.start)) / DAG) : null;
     var verstreken = totaal !== null ? Math.max(0, Math.min(totaal, totaal - dagen)) : null;
     return {
-      ruw: i,
-      status: i.status,
-      klant: i.klant,
-      rol: i.rol,
-      uren: i.uren,
+      ruw: o,
+      klant: o.klant, rol: o.rol, uren: o.uren, contact: o.contact, verlenging: o.verlenging,
+      start: o.start, eind: o.eind,
+      startKort: datumKort(o.start), eindKort: datumKort(o.eind),
       dagenRest: dagen,
       resterend: looptijd(dagen),
       voortgang: totaal ? Math.round(verstreken / totaal * 100) : 0,
-      startKort: datumKort(i.start),
-      eindKort: datumKort(i.eind),
+      loopt: dagenTot(o.start) <= 0 && dagen >= 0,
+      loopAf: dagen !== null && dagen >= 0 && dagen <= 60
+    };
+  }
+
+  /* alles wat een scherm over iemands inzet wil weten, op één plek */
+  function inzetInfo(p) {
+    var i = p.inzet || { capaciteit: 36, opdrachten: [], eerder: [] };
+    var cap = i.capaciteit || 0;
+    var opdrachten = (i.opdrachten || []).map(verrijkOpdracht)
+      .sort(function (a, b) { return b.uren - a.uren; });
+    var lopend = opdrachten.filter(function (o) { return o.loopt; });
+    var bezet = lopend.reduce(function (a, o) { return a + (o.uren || 0); }, 0);
+    var vrij = Math.max(0, cap - bezet);
+    var aflopend = lopend.filter(function (o) { return o.loopAf; });
+
+    return {
+      ruw: i,
+      capaciteit: cap,
+      bezet: bezet,
+      vrij: vrij,
+      bezetting: cap ? Math.round(bezet / cap * 100) : 0,
+      opdrachten: opdrachten,
+      lopend: lopend,
+      aantal: lopend.length,
+      /* vol = niets meer kwijt, ruimte = deels inzetbaar, beschikbaar = helemaal vrij */
+      status: bezet === 0 ? 'beschikbaar' : (vrij > 0 ? 'ruimte' : 'vol'),
+      loopAf: aflopend.length > 0,
+      aflopend: aflopend,
+      eerstvolgendEind: lopend.length
+        ? lopend.slice().sort(function (a, b) { return a.dagenRest - b.dagenRest; })[0]
+        : null,
       beschikbaarVanaf: i.beschikbaarVanaf ? datumKort(i.beschikbaarVanaf) : null,
-      beschikbaarNu: i.status === 'beschikbaar' && (!i.beschikbaarVanaf || dagenTot(i.beschikbaarVanaf) <= 0),
-      loopAf: dagen !== null && dagen >= 0 && dagen <= 60,
-      eerder: i.eerder || []
+      beschikbaarVanafRuw: i.beschikbaarVanaf,
+      eerder: (i.eerder || []).map(verrijkOpdracht)
     };
   }
 
   var INZET_STATUS = {
-    ingezet:     { label: 'Ingezet',        cls: 'pub' },
-    binnenkort:  { label: 'Loopt af',       cls: 'rev' },
-    beschikbaar: { label: 'Beschikbaar',    cls: 'hot' }
+    vol:         { label: 'Volgeboekt',  cls: 'pub' },
+    ruimte:      { label: 'Ruimte',      cls: 'rev' },
+    beschikbaar: { label: 'Beschikbaar', cls: 'hot' }
   };
+
+  /* ---------------- salesflow ----------------
+     Vier statussen, in de volgorde waarin een voorstel er doorheen loopt.
+     'afgewezen' en 'akkoord' zijn eindpunten. */
+  var SALES = [
+    { sleutel:'voorstel',  label:'Voorstel',          kleur:'var(--petrol)',    uitleg:'Profiel verstuurd, nog geen reactie' },
+    { sleutel:'wachten',   label:'Wachten op reactie', kleur:'var(--mustard)',  uitleg:'De klant beraadt zich' },
+    { sleutel:'afgewezen', label:'Afgewezen',          kleur:'var(--clay)',     uitleg:'Niet doorgegaan' },
+    { sleutel:'akkoord',   label:'Akkoord',            kleur:'var(--teal)',     uitleg:'Rond \u2014 klaar om in te plannen' }
+  ];
+  var SALES_BIJ = {};
+  SALES.forEach(function (s) { SALES_BIJ[s.sleutel] = s; });
+
+  /* hoeveel dagen ligt een voorstel al stil? */
+  function voorstelInfo(v) {
+    var dagen = -(dagenTot(v.gewijzigd) || 0);
+    return {
+      ruw: v,
+      status: SALES_BIJ[v.status] || SALES[0],
+      open: v.status === 'voorstel' || v.status === 'wachten',
+      stil: dagen,
+      stilTekst: dagen <= 0 ? 'vandaag' : looptijd(dagen) + ' geleden',
+      verstuurdKort: datumKort(v.verstuurd),
+      startKort: datumKort(v.start),
+      /* een open voorstel waar twee weken niets mee gebeurd is, vraagt om actie */
+      treuzelt: (v.status === 'voorstel' || v.status === 'wachten') && dagen >= 14,
+      weekomzet: (v.uren || 0) * (v.tarief || 0)
+    };
+  }
 
   /* ---------------- mails aan de consultant ----------------
      Deze kant van het beheer is net zo belangrijk als mailen naar klanten:
@@ -566,6 +708,13 @@
     document.querySelectorAll('[data-badge="pages"]').forEach(function (el) {
       el.textContent = data.pages.filter(function (p) { return p.status !== 'arch'; }).length;
     });
+    var openVoorstellen = (data.voorstellen || []).filter(function (v) {
+      return v.status === 'voorstel' || v.status === 'wachten'; }).length;
+    document.querySelectorAll('[data-badge="sales"]').forEach(function (el) {
+      if (openVoorstellen) { el.textContent = openVoorstellen; el.style.display = ''; }
+      else { el.style.display = 'none'; }
+    });
+
     var unread = data.mails.filter(function (m) { return m.ongelezen && m.map !== 'verzonden'; }).length;
     document.querySelectorAll('[data-badge="mail"]').forEach(function (el) {
       if (unread) { el.textContent = unread; el.style.display = ''; }
@@ -629,7 +778,8 @@
     load: load, save: save, reset: reset, fresh: fresh,
     STATUS: STATUS, ICON: ICON, COLORS: COLORS, CONSULTANT_MAILS: CONSULTANT_MAILS,
     INZET_STATUS: INZET_STATUS, inzetInfo: inzetInfo, datumKort: datumKort,
-    dagenTot: dagenTot, looptijd: looptijd, VANDAAG: VANDAAG,
+    SALES: SALES, SALES_BIJ: SALES_BIJ, voorstelInfo: voorstelInfo,
+    dagenTot: dagenTot, looptijd: looptijd, VANDAAG: VANDAAG, iso: iso, over: over,
     esc: esc, slug: slug, initials: initials, kleurVoor: kleurVoor, nf: nf, param: param,
     editorUrl: editorUrl, cvUrl: cvUrl,
     toast: toast, openModal: openModal, closeModal: closeModal, init: init,

@@ -373,27 +373,36 @@ section.blok{padding:clamp(34px,5vw,56px) 0;border-bottom:1px solid var(--line)}
   /* beschikbaarheid uit de inzet-tracker */
   var bes = document.getElementById('beschikbaar');
   var tx = document.getElementById('beschikbaarTx');
-  if (i.klant){
+  if (i.vrij > 0 && i.bezet > 0){
+    // deels bezet: juist dan is het interessant om te weten hoeveel er vrij is
+    tx.textContent = i.vrij + ' uur per week beschikbaar · nu ' + i.bezet + ' uur bij ' +
+      i.lopend.map(function(o){ return o.klant; }).join(' en ');
+  } else if (i.bezet > 0){
     bes.classList.add('bezet');
-    tx.textContent = 'Nu bij ' + i.klant + ' — beschikbaar vanaf ' + i.eindKort;
-    document.getElementById('fBeschikbaar').textContent = i.eindKort;
-    document.getElementById('fOpdracht').textContent = i.klant + ' · ' + i.rol;
+    tx.textContent = 'Volgeboekt tot ' + (i.eerstvolgendEind ? i.eerstvolgendEind.eindKort : '—');
   } else {
     tx.textContent = i.beschikbaarVanaf ? 'Beschikbaar vanaf ' + i.beschikbaarVanaf : 'Direct beschikbaar';
-    document.getElementById('fBeschikbaar').textContent = i.beschikbaarVanaf || 'direct';
-    document.getElementById('fOpdracht').textContent = 'geen lopende opdracht';
   }
-  document.getElementById('cUren').textContent = i.uren || 32;
-  document.getElementById('cOpdrachten').textContent = (i.eerder.length + (i.klant ? 1 : 0)) || 1;
+
+  document.getElementById('fBeschikbaar').textContent = i.vrij > 0
+    ? i.vrij + ' uur per week'
+    : (i.eerstvolgendEind ? 'vanaf ' + i.eerstvolgendEind.eindKort : 'direct');
+  document.getElementById('fOpdracht').textContent = i.lopend.length
+    ? i.lopend.map(function(o){ return o.klant + ' (' + o.uren + ' u)'; }).join(' · ')
+    : 'geen lopende opdracht';
+  document.getElementById('cUren').textContent = i.vrij || i.capaciteit;
+  document.getElementById('cOpdrachten').textContent = i.eerder.length + i.lopend.length || 1;
 
   /* loopbaan: huidige opdracht plus de eerdere, compact */
   var kleuren = ['var(--c-petrol)','var(--c-tangerine)','var(--c-mustard)','var(--c-teal)'];
   var rijen = [];
-  if (i.klant) rijen.push({ van: i.startKort, tot: 'heden', rol: i.rol, org: i.klant,
-    tekst: 'Lopende opdracht voor ' + i.uren + ' uur per week.' });
+  i.lopend.forEach(function(o){
+    rijen.push({ van: o.startKort, tot: 'heden', rol: o.rol, org: o.klant,
+      tekst: 'Lopende opdracht voor ' + o.uren + ' uur per week.' });
+  });
   i.eerder.forEach(function(e){
-    rijen.push({ van: Reijn.datumKort(e.start), tot: Reijn.datumKort(e.eind), rol: e.rol, org: e.klant,
-      tekst: 'Afgeronde opdracht.' });
+    rijen.push({ van: e.startKort, tot: e.eindKort, rol: e.rol, org: e.klant,
+      tekst: 'Afgeronde opdracht' + (e.uren ? ' voor ' + e.uren + ' uur per week.' : '.') });
   });
   rijen.push({ van: '2017', tot: '2021', rol: 'HR-adviseur', org: Merk.org,
     tekst: 'Vaste basis: advies aan leidinggevenden en de eerste eigen trajecten.' });

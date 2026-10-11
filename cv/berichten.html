@@ -28,6 +28,7 @@
     <div class="sb-groep">Beheer</div>
     <a href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
     <a href="paginas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>Pagina's <span class="badge" data-badge="pages">3</span></a>
+    <a href="sales.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg>Sales <span class="badge" data-badge="sales">3</span></a>
     <a href="inzet.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/><path d="M12 15v3"/></svg>Inzet <span class="badge" data-badge="inzet">3</span></a>
     <a class="active" href="berichten.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>Berichten <span class="badge" data-badge="mail">3</span></a>
     <div class="sb-groep">Analyse</div>
@@ -44,7 +45,7 @@
   <span class="mu"><img src="lieve.jpg" alt=""></span>
 </div>
 <nav class="mobile-nav">
-  <a href="start.html">← Start</a><a href="dashboard.html">Dashboard</a><a href="paginas.html">Pagina's</a><a href="inzet.html">Inzet</a><a class="active" href="berichten.html">Berichten</a><a href="analytics.html">Analyse</a><a href="instellingen.html">Instellingen</a>
+  <a href="start.html">← Start</a><a href="dashboard.html">Dashboard</a><a href="paginas.html">Pagina's</a><a href="sales.html">Sales</a><a href="inzet.html">Inzet</a><a class="active" href="berichten.html">Berichten</a><a href="analytics.html">Analyse</a><a href="instellingen.html">Instellingen</a>
 </nav>
 
 <main class="main">
@@ -384,10 +385,31 @@
       }]
     };
     data.mails.unshift(nieuw);
+
+    /* Een verstuurd profiel is het begin van een salestraject: hij komt
+       meteen als voorstel op het bord te staan. */
+    data.voorstellen = data.voorstellen || [];
+    data.voorstellen.unshift({
+      id: 'v' + Date.now(),
+      pagina: p.id,
+      klant: o.org,
+      contact: o.naam,
+      rol: p.functie,
+      uren: Math.max(8, Reijn.inzetInfo(p).vrij || 16),
+      tarief: 105,
+      start: Reijn.over(30),
+      status: 'voorstel',
+      verstuurd: Reijn.iso(Reijn.VANDAAG),
+      gewijzigd: Reijn.iso(Reijn.VANDAAG),
+      variant: v,
+      notitie: 'Profiel verstuurd via de mailopsteller.',
+      historie: [{ status: 'voorstel', datum: Reijn.iso(Reijn.VANDAAG) }]
+    });
+
     data.activity.unshift({ ic:'mail', kleur:'var(--tangerine)', tekst:'Link verstuurd naar <b>'+Reijn.esc(o.naam)+'</b> ('+Reijn.esc(o.org)+')', tijd:'nu' });
     Reijn.save(data);
     Reijn.closeModal('mCompose');
-    Reijn.toast('Verstuurd naar ' + o.mail + ' ✓');
+    Reijn.toast('Verstuurd naar ' + o.mail + ' ✓ · staat nu als voorstel op het salesbord');
 
     // naar de map Verzonden springen zodat de demo doorloopt
     map = 'verzonden'; actief = nieuw;

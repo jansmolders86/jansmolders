@@ -156,8 +156,9 @@ a{color:inherit;text-decoration:none}
 .heat-flag svg{width:16px;height:16px;flex:0 0 auto;margin-top:1px}
 
 .quick{display:flex;flex-direction:column;gap:9px;margin-top:4px}
-.quick button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:13px;cursor:pointer;font-family:var(--body)}
-.quick button:hover{border-color:var(--tangerine);background:#fff}
+.quick button,.quick a{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:13px;cursor:pointer;font-family:var(--body)}
+.quick button:hover,.quick a:hover{border-color:var(--tangerine);background:#fff}
+.quick .tx{min-width:0}
 .quick .ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:#fff;flex:0 0 auto}
 .quick .ic svg{width:19px;height:19px}
 .quick .tx strong{display:block;font-size:14px;color:var(--ink)}
@@ -229,6 +230,7 @@ a{color:inherit;text-decoration:none}
     <div class="sb-groep">Beheer</div>
     <a class="active" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
     <a href="paginas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>Pagina's <span class="badge" data-badge="pages">3</span></a>
+    <a href="sales.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg>Sales <span class="badge" data-badge="sales">3</span></a>
     <a href="inzet.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/><path d="M12 15v3"/></svg>Inzet <span class="badge" data-badge="inzet">3</span></a>
     <a href="berichten.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>Berichten <span class="badge" data-badge="mail">3</span></a>
     <div class="sb-groep">Analyse</div>
@@ -251,7 +253,7 @@ a{color:inherit;text-decoration:none}
   <span class="mu"><img src="lieve.jpg" alt="Lieve van der Weijde"></span>
 </div>
 <nav class="mobile-nav">
-  <a href="start.html">← Start</a><a class="active" href="dashboard.html">Dashboard</a><a href="paginas.html">Pagina's</a><a href="inzet.html">Inzet</a><a href="berichten.html">Berichten</a><a href="analytics.html">Analyse</a><a href="instellingen.html">Instellingen</a>
+  <a href="start.html">← Start</a><a class="active" href="dashboard.html">Dashboard</a><a href="paginas.html">Pagina's</a><a href="sales.html">Sales</a><a href="inzet.html">Inzet</a><a href="berichten.html">Berichten</a><a href="analytics.html">Analyse</a><a href="instellingen.html">Instellingen</a>
 </nav>
 
 <!-- ============ MAIN ============ -->
@@ -317,7 +319,7 @@ a{color:inherit;text-decoration:none}
     <div>
       <!-- inzet die afloopt -->
       <section class="card" style="margin-bottom:22px">
-        <div class="card-head"><div><h2>Inzet loopt af</h2><p class="card-sub" style="margin:0">Binnen 60 dagen</p></div><a class="btn ghost sm" href="inzet.html">Alle inzet \u2192</a></div>
+        <div class="card-head"><div><h2>Inzet loopt af</h2><p class="card-sub" style="margin:0">Binnen 60 dagen</p></div><a class="btn ghost sm" href="inzet.html">Alle inzet →</a></div>
         <div id="afloopLijst"></div>
       </section>
 
@@ -442,22 +444,25 @@ a{color:inherit;text-decoration:none}
 
   /* ---------- inzet die binnenkort afloopt ---------- */
   function renderAfloop(){
-    var af = data.pages
-      .filter(function(p){ return p.status !== 'arch' && Reijn.inzetInfo(p).loopAf; })
-      .sort(function(a,b){ return Reijn.inzetInfo(a).dagenRest - Reijn.inzetInfo(b).dagenRest; })
-      .slice(0, 4);
+    /* een consultant kan meerdere opdrachten hebben; we tonen ze per opdracht */
+    var af = [];
+    data.pages.filter(function(p){ return p.status !== 'arch'; }).forEach(function(p){
+      Reijn.inzetInfo(p).aflopend.forEach(function(o){ af.push({ p: p, o: o }); });
+    });
+    af.sort(function(a,b){ return a.o.dagenRest - b.o.dagenRest; });
+    af = af.slice(0, 4);
+
     var el = document.getElementById('afloopLijst');
     if (!af.length){
       el.innerHTML = '<div style="padding:18px 4px;text-align:center;color:var(--ink-soft);font-size:13.5px">Geen opdrachten die binnen 60 dagen aflopen.</div>';
       return;
     }
-    el.innerHTML = af.map(function(p){
-      var i = Reijn.inzetInfo(p);
-      return '<a class="review-item afloop-item" style="text-decoration:none" href="pagina.html?id='+p.id+'">'+
-        '<div class="avatar" style="background:'+p.kleur+'">'+Reijn.esc(p.init)+'</div>'+
-        '<div class="who"><strong>'+Reijn.esc(p.naam)+' <span class="var">\u00b7 '+Reijn.esc(i.klant)+'</span></strong>'+
-        '<span>'+Reijn.esc(i.rol)+' \u2014 tot '+i.eindKort+'</span></div>'+
-        '<span class="pill rev">nog '+i.resterend+'</span>'+
+    el.innerHTML = af.map(function(r){
+      return '<a class="review-item afloop-item" style="text-decoration:none" href="pagina.html?id='+r.p.id+'">'+
+        '<div class="avatar" style="background:'+r.p.kleur+'">'+Reijn.esc(r.p.init)+'</div>'+
+        '<div class="who"><strong>'+Reijn.esc(r.p.naam)+' <span class="var">\u00b7 '+Reijn.esc(r.o.klant)+' ('+r.o.uren+' u)</span></strong>'+
+        '<span>'+Reijn.esc(r.o.rol)+' \u2014 tot '+r.o.eindKort+'</span></div>'+
+        '<span class="pill rev">nog '+r.o.resterend+'</span>'+
       '</a>';
     }).join('');
   }
