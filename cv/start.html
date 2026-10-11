@@ -3,7 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Visueel CV — demo</title>
+<meta name="description" content="Syno — van profiel naar voorstel naar inzet. Demo met voorbeelddata.">
+<meta name="application-name" content="Syno">
+<meta name="theme-color" content="#3B6FD4">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Syno — demo">
+<meta property="og:description" content="Syno — van profiel naar voorstel naar inzet. Demo met voorbeelddata.">
+<title>Syno — demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -33,20 +39,14 @@
   .st-merk a i{width:10px;height:10px;border-radius:50%;display:inline-block}
 
   /* ---------- hero ---------- */
-  .st-hero{max-width:34ch;margin-bottom:clamp(24px,4vw,40px)}
+  .st-hero{margin-bottom:clamp(24px,4vw,40px)}
   .st-hero .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
     color:var(--ink-soft);display:inline-flex;align-items:center;gap:9px;margin-bottom:14px}
   .st-hero .eyebrow i{width:11px;height:11px;border-radius:3px;background:var(--tangerine);transform:rotate(45deg)}
-  .st-hero h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,5.6vw,60px);line-height:1.02;
-    letter-spacing:-.035em;margin:0 0 14px}
+  .st-hero h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,7.4vw,86px);line-height:.98;
+    letter-spacing:-.04em;margin:0 0 16px;max-width:18ch}
   .st-hero h1 em{font-style:normal;color:var(--accent-ink)}
-  .st-hero p{margin:0;color:var(--ink-soft);font-size:clamp(16px,1.6vw,18px);line-height:1.55;max-width:46ch}
-
-  /* levende cijfers uit de demo */
-  .st-cijfers{display:flex;gap:clamp(18px,3vw,40px);flex-wrap:wrap;margin:26px 0 0;padding-top:22px;
-    border-top:1px solid var(--line)}
-  .st-cijfers div b{display:block;font-family:var(--display);font-weight:800;font-size:clamp(24px,3vw,32px);line-height:1}
-  .st-cijfers div span{font-size:12.5px;color:var(--ink-soft)}
+  .st-hero p{margin:0;color:var(--ink-soft);font-size:clamp(16px,1.7vw,19px);line-height:1.5;max-width:54ch}
 
   /* ---------- de drie poorten ---------- */
   .st-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:stretch;margin-top:clamp(26px,4vw,44px)}
@@ -96,8 +96,8 @@
 <div class="start">
 
   <header class="st-balk">
-    <span class="merk"><img class="brand-logo" src="reijn-logo.png" alt=""><span class="wm">Reijn</span><span class="tag">CMS</span></span>
-    <nav class="st-merk" aria-label="Huisstijl">
+    <span class="merk"><img class="brand-logo" src="reijn-logo.png" alt=""><span class="wm">Reijn</span><span class="tag">Syno</span></span>
+    <nav class="st-merk" aria-label="Huisstijl" data-merkvast>
       <a href="start.html" data-brandkeuze="whitelabel"><i style="background:#3B6FD4"></i>White label</a>
       <a href="start.html?brand=reijn" data-brandkeuze="reijn"><i style="background:#E8641E"></i>Reijn</a>
       <a href="start.html?brand=aag" data-brandkeuze="aag"><i style="background:#F8AF5F"></i>AAG</a>
@@ -106,17 +106,11 @@
 
   <section class="st-hero">
     <span class="eyebrow"><i></i>Demo</span>
-    <h1>Een cv dat <em>verkoopt</em>, en alles eromheen.</h1>
+    <h1>Het gehele <em>proces</em> in beeld.</h1>
     <p>Van het profiel dat de opdrachtgever ziet, via het voorstel dat eruit volgt,
        tot de uren die het oplevert. Drie ingangen, één verhaal.</p>
   </section>
 
-  <div class="st-cijfers">
-    <div><b id="cProfielen">—</b><span>profielen</span></div>
-    <div><b id="cVoorstellen">—</b><span>open voorstellen</span></div>
-    <div><b id="cBezetting">—</b><span>bezettingsgraad</span></div>
-    <div><b id="cVrij">—</b><span>uur per week vrij</span></div>
-  </div>
 
   <div class="st-grid">
 
@@ -205,25 +199,5 @@
 </div>
 
 <script src="cms.js"></script>
-<script>
-(function(){
-  /* de cijfers in de kop komen uit dezelfde demo-data als de rest */
-  var data = Reijn.load();
-  var actief = data.pages.filter(function(p){ return p.status !== 'arch'; });
-
-  var cap = 0, bezet = 0;
-  actief.forEach(function(p){
-    var i = Reijn.inzetInfo(p);
-    cap += i.capaciteit; bezet += i.bezet;
-  });
-  var open = (data.voorstellen || []).filter(function(v){
-    return v.status === 'voorstel' || v.status === 'wachten'; }).length;
-
-  document.getElementById('cProfielen').textContent = actief.length;
-  document.getElementById('cVoorstellen').textContent = open;
-  document.getElementById('cBezetting').textContent = cap ? Math.round(bezet / cap * 100) + '%' : '—';
-  document.getElementById('cVrij').textContent = cap - bezet;
-})();
-</script>
 </body>
 </html>

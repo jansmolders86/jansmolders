@@ -13,11 +13,11 @@
      ontbreken, dan valt alles terug op white label in plaats van te breken. */
   if (!global.Merk) {
     global.Merk = {
-      actief: 'whitelabel', naam: 'Visueel CV', org: 'Voorbeeld', domein: 'voorbeeld.nl',
+      actief: 'whitelabel', naam: 'Syno', org: 'Voorbeeld', domein: 'voorbeeld.nl',
       product: 'Visueel CV', productMv: "Visuele CV's",
       url: function (u) { return u; },
       tekst: function (t) { return t; },
-      MERKEN: { whitelabel: { naam: 'Visueel CV', logo: null, logoLight: null } }
+      MERKEN: { whitelabel: { naam: 'Syno', logo: null, logoLight: null } }
     };
   }
 
@@ -244,7 +244,43 @@
         rol:'Adviseur digitalisering', uren:20, tarief:95, start:over(50),
         status:'afgewezen', verstuurd:over(-26), gewijzigd:over(-12), variant:'Gemeente',
         notitie:'Ze kozen voor een kandidaat met meer ervaring in het sociaal domein.',
-        historie:[{status:'voorstel',datum:over(-26)},{status:'wachten',datum:over(-20)},{status:'afgewezen',datum:over(-12)}] }
+        historie:[{status:'voorstel',datum:over(-26)},{status:'wachten',datum:over(-20)},{status:'afgewezen',datum:over(-12)}] },
+
+      { id:'v10', pagina:'sanne-de-vries', klant:'Amphia', contact:'Marc de Wit',
+        rol:'Business controller zorgvastgoed', uren:24, tarief:108, start:over(55),
+        status:'wachten', verstuurd:over(-14), gewijzigd:over(-7), variant:'Ziekenhuis',
+        notitie:'Sanne komt in oktober vrij; Amphia weet dat en wacht daarop.',
+        historie:[{status:'voorstel',datum:over(-14)},{status:'wachten',datum:over(-7)}] },
+
+      { id:'v11', pagina:'kim-vermeer', klant:'Gemeente Nijmegen', contact:'Joris Kleijn',
+        rol:'Trainer teamontwikkeling', uren:12, tarief:110, start:over(42),
+        status:'voorstel', verstuurd:over(-2), gewijzigd:over(-2), variant:'Gemeente',
+        notitie:'Vraag kwam via het netwerk van Kim zelf.',
+        historie:[{status:'voorstel',datum:over(-2)}] },
+
+      { id:'v12', pagina:'daan-mulder', klant:'ROC Rijnmond', contact:'Sandra Beek',
+        rol:'Recruiter onderwijspersoneel', uren:16, tarief:92, start:over(30),
+        status:'afgewezen', verstuurd:over(-48), gewijzigd:over(-29), variant:'Onderwijs',
+        notitie:'Vacature is intern ingevuld.',
+        historie:[{status:'voorstel',datum:over(-48)},{status:'wachten',datum:over(-38)},{status:'afgewezen',datum:over(-29)}] },
+
+      { id:'v13', pagina:'noor-jansen', klant:'Radboudumc', contact:'Marieke Doornbos',
+        rol:'Organisatieadviseur zorgteams', uren:8, tarief:104, start:over(65),
+        status:'voorstel', verstuurd:over(-6), gewijzigd:over(-6), variant:'Ziekenhuis',
+        notitie:'Marieke vroeg of we nog iemand hadden naast Gijs.',
+        historie:[{status:'voorstel',datum:over(-6)}] },
+
+      { id:'v14', pagina:'fatima-el-amrani', klant:'Waterschap Rivierenland', contact:'Hugo Bergsma',
+        rol:'Projectleider omgevingswet', uren:8, tarief:112, start:over(75),
+        status:'akkoord', verstuurd:over(-52), gewijzigd:over(-16), variant:'Gemeente',
+        notitie:'Akkoord, start zodra het Arnhemse traject afloopt.',
+        historie:[{status:'voorstel',datum:over(-52)},{status:'wachten',datum:over(-40)},{status:'akkoord',datum:over(-16)}] },
+
+      { id:'v15', pagina:'thomas-bakker', klant:'Zorggroep Helmond', contact:'Marc de Wit',
+        rol:'Projectleider EPD-migratie', uren:24, tarief:98, start:over(20),
+        status:'wachten', verstuurd:over(-9), gewijzigd:over(-2), variant:'Zorg',
+        notitie:'Marc legt het voor aan de raad van bestuur.',
+        historie:[{status:'voorstel',datum:over(-9)},{status:'wachten',datum:over(-2)}] }
     ];
   }
 

@@ -3,12 +3,27 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Reijn CMS — Sales</title>
+<meta name="description" content="Salesflow in Syno: van voorstel tot akkoord.">
+<meta name="application-name" content="Syno">
+<meta name="theme-color" content="#3B6FD4">
+<title>Sales · Syno — Reijn</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="cms.css">
 <style>
+  /* ---------- uitlegbalk ---------- */
+  .uitlegbalk{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px;padding:13px 18px;
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;font-size:13.5px}
+  .uitlegbalk .stap{display:inline-flex;align-items:center;gap:8px;color:var(--ink)}
+  .uitlegbalk .stap b{width:20px;height:20px;border-radius:50%;background:var(--paper-2);color:var(--ink-soft);
+    display:grid;place-items:center;font-family:var(--mono);font-size:11px;font-weight:700}
+  .uitlegbalk .stap.klaar b{background:var(--teal);color:#fff}
+  .uitlegbalk .pijl{color:var(--ink-soft);font-family:var(--mono)}
+  .uitlegbalk .grow{flex:1}
+  .uitlegbalk .hint{color:var(--ink-soft);font-size:12.5px}
+  @media(max-width:900px){.uitlegbalk .hint,.uitlegbalk .pijl{display:none}}
+
   /* ---------- het bord ---------- */
   .bord{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;align-items:start}
   @media(max-width:1100px){.bord{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -66,7 +81,7 @@
 <body>
 
 <aside class="sidebar">
-  <div class="sb-brand"><img src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><span class="tag">CMS</span></div>
+  <div class="sb-brand"><img src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><span class="tag">Syno</span></div>
   <nav class="sb-nav">
     <div class="sb-groep">Beheer</div>
     <a href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
@@ -84,7 +99,7 @@
 </aside>
 
 <div class="mobile-top">
-  <img class="lg" src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><span class="tag">CMS</span>
+  <img class="lg" src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><span class="tag">Syno</span>
   <span class="mu"><img src="lieve.jpg" alt=""></span>
 </div>
 <nav class="mobile-nav">
@@ -109,6 +124,18 @@
     <div class="kpi c-teal"><div class="lbl">Akkoord</div><div class="val" id="kAkkoord">—</div><div class="sub" id="kAkkoordSub">—</div></div>
     <div class="kpi c-tangerine"><div class="lbl">Scoringskans</div><div class="val" id="kScore">—</div><div class="sub">akkoord t.o.v. afgerond</div></div>
   </section>
+
+  <div class="uitlegbalk">
+    <span class="stap"><b>1</b> Profiel verstuurd</span>
+    <span class="pijl">→</span>
+    <span class="stap"><b>2</b> Klant denkt na</span>
+    <span class="pijl">→</span>
+    <span class="stap"><b>3</b> Akkoord of afgewezen</span>
+    <span class="pijl">→</span>
+    <span class="stap klaar"><b>4</b> Inzet vastleggen</span>
+    <span class="grow"></span>
+    <span class="hint">Sleep een kaart naar de volgende kolom, of klik hem open voor het verloop.</span>
+  </div>
 
   <div class="bord" id="bord"></div>
 </main>
@@ -160,6 +187,16 @@
 (function(){
   var data = Reijn.load();
   var q = '', open = null;
+
+  /* Draait deze pagina tegen een oudere cms.js of een oude opgeslagen demo,
+     dan ontbreken de voorstellen. Zeg dat dan, in plaats van een leeg bord. */
+  if (!Reijn.SALES || !data.voorstellen){
+    document.getElementById('bord').innerHTML =
+      '<div class="empty" style="grid-column:1/-1;background:var(--surface);border:1px solid var(--line);border-radius:18px">'+
+      '<strong>De demo-data is verouderd</strong>Deze pagina hoort bij een nieuwere cms.js. '+
+      'Ververs de pagina, of zet de demo terug via Instellingen → Demo resetten.</div>';
+    return;
+  }
 
   function pagina(id){ return data.pages.filter(function(p){ return p.id === id; })[0] || {}; }
 

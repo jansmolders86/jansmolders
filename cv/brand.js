@@ -13,12 +13,12 @@
 
   var MERKEN = {
     whitelabel: {
-      naam: 'Visueel CV',            // productnaam in de zijbalk
+      naam: 'Syno',                  // naam van het pakket zelf
       org: 'Voorbeeld',              // organisatienaam in teksten en e-mails
       product: 'Visueel CV', productMv: "Visuele CV's",
       domein: 'voorbeeld.nl',
       adres: null, adresCv: null,    // null = het bestaande adres laten staan
-      voettekst: 'Een profiel van Visueel CV',
+      voettekst: 'Een profiel uit Syno',
       contact: {
         naam: 'Robin de Vries', voornaam: 'Robin', rol: 'Relatiebeheerder',
         tel: '010 - 123 45 67', telHref: '0101234567',
@@ -155,6 +155,8 @@
   function herschrijfTekstknoop(t) {
     var ouder = t.parentNode;
     if (!ouder || OVERSLAAN[ouder.nodeName]) return;
+    // een merkkiezer noemt alle merken bij naam; die mogen niet meeveranderen
+    if (ouder.closest && ouder.closest('[data-merkvast]')) return;
     var v = t.nodeValue;
     if (!v || !RAAKT.test(v)) return;
     var nieuw = herschrijf(v);
@@ -221,6 +223,16 @@
       if (RAAKT.test(h)) a.setAttribute('href', herschrijf(h));
     });
 
+    /* metagegevens: wat een linkvoorbeeld of tabblad toont */
+    Array.prototype.forEach.call(
+      document.querySelectorAll('meta[name="description"],meta[property="og:title"],meta[property="og:description"]'),
+      function (m) {
+        var v = m.getAttribute('content');
+        if (v && RAAKT.test(v)) m.setAttribute('content', herschrijf(v));
+      });
+    var thema = document.querySelector('meta[name="theme-color"]');
+    if (thema) thema.setAttribute('content', merk.kleur);
+
     /* de zin onder het logo in de voettekst */
     if (merk.voettekst) {
       Array.prototype.forEach.call(document.querySelectorAll('.foot-tag'), function (el) {
@@ -244,6 +256,8 @@
     /* alle interne links het merk laten meenemen */
     if (actief !== 'whitelabel') {
       Array.prototype.forEach.call(document.querySelectorAll('a[href]'), function (a) {
+        // de merkkiezer wijst juist naar de ándere merken: die links met rust laten
+        if (a.closest('[data-merkvast]')) return;
         var h = a.getAttribute('href');
         if (h && h.indexOf('.html') > -1) a.setAttribute('href', merkUrl(h));
       });
