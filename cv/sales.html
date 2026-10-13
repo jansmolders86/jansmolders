@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="description" content="Salesflow in Syno: van voorstel tot akkoord.">
+<meta name="description" content="Salesflow in Syno: van opzet tot akkoord.">
 <meta name="application-name" content="Syno">
 <meta name="theme-color" content="#3B6FD4">
 <title>Sales · Syno — Reijn</title>
@@ -119,7 +119,7 @@
   </div>
 
   <section class="kpis">
-    <div class="kpi c-petrol"><div class="lbl">Open voorstellen</div><div class="val" id="kOpen">—</div><div class="sub" id="kOpenSub">—</div></div>
+    <div class="kpi c-petrol"><div class="lbl">Open trajecten</div><div class="val" id="kOpen">—</div><div class="sub" id="kOpenSub">—</div></div>
     <div class="kpi c-mustard"><div class="lbl">Ligt stil</div><div class="val" id="kStil">—</div><div class="sub">langer dan 2 weken niets gehoord</div></div>
     <div class="kpi c-teal"><div class="lbl">Akkoord</div><div class="val" id="kAkkoord">—</div><div class="sub" id="kAkkoordSub">—</div></div>
     <div class="kpi c-tangerine"><div class="lbl">Scoringskans</div><div class="val" id="kScore">—</div><div class="sub">akkoord t.o.v. afgerond</div></div>
@@ -359,13 +359,13 @@
       tip.className = past ? 'note' : 'note warn';
       document.getElementById('vTipTx').textContent = past
         ? (p.naam || '') + ' heeft ' + inz.vrij + ' uur vrij — deze ' + v.uren + ' uur passen erin.'
-        : (p.naam || '') + ' heeft nog maar ' + inz.vrij + ' uur vrij, dit voorstel vraagt er ' + v.uren + '.';
+        : (p.naam || '') + ' heeft nog maar ' + inz.vrij + ' uur vrij, dit traject vraagt er ' + v.uren + '.';
     } else {
       inplan.style.display = 'none';
       tip.style.display = i.treuzelt ? '' : 'none';
       tip.className = 'note warn';
       if (i.treuzelt) document.getElementById('vTipTx').textContent =
-        'Dit voorstel ligt ' + i.stilTekst.replace(' geleden','') + ' stil. Tijd om ' +
+        'Dit traject ligt ' + i.stilTekst.replace(' geleden','') + ' stil. Tijd om ' +
         (v.contact || 'de klant') + ' te bellen?';
     }
 
