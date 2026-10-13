@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Salesflow in Syno: van voorstel tot akkoord.">
+<meta name="application-name" content="Syno">
+<meta name="theme-color" content="#3B6FD4">
+<title>Sales · Syno — Reijn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="cms.css">
+<style>
+  /* ---------- uitlegbalk ---------- */
+  .uitlegbalk{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px;padding:13px 18px;
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;font-size:13.5px}
+  .uitlegbalk .stap{display:inline-flex;align-items:center;gap:8px;color:var(--ink)}
+  .uitlegbalk .stap b{width:20px;height:20px;border-radius:50%;background:var(--paper-2);color:var(--ink-soft);
+    display:grid;place-items:center;font-family:var(--mono);font-size:11px;font-weight:700}
+  .uitlegbalk .stap.klaar b{background:var(--teal);color:#fff}
+  .uitlegbalk .pijl{color:var(--ink-soft);font-family:var(--mono)}
+  .uitlegbalk .grow{flex:1}
+  .uitlegbalk .hint{color:var(--ink-soft);font-size:12.5px}
+  @media(max-width:900px){.uitlegbalk .hint,.uitlegbalk .pijl{display:none}}
+
+  /* ---------- het bord ---------- */
+  .bord{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;align-items:start}
+  @media(max-width:1100px){.bord{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:640px){.bord{grid-template-columns:minmax(0,1fr)}}
+
+  .kolom{background:var(--surface);border:1px solid var(--line);border-radius:18px;
+    display:flex;flex-direction:column;min-height:220px;transition:background .15s,border-color .15s}
+  .kolom.sleep{border-color:var(--tangerine);background:color-mix(in srgb,var(--tangerine) 7%,var(--surface))}
+  .kolom-kop{padding:15px 16px 12px;border-bottom:1px solid var(--line)}
+  .kolom-kop .rij{display:flex;align-items:center;gap:9px}
+  .kolom-kop .stip{width:10px;height:10px;border-radius:3px;flex:0 0 auto;transform:rotate(45deg)}
+  .kolom-kop h2{font-family:var(--display);font-size:15px;margin:0;font-weight:700;flex:1;min-width:0}
+  .kolom-kop .n{font-family:var(--mono);font-size:12px;background:var(--paper-2);color:var(--ink-soft);
+    padding:2px 8px;border-radius:999px}
+  .kolom-kop .sub{font-size:11.5px;color:var(--ink-soft);margin-top:5px}
+  .stapel{padding:12px;display:flex;flex-direction:column;gap:10px;flex:1}
+  .kolom .leeg{border:1.5px dashed var(--line);border-radius:13px;padding:20px 12px;text-align:center;
+    color:var(--ink-soft);font-size:12.5px}
+
+  /* ---------- kaart ---------- */
+  .kaart{background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--line);
+    border-radius:12px;padding:12px 13px;cursor:grab;transition:box-shadow .15s,transform .15s}
+  .kaart:hover{box-shadow:0 10px 22px -16px rgba(34,30,26,.6);transform:translateY(-1px)}
+  .kaart:active{cursor:grabbing}
+  .kaart.weg{opacity:.4}
+  .kaart .kop{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+  .kaart .kop .nm{font-weight:700;font-size:13.5px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .kaart .klant{font-size:13.5px;font-weight:600}
+  .kaart .rol{font-size:12.5px;color:var(--ink-soft);line-height:1.4;margin-top:1px}
+  .kaart .voet{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .kaart .uren{font-family:var(--mono);font-size:11px;background:var(--paper-2);color:var(--ink-soft);
+    padding:3px 7px;border-radius:6px}
+  .kaart .stil{font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);margin-left:auto}
+  .kaart .vlag{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;
+    background:color-mix(in srgb,var(--clay) 16%,transparent);color:var(--clay);padding:3px 8px;border-radius:999px}
+
+  /* ---------- detail ---------- */
+  .tijdlijn{border-left:2px solid var(--line);margin:4px 0 0 7px;padding-left:16px}
+  .tijdlijn .stap{position:relative;padding:9px 0;font-size:13.5px}
+  .tijdlijn .stap::before{content:"";position:absolute;left:-23px;top:14px;width:10px;height:10px;
+    border-radius:50%;border:2px solid var(--surface)}
+  .tijdlijn .stap b{font-weight:700}
+  .tijdlijn .stap span{display:block;font-family:var(--mono);font-size:11px;color:var(--ink-soft)}
+  .statuskiezer{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+  .statuskiezer button{display:flex;align-items:center;gap:9px;border:1.5px solid var(--line);
+    background:var(--paper);border-radius:12px;padding:11px 12px;cursor:pointer;font-family:var(--body);
+    font-size:13.5px;font-weight:600;text-align:left}
+  .statuskiezer button:hover{border-color:var(--tangerine)}
+  .statuskiezer button.on{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+  .statuskiezer .stip{width:10px;height:10px;border-radius:3px;flex:0 0 auto;transform:rotate(45deg)}
+</style>
+<link rel="stylesheet" href="brand.css">
+<script src="brand.js"></script>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-brand"><img src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><img class="syno" src="syno-woordmerk-light.png" alt="Syno"></div>
+  <nav class="sb-nav">
+    <div class="sb-groep">Beheer</div>
+    <a href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
+    <a href="paginas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>Pagina's <span class="badge" data-badge="pages">3</span></a>
+    <a class="active" href="sales.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg>Sales <span class="badge" data-badge="sales">3</span></a>
+    <a href="inzet.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/><path d="M12 15v3"/></svg>Inzet <span class="badge" data-badge="inzet">3</span></a>
+    <a href="berichten.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>Berichten <span class="badge" data-badge="mail">3</span></a>
+    <div class="sb-groep">Analyse</div>
+    <a href="analytics.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>Analyse</a>
+    <div class="sb-groep">Systeem</div>
+    <a href="instellingen.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1L14.5 2h-5l-.4 2.6a7 7 0 0 0-1.7 1l-2.3-1-2 3.4L3 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1l.4 2.6h5l.4-2.6a7 7 0 0 0 1.7-1l2.3 1 2-3.4-2-1.5a7 7 0 0 0 .1-1z"/></svg>Instellingen</a>
+    <a class="sb-terug" href="start.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Terug naar de start</a>
+  </nav>
+  <div class="sb-user"><img src="lieve.jpg" alt=""><div><div class="nm">Lieve van der Weijde</div><div class="rl">Relatiebeheerder</div></div></div>
+</aside>
+
+<div class="mobile-top">
+  <img class="lg" src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><img class="syno" src="syno-woordmerk-light.png" alt="Syno">
+  <span class="mu"><img src="lieve.jpg" alt=""></span>
+</div>
+<nav class="mobile-nav">
+  <a href="start.html">← Start</a><a href="dashboard.html">Dashboard</a><a href="paginas.html">Pagina's</a><a class="active" href="sales.html">Sales</a><a href="inzet.html">Inzet</a><a href="berichten.html">Berichten</a><a href="analytics.html">Analyse</a><a href="instellingen.html">Instellingen</a>
+</nav>
+
+<main class="main">
+  <div class="topbar">
+    <div class="greet">
+      <div class="crumbs"><a href="start.html">Start</a> › <span>Sales</span></div>
+      <h1>Sales</h1>
+      <p>Van verstuurd profiel tot akkoord — sleep een kaart naar de volgende stap.</p>
+    </div>
+    <div class="grow"></div>
+    <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg><input id="q" placeholder="Zoek op consultant, klant of rol…"></div>
+    <a class="btn accent" href="berichten.html?compose=1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg>Profiel versturen</a>
+  </div>
+
+  <section class="kpis">
+    <div class="kpi c-petrol"><div class="lbl">Open voorstellen</div><div class="val" id="kOpen">—</div><div class="sub" id="kOpenSub">—</div></div>
+    <div class="kpi c-mustard"><div class="lbl">Ligt stil</div><div class="val" id="kStil">—</div><div class="sub">langer dan 2 weken niets gehoord</div></div>
+    <div class="kpi c-teal"><div class="lbl">Akkoord</div><div class="val" id="kAkkoord">—</div><div class="sub" id="kAkkoordSub">—</div></div>
+    <div class="kpi c-tangerine"><div class="lbl">Scoringskans</div><div class="val" id="kScore">—</div><div class="sub">akkoord t.o.v. afgerond</div></div>
+  </section>
+
+  <div class="uitlegbalk">
+    <span class="stap"><b>1</b> Profiel verstuurd</span>
+    <span class="pijl">→</span>
+    <span class="stap"><b>2</b> Klant denkt na</span>
+    <span class="pijl">→</span>
+    <span class="stap"><b>3</b> Akkoord of afgewezen</span>
+    <span class="pijl">→</span>
+    <span class="stap klaar"><b>4</b> Inzet vastleggen</span>
+    <span class="grow"></span>
+    <span class="hint">Sleep een kaart naar de volgende kolom, of klik hem open voor het verloop.</span>
+  </div>
+
+  <div class="bord" id="bord"></div>
+</main>
+
+<!-- ============ kaart openen ============ -->
+<div class="ov" id="mKaart">
+  <div class="modal">
+    <div class="modal-head">
+      <div><h3 id="vTitel">—</h3><p id="vSub">—</p></div>
+      <button class="iconbtn x" data-close aria-label="Sluiten">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="row3" style="margin-bottom:18px">
+        <div><div class="mono muted" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase">Omvang</div>
+          <div style="font-family:var(--display);font-weight:800;font-size:21px" id="vUren">—</div></div>
+        <div><div class="mono muted" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase">Tarief</div>
+          <div style="font-family:var(--display);font-weight:800;font-size:21px" id="vTarief">—</div></div>
+        <div><div class="mono muted" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase">Beoogde start</div>
+          <div style="font-family:var(--display);font-weight:800;font-size:21px" id="vStart">—</div></div>
+      </div>
+
+      <div class="field"><label>Status</label></div>
+      <div class="statuskiezer" id="vStatus"></div>
+
+      <div class="field" style="margin-top:18px"><label for="vNotitie">Notitie</label>
+        <textarea id="vNotitie" style="min-height:80px"></textarea></div>
+
+      <div class="field" style="margin-bottom:6px"><label>Verloop</label></div>
+      <div class="tijdlijn" id="vHistorie"></div>
+
+      <div class="note" id="vTip" style="margin-top:16px;display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+        <span id="vTipTx"></span>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <a class="btn line" id="vProfiel" href="pagina.html" style="margin-right:auto">Profiel openen</a>
+      <a class="btn line" id="vMail" href="berichten.html">Klant mailen</a>
+      <button class="btn accent" id="vInplannen" style="display:none">Inzet vastleggen</button>
+      <button class="btn ghost" data-close>Sluiten</button>
+    </div>
+  </div>
+</div>
+
+<div class="demo-flag">Demo — nepdata</div>
+
+<script src="cms.js"></script>
+<script>
+(function(){
+  var data = Reijn.load();
+  var q = '', open = null;
+
+  /* Draait deze pagina tegen een oudere cms.js of een oude opgeslagen demo,
+     dan ontbreken de voorstellen. Zeg dat dan, in plaats van een leeg bord. */
+  if (!Reijn.SALES || !data.voorstellen){
+    document.getElementById('bord').innerHTML =
+      '<div class="empty" style="grid-column:1/-1;background:var(--surface);border:1px solid var(--line);border-radius:18px">'+
+      '<strong>De demo-data is verouderd</strong>Deze pagina hoort bij een nieuwere cms.js. '+
+      'Ververs de pagina, of zet de demo terug via Instellingen → Demo resetten.</div>';
+    return;
+  }
+
+  function pagina(id){ return data.pages.filter(function(p){ return p.id === id; })[0] || {}; }
+
+  function lijst(){
+    return (data.voorstellen || []).filter(function(v){
+      if (!q) return true;
+      var p = pagina(v.pagina);
+      return ((p.naam || '') + ' ' + v.klant + ' ' + v.rol + ' ' + (v.contact || '')).toLowerCase().indexOf(q) > -1;
+    });
+  }
+
+  /* ---------- kerncijfers ---------- */
+  function kpis(){
+    var alles = data.voorstellen || [];
+    var openV = alles.filter(function(v){ return Reijn.voorstelInfo(v).open; });
+    var stil = openV.filter(function(v){ return Reijn.voorstelInfo(v).treuzelt; });
+    var akkoord = alles.filter(function(v){ return v.status === 'akkoord'; });
+    var afgewezen = alles.filter(function(v){ return v.status === 'afgewezen'; });
+    var afgerond = akkoord.length + afgewezen.length;
+
+    document.getElementById('kOpen').textContent = openV.length;
+    document.getElementById('kOpenSub').textContent =
+      openV.reduce(function(a,v){ return a + v.uren; }, 0) + ' uur per week in de markt';
+    document.getElementById('kStil').textContent = stil.length;
+    document.getElementById('kAkkoord').textContent = akkoord.length;
+    document.getElementById('kAkkoordSub').textContent =
+      akkoord.reduce(function(a,v){ return a + v.uren; }, 0) + ' uur per week gewonnen';
+    document.getElementById('kScore').textContent =
+      afgerond ? Math.round(akkoord.length / afgerond * 100) + '%' : '—';
+  }
+
+  /* ---------- het bord ---------- */
+  function tekenBord(){
+    var items = lijst();
+    document.getElementById('bord').innerHTML = Reijn.SALES.map(function(s){
+      var kaarten = items.filter(function(v){ return v.status === s.sleutel; })
+        .sort(function(a,b){ return Reijn.voorstelInfo(b).stil - Reijn.voorstelInfo(a).stil; });
+      var uren = kaarten.reduce(function(a,v){ return a + v.uren; }, 0);
+
+      return '<section class="kolom" data-kolom="'+s.sleutel+'">'+
+        '<div class="kolom-kop">'+
+          '<div class="rij"><span class="stip" style="background:'+s.kleur+'"></span>'+
+            '<h2>'+s.label+'</h2><span class="n">'+kaarten.length+'</span></div>'+
+          '<div class="sub">'+(kaarten.length ? uren + ' uur per week' : s.uitleg)+'</div>'+
+        '</div>'+
+        '<div class="stapel" data-stapel="'+s.sleutel+'">'+
+          (kaarten.map(kaart).join('') ||
+           '<div class="leeg">Sleep hier een kaart naartoe</div>')+
+        '</div>'+
+      '</section>';
+    }).join('');
+    koppelSlepen();
+  }
+
+  function kaart(v){
+    var p = pagina(v.pagina), i = Reijn.voorstelInfo(v);
+    return '<article class="kaart" draggable="true" data-id="'+v.id+'" style="border-left-color:'+i.status.kleur+'">'+
+      '<div class="kop"><span class="avatar sm" style="background:'+(p.kleur||'var(--petrol)')+'">'+
+        Reijn.esc(p.init||'?')+'</span><span class="nm">'+Reijn.esc(p.naam||'Onbekend')+'</span></div>'+
+      '<div class="klant">'+Reijn.esc(v.klant)+'</div>'+
+      '<div class="rol">'+Reijn.esc(v.rol)+'</div>'+
+      '<div class="voet">'+
+        '<span class="uren">'+v.uren+' u/wk</span>'+
+        (i.treuzelt ? '<span class="vlag">ligt stil</span>' : '')+
+        '<span class="stil">'+i.stilTekst+'</span>'+
+      '</div>'+
+    '</article>';
+  }
+
+  /* ---------- slepen ---------- */
+  var sleept = null;
+
+  function koppelSlepen(){
+    document.querySelectorAll('.kaart').forEach(function(k){
+      k.addEventListener('dragstart', function(e){
+        sleept = k.getAttribute('data-id');
+        k.classList.add('weg');
+        if (e.dataTransfer){ e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', sleept); }
+      });
+      k.addEventListener('dragend', function(){ k.classList.remove('weg'); sleept = null; });
+      k.addEventListener('click', function(){ openKaart(k.getAttribute('data-id')); });
+    });
+
+    document.querySelectorAll('.kolom').forEach(function(kol){
+      kol.addEventListener('dragover', function(e){ e.preventDefault(); kol.classList.add('sleep'); });
+      kol.addEventListener('dragleave', function(){ kol.classList.remove('sleep'); });
+      kol.addEventListener('drop', function(e){
+        e.preventDefault();
+        kol.classList.remove('sleep');
+        var id = sleept || (e.dataTransfer && e.dataTransfer.getData('text/plain'));
+        if (id) zetStatus(id, kol.getAttribute('data-kolom'));
+      });
+    });
+  }
+
+  /* ---------- status wijzigen ---------- */
+  function zetStatus(id, nieuw){
+    var v = (data.voorstellen || []).filter(function(x){ return x.id === id; })[0];
+    if (!v || v.status === nieuw) return;
+
+    v.status = nieuw;
+    v.gewijzigd = Reijn.iso(Reijn.VANDAAG);
+    v.historie = v.historie || [];
+    v.historie.push({ status: nieuw, datum: v.gewijzigd });
+
+    var p = pagina(v.pagina);
+    data.activity.unshift({ ic:'check', kleur: Reijn.SALES_BIJ[nieuw].kleur,
+      tekst:'<b>'+Reijn.esc(p.naam||'')+'</b> bij '+Reijn.esc(v.klant)+': '+Reijn.SALES_BIJ[nieuw].label.toLowerCase(),
+      tijd:'nu' });
+    Reijn.save(data);
+
+    Reijn.toast(v.klant + ' — ' + Reijn.SALES_BIJ[nieuw].label.toLowerCase());
+    alles();
+    if (open === id) openKaart(id);
+  }
+
+  /* ---------- kaart openen ---------- */
+  function openKaart(id){
+    var v = (data.voorstellen || []).filter(function(x){ return x.id === id; })[0];
+    if (!v) return;
+    open = id;
+    var p = pagina(v.pagina), i = Reijn.voorstelInfo(v);
+
+    document.getElementById('vTitel').textContent = (p.naam || '') + ' → ' + v.klant;
+    document.getElementById('vSub').innerHTML = Reijn.esc(v.rol) +
+      (v.contact ? ' · contact: <b>' + Reijn.esc(v.contact) + '</b>' : '') +
+      ' · verstuurd ' + i.verstuurdKort;
+    document.getElementById('vUren').textContent = v.uren + ' u/wk';
+    document.getElementById('vTarief').textContent = '€ ' + v.tarief;
+    document.getElementById('vStart').textContent = i.startKort;
+    document.getElementById('vNotitie').value = v.notitie || '';
+    document.getElementById('vProfiel').href = Merk.url('pagina.html?id=' + v.pagina);
+    document.getElementById('vMail').href = Merk.url('berichten.html?compose=1&page=' + v.pagina);
+
+    document.getElementById('vStatus').innerHTML = Reijn.SALES.map(function(s){
+      return '<button data-zet="'+s.sleutel+'"'+(s.sleutel===v.status?' class="on"':'')+'>'+
+        '<span class="stip" style="background:'+s.kleur+'"></span>'+s.label+'</button>';
+    }).join('');
+
+    document.getElementById('vHistorie').innerHTML = (v.historie || []).map(function(h){
+      var s = Reijn.SALES_BIJ[h.status] || Reijn.SALES[0];
+      return '<div class="stap" style="--k:'+s.kleur+'">'+
+        '<b>'+s.label+'</b><span>'+Reijn.datumKort(h.datum)+'</span></div>';
+    }).join('');
+    document.querySelectorAll('#vHistorie .stap').forEach(function(el, n){
+      var s = Reijn.SALES_BIJ[(v.historie[n]||{}).status] || Reijn.SALES[0];
+      el.style.setProperty('--k', s.kleur);
+      el.querySelector('b').style.color = 'var(--ink)';
+    });
+
+    // bij akkoord: de logische volgende stap is inplannen
+    var inplan = document.getElementById('vInplannen');
+    var tip = document.getElementById('vTip');
+    if (v.status === 'akkoord'){
+      var inz = Reijn.inzetInfo(p);
+      var past = inz.vrij >= v.uren;
+      inplan.style.display = '';
+      inplan.textContent = past ? 'Inzet vastleggen' : 'Inzet bekijken';
+      tip.style.display = '';
+      tip.className = past ? 'note' : 'note warn';
+      document.getElementById('vTipTx').textContent = past
+        ? (p.naam || '') + ' heeft ' + inz.vrij + ' uur vrij — deze ' + v.uren + ' uur passen erin.'
+        : (p.naam || '') + ' heeft nog maar ' + inz.vrij + ' uur vrij, dit voorstel vraagt er ' + v.uren + '.';
+    } else {
+      inplan.style.display = 'none';
+      tip.style.display = i.treuzelt ? '' : 'none';
+      tip.className = 'note warn';
+      if (i.treuzelt) document.getElementById('vTipTx').textContent =
+        'Dit voorstel ligt ' + i.stilTekst.replace(' geleden','') + ' stil. Tijd om ' +
+        (v.contact || 'de klant') + ' te bellen?';
+    }
+
+    Reijn.openModal('mKaart');
+  }
+
+  document.getElementById('vStatus').addEventListener('click', function(e){
+    var b = e.target.closest('[data-zet]'); if (!b) return;
+    zetStatus(open, b.getAttribute('data-zet'));
+  });
+
+  document.getElementById('vNotitie').addEventListener('input', function(){
+    var v = (data.voorstellen || []).filter(function(x){ return x.id === open; })[0];
+    if (!v) return;
+    v.notitie = this.value;
+    clearTimeout(this._t);
+    this._t = setTimeout(function(){ Reijn.save(data); }, 400);
+  });
+
+  /* akkoord omzetten in een echte opdracht */
+  document.getElementById('vInplannen').addEventListener('click', function(){
+    var v = (data.voorstellen || []).filter(function(x){ return x.id === open; })[0];
+    if (!v) return;
+    var p = pagina(v.pagina), inz = Reijn.inzetInfo(p);
+    if (inz.vrij < v.uren){
+      window.location.href = Merk.url('inzet.html');
+      return;
+    }
+    var eind = new Date(Reijn.VANDAAG);
+    eind.setFullYear(eind.getFullYear() + 1);
+    p.inzet = p.inzet || { capaciteit: 36, opdrachten: [], eerder: [] };
+    p.inzet.opdrachten.push({
+      klant: v.klant, rol: v.rol, uren: v.uren, start: v.start, eind: Reijn.iso(eind),
+      tarief: v.tarief, verlenging: null, contact: v.contact
+    });
+    p.inzet.beschikbaarVanaf = null;
+    p.bijgewerkt = 'zojuist';
+    v.ingepland = true;
+    data.activity.unshift({ ic:'clock', kleur:'var(--teal)',
+      tekst:'<b>'+Reijn.esc(p.naam)+'</b> ingepland bij '+Reijn.esc(v.klant)+' voor '+v.uren+' uur', tijd:'nu' });
+    Reijn.save(data);
+    Reijn.closeModal('mKaart');
+    Reijn.toast(p.naam.split(' ')[0] + ' staat ingepland bij ' + v.klant + ' ✓');
+    alles();
+  });
+
+  document.getElementById('q').addEventListener('input', function(e){
+    q = e.target.value.toLowerCase().trim(); tekenBord();
+  });
+
+  function alles(){ kpis(); tekenBord(); Reijn.animeer(); }
+  alles();
+})();
+</script>
+</body>
+</html>
