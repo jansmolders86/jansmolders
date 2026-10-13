@@ -3,11 +3,16 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Reijn CMS — Pagina's</title>
+<meta name="description" content="Alle consultantprofielen en hun varianten in Syno.">
+<meta name="application-name" content="Syno">
+<meta name="theme-color" content="#3B6FD4">
+<title>Pagina's · Syno — Reijn</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="cms.css">
+<link rel="stylesheet" href="brand.css">
+<script src="brand.js"></script>
 </head>
 <body>
 
@@ -16,14 +21,20 @@
   <div class="sb-brand">
     <img src="reijn-logo-light.png" alt="Reijn logo">
     <span class="wm">Reijn</span>
-    <span class="tag">CMS</span>
+    <img class="syno" src="syno-woordmerk-light.png" alt="Syno">
   </div>
   <nav class="sb-nav">
+    <div class="sb-groep">Beheer</div>
     <a href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
-    <a class="active" href="paginas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>Pagina's <span class="badge" data-badge="pages">47</span></a>
-    <a href="analytics.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>Analytics</a>
-    <a href="berichten.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>Berichten <span class="badge" data-badge="mail">2</span></a>
+    <a class="active" href="paginas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>Pagina's <span class="badge" data-badge="pages">3</span></a>
+    <a href="sales.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg>Sales <span class="badge" data-badge="sales">3</span></a>
+    <a href="inzet.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/><path d="M12 15v3"/></svg>Inzet <span class="badge" data-badge="inzet">3</span></a>
+    <a href="berichten.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>Berichten <span class="badge" data-badge="mail">3</span></a>
+    <div class="sb-groep">Analyse</div>
+    <a href="analytics.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>Analyse</a>
+    <div class="sb-groep">Systeem</div>
     <a href="instellingen.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1L14.5 2h-5l-.4 2.6a7 7 0 0 0-1.7 1l-2.3-1-2 3.4L3 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1l.4 2.6h5l.4-2.6a7 7 0 0 0 1.7-1l2.3 1 2-3.4-2-1.5a7 7 0 0 0 .1-1z"/></svg>Instellingen</a>
+    <a class="sb-terug" href="start.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Terug naar de start</a>
   </nav>
   <div class="sb-user">
     <img src="lieve.jpg" alt="">
@@ -34,15 +45,11 @@
 <!-- ============ MOBIEL ============ -->
 <div class="mobile-top">
   <img class="lg" src="reijn-logo-light.png" alt="Reijn logo">
-  <span class="wm">Reijn</span><span class="tag">CMS</span>
+  <span class="wm">Reijn</span><img class="syno" src="syno-woordmerk-light.png" alt="Syno">
   <span class="mu"><img src="lieve.jpg" alt="Lieve van der Weijde"></span>
 </div>
 <nav class="mobile-nav">
-  <a href="dashboard.html">Dashboard</a>
-  <a class="active" href="paginas.html">Pagina's</a>
-  <a href="analytics.html">Analytics</a>
-  <a href="berichten.html">Berichten</a>
-  <a href="instellingen.html">Instellingen</a>
+  <a href="start.html">← Start</a><a href="dashboard.html">Dashboard</a><a class="active" href="paginas.html">Pagina's</a><a href="sales.html">Sales</a><a href="inzet.html">Inzet</a><a href="berichten.html">Berichten</a><a href="analytics.html">Analyse</a><a href="instellingen.html">Instellingen</a>
 </nav>
 
 <!-- ============ MAIN ============ -->
@@ -56,7 +63,8 @@
     <div class="grow"></div>
     <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg><input id="q" placeholder="Zoek op naam, functie of variant…"></div>
     <button class="bell" aria-label="Meldingen"><span class="dot"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
-    <a class="btn accent" href="nieuwe-pagina.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nieuwe pagina</a>
+    <a class="btn" href="nieuwe-pagina.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nieuwe pagina</a>
+    <a class="btn accent" href="berichten.html?compose=1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg>Profiel versturen</a>
   </div>
 
   <section class="kpis">
@@ -89,7 +97,7 @@
 
     <div class="rows">
       <div class="row row-pages rhead">
-        <div>Consultant</div><div>Status</div><div>Varianten</div><div>Weergaven</div><div>Bijgewerkt</div><div></div>
+        <div>Consultant</div><div>Status</div><div>Varianten</div><div>Weergaven</div><div>Bijgewerkt</div><div>Acties</div><div></div>
       </div>
     </div>
     <div class="rows" id="rows"></div>
@@ -176,7 +184,7 @@
       var vars = p.varianten.length
         ? '<b>'+p.varianten.length+(p.varianten.length===1?' variant':' varianten')+'</b><br>'+Reijn.esc(p.varianten.join(' · '))
         : '<span class="muted">nog geen varianten</span>';
-      return '<div class="row row-pages hoverable">'+
+      return '<div class="row row-pages klikbaar" data-ga="'+p.id+'">'+
         '<div class="p"><a class="avatar md" style="background:'+p.kleur+'" href="pagina.html?id='+p.id+'">'+Reijn.esc(p.init)+'</a>'+
           '<div><a class="nm" href="pagina.html?id='+p.id+'">'+Reijn.esc(p.naam)+'</a><div class="fn">'+Reijn.esc(p.functie)+'</div></div></div>'+
         '<span class="pill '+s.cls+'">'+s.label+'</span>'+
@@ -184,7 +192,8 @@
         '<div class="num hide-m">'+(p.views? Reijn.nf(p.views) : '—')+' <span>weergaven</span></div>'+
         '<div class="hide-m" style="font-size:12.5px;color:var(--ink-soft)">'+Reijn.esc(p.bijgewerkt)+'</div>'+
         '<div class="acts">'+
-          '<a class="iconbtn" href="index.html" target="_blank" title="Live bekijken">'+Reijn.ICON.eye+'</a>'+
+          '<a class="iconbtn" href="'+Reijn.cvUrl(p)+'" target="_blank" title="Live bekijken">'+Reijn.ICON.eye+'</a>'+
+          '<a class="iconbtn actbtn mail" href="berichten.html?compose=1&page='+p.id+'" title="Profiel naar een klant sturen">'+Reijn.ICON.mail+'Mailen</a>'+
           '<a class="iconbtn edit" href="'+Reijn.editorUrl(p)+'">'+Reijn.ICON.edit+'Bewerken</a>'+
           '<span class="menu-wrap">'+
             '<button class="iconbtn" data-menu aria-label="Meer acties">'+Reijn.ICON.dots+'</button>'+
@@ -202,6 +211,7 @@
             '</div>'+
           '</span>'+
         '</div>'+
+        '<span class="chev" aria-hidden="true">›</span>'+
       '</div>';
     }).join('') || '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg><strong>Geen pagina’s gevonden</strong>Pas je zoekterm of filter aan.</div>';
 
@@ -217,6 +227,13 @@
   });
   document.getElementById('q').addEventListener('input', function(e){ q = e.target.value.toLowerCase().trim(); render(); });
   document.getElementById('sort').addEventListener('change', function(e){ sort = e.target.value; render(); });
+
+  // klik ergens op de rij -> beheerscherm (knoppen en links doen hun eigen ding)
+  rowsEl.addEventListener('click', function(e){
+    if (e.target.closest('a,button')) return;
+    var rij = e.target.closest('[data-ga]');
+    if (rij) window.location.href = Merk.url('pagina.html?id=' + rij.getAttribute('data-ga'));
+  });
 
   // rij-acties
   rowsEl.addEventListener('click', function(e){

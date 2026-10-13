@@ -3,7 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Reijn CMS — Instellingen</title>
+<meta name="description" content="Instellingen van Syno: huisstijl, team en integraties.">
+<meta name="application-name" content="Syno">
+<meta name="theme-color" content="#3B6FD4">
+<title>Instellingen · Syno — Reijn</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -30,28 +33,35 @@
   .integr .tx span{font-size:12.5px;color:var(--ink-soft)}
   @media(max-width:900px){.setgrid{grid-template-columns:1fr}.setnav{position:static;display:flex;gap:6px;overflow-x:auto}.setnav button{white-space:nowrap}}
 </style>
+<link rel="stylesheet" href="brand.css">
+<script src="brand.js"></script>
 </head>
 <body>
 
 <aside class="sidebar">
-  <div class="sb-brand"><img src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><span class="tag">CMS</span></div>
+  <div class="sb-brand"><img src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><img class="syno" src="syno-woordmerk-light.png" alt="Syno"></div>
   <nav class="sb-nav">
+    <div class="sb-groep">Beheer</div>
     <a href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
-    <a href="paginas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>Pagina's <span class="badge" data-badge="pages">47</span></a>
-    <a href="analytics.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>Analytics</a>
-    <a href="berichten.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>Berichten <span class="badge" data-badge="mail">2</span></a>
+    <a href="paginas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>Pagina's <span class="badge" data-badge="pages">3</span></a>
+    <a href="sales.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg>Sales <span class="badge" data-badge="sales">3</span></a>
+    <a href="inzet.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/><path d="M12 15v3"/></svg>Inzet <span class="badge" data-badge="inzet">3</span></a>
+    <a href="berichten.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>Berichten <span class="badge" data-badge="mail">3</span></a>
+    <div class="sb-groep">Analyse</div>
+    <a href="analytics.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>Analyse</a>
+    <div class="sb-groep">Systeem</div>
     <a class="active" href="instellingen.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1L14.5 2h-5l-.4 2.6a7 7 0 0 0-1.7 1l-2.3-1-2 3.4L3 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1l.4 2.6h5l.4-2.6a7 7 0 0 0 1.7-1l2.3 1 2-3.4-2-1.5a7 7 0 0 0 .1-1z"/></svg>Instellingen</a>
+    <a class="sb-terug" href="start.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Terug naar de start</a>
   </nav>
   <div class="sb-user"><img src="lieve.jpg" alt=""><div><div class="nm">Lieve van der Weijde</div><div class="rl">Relatiebeheerder</div></div></div>
 </aside>
 
 <div class="mobile-top">
-  <img class="lg" src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><span class="tag">CMS</span>
+  <img class="lg" src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><img class="syno" src="syno-woordmerk-light.png" alt="Syno">
   <span class="mu"><img src="lieve.jpg" alt=""></span>
 </div>
 <nav class="mobile-nav">
-  <a href="dashboard.html">Dashboard</a><a href="paginas.html">Pagina's</a>
-  <a href="analytics.html">Analytics</a><a href="berichten.html">Berichten</a><a class="active" href="instellingen.html">Instellingen</a>
+  <a href="start.html">← Start</a><a href="dashboard.html">Dashboard</a><a href="paginas.html">Pagina's</a><a href="sales.html">Sales</a><a href="inzet.html">Inzet</a><a href="berichten.html">Berichten</a><a href="analytics.html">Analyse</a><a class="active" href="instellingen.html">Instellingen</a>
 </nav>
 
 <main class="main">
@@ -94,11 +104,28 @@
         </section>
 
         <section class="card" style="margin-bottom:22px">
+          <div class="card-head"><div><h2>Merk</h2><p class="card-sub">Het CMS is white label: kleuren en logo volgen de organisatie die het gebruikt.</p></div>
+            <span class="pill info" id="huidigMerk">—</span></div>
+          <div class="brandkiezer" data-merkvast>
+            <a href="?" data-brandkeuze="whitelabel"><span class="stip" style="background:#E6E9EE;border:1px solid #DCE1E7"></span>
+              <span><strong>White label</strong><span>Neutraal, zonder logo</span></span></a>
+            <a href="?brand=reijn" data-brandkeuze="reijn"><span class="stip" style="background:#E8641E"></span>
+              <span><strong>Reijn</strong><span>Petrol en tangerine</span></span></a>
+            <a href="?brand=aag" data-brandkeuze="aag"><span class="stip" style="background:#F8AF5F"></span>
+              <span><strong>AAG</strong><span>Amber en leisteengrijs</span></span></a>
+          </div>
+          <div class="note" style="margin-top:16px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+            <span>In deze demo wissel je van merk via de adresbalk: <b>?brand=reijn</b> of <b>?brand=aag</b>. Zonder parameter zie je de white-labelversie.</span>
+          </div>
+        </section>
+
+        <section class="card" style="margin-bottom:22px">
           <div class="card-head"><div><h2>Huisstijl</h2><p class="card-sub">Kleuren en logo worden op alle visuele CV's toegepast.</p></div></div>
           <div class="field"><label>Logo</label>
             <div class="logo-box">
-              <img src="reijn-logo.png" alt="Reijn logo">
-              <div style="flex:1;min-width:0"><strong style="display:block;font-size:14.5px">reijn-logo.png</strong><span class="hint">SVG of PNG, transparante achtergrond</span></div>
+              <img src="reijn-logo.png" alt="logo" class="brand-logo">
+              <div style="flex:1;min-width:0"><strong style="display:block;font-size:14.5px" id="logoNaam">reijn-logo.png</strong><span class="hint">SVG of PNG, transparante achtergrond</span></div>
               <button class="btn line sm" data-toast="Bestandskiezer geopend (demo)">Vervangen</button>
             </div>
           </div>
@@ -348,6 +375,11 @@
 <script>
 (function(){
   var data = Reijn.load();
+
+  var namen = { whitelabel:'White label', reijn:'Reijn', aag:'AAG' };
+  document.getElementById('huidigMerk').textContent = 'Actief: ' + namen[Merk.actief];
+  document.getElementById('logoNaam').textContent =
+    Merk.actief === 'whitelabel' ? 'geen logo ingesteld' : Merk.MERKEN[Merk.actief].logo;
 
   document.getElementById('setnav').addEventListener('click', function(e){
     var b = e.target.closest('button'); if(!b) return;

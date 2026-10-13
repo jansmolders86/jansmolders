@@ -3,7 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Reijn CMS — Berichten</title>
+<meta name="description" content="Profielen delen met opdrachtgevers vanuit Syno.">
+<meta name="application-name" content="Syno">
+<meta name="theme-color" content="#3B6FD4">
+<title>Berichten · Syno — Reijn</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -17,28 +20,35 @@
   .tmpl button:hover{border-color:var(--tangerine)}
   .tmpl button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 </style>
+<link rel="stylesheet" href="brand.css">
+<script src="brand.js"></script>
 </head>
 <body>
 
 <aside class="sidebar">
-  <div class="sb-brand"><img src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><span class="tag">CMS</span></div>
+  <div class="sb-brand"><img src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><img class="syno" src="syno-woordmerk-light.png" alt="Syno"></div>
   <nav class="sb-nav">
+    <div class="sb-groep">Beheer</div>
     <a href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
-    <a href="paginas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>Pagina's <span class="badge" data-badge="pages">47</span></a>
-    <a href="analytics.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>Analytics</a>
-    <a class="active" href="berichten.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>Berichten <span class="badge" data-badge="mail">2</span></a>
+    <a href="paginas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>Pagina's <span class="badge" data-badge="pages">3</span></a>
+    <a href="sales.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg>Sales <span class="badge" data-badge="sales">3</span></a>
+    <a href="inzet.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/><path d="M12 15v3"/></svg>Inzet <span class="badge" data-badge="inzet">3</span></a>
+    <a class="active" href="berichten.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg>Berichten <span class="badge" data-badge="mail">3</span></a>
+    <div class="sb-groep">Analyse</div>
+    <a href="analytics.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>Analyse</a>
+    <div class="sb-groep">Systeem</div>
     <a href="instellingen.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1L14.5 2h-5l-.4 2.6a7 7 0 0 0-1.7 1l-2.3-1-2 3.4L3 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1l.4 2.6h5l.4-2.6a7 7 0 0 0 1.7-1l2.3 1 2-3.4-2-1.5a7 7 0 0 0 .1-1z"/></svg>Instellingen</a>
+    <a class="sb-terug" href="start.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Terug naar de start</a>
   </nav>
   <div class="sb-user"><img src="lieve.jpg" alt=""><div><div class="nm">Lieve van der Weijde</div><div class="rl">Relatiebeheerder</div></div></div>
 </aside>
 
 <div class="mobile-top">
-  <img class="lg" src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><span class="tag">CMS</span>
+  <img class="lg" src="reijn-logo-light.png" alt="Reijn logo"><span class="wm">Reijn</span><img class="syno" src="syno-woordmerk-light.png" alt="Syno">
   <span class="mu"><img src="lieve.jpg" alt=""></span>
 </div>
 <nav class="mobile-nav">
-  <a href="dashboard.html">Dashboard</a><a href="paginas.html">Pagina's</a>
-  <a href="analytics.html">Analytics</a><a class="active" href="berichten.html">Berichten</a><a href="instellingen.html">Instellingen</a>
+  <a href="start.html">← Start</a><a href="dashboard.html">Dashboard</a><a href="paginas.html">Pagina's</a><a href="sales.html">Sales</a><a href="inzet.html">Inzet</a><a class="active" href="berichten.html">Berichten</a><a href="analytics.html">Analyse</a><a href="instellingen.html">Instellingen</a>
 </nav>
 
 <main class="main">
@@ -50,7 +60,8 @@
     </div>
     <div class="grow"></div>
     <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg><input id="q" placeholder="Zoek in berichten…"></div>
-    <button class="btn accent" data-open="mCompose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nieuw bericht</button>
+    <a class="btn line" href="paginas.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Consultant mailen</a>
+    <button class="btn accent" data-open="mCompose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg>Profiel naar klant sturen</button>
   </div>
 
   <section class="kpis" style="margin-bottom:22px">
@@ -63,8 +74,9 @@
   <div class="inbox">
     <div class="inbox-list">
       <div class="ihead">
-        <button class="tab active" data-map="inbox">Postvak IN</button>
-        <button class="tab" data-map="verzonden">Verzonden</button>
+        <button class="tab active" data-map="inbox">Klanten <span class="n" data-tel="inbox"></span></button>
+        <button class="tab" data-map="consultant">Consultants <span class="n" data-tel="consultant"></span></button>
+        <button class="tab" data-map="verzonden">Verzonden <span class="n" data-tel="verzonden"></span></button>
         <div class="grow" style="flex:1"></div>
         <button class="iconbtn" data-toast="Alles gemarkeerd als gelezen" title="Alles gelezen">✓</button>
       </div>
@@ -178,6 +190,10 @@
   }
 
   function renderThreads(){
+    ['inbox','consultant','verzonden'].forEach(function(m){
+      var n = data.mails.filter(function(x){ return x.map === m; }).length;
+      document.querySelectorAll('[data-tel="'+m+'"]').forEach(function(el){ el.textContent = n; });
+    });
     var items = lijst();
     if (!actief || items.indexOf(actief) === -1) actief = items[0] || null;
     document.getElementById('threads').innerHTML = items.map(function(m){
@@ -222,6 +238,7 @@
         '<span class="avatar md" style="background:'+m.kleur+'">'+Reijn.esc(m.init)+'</span>'+
         '<div style="flex:1;min-width:0"><h3>'+Reijn.esc(m.onderwerp)+'</h3>'+
           '<div class="meta">'+Reijn.esc(m.klant)+' · '+Reijn.esc(m.org)+' · '+Reijn.esc(m.email)+'</div></div>'+
+        (m.intern ? '<span class="pill info">Aan de consultant</span>' : '')+
         (pagina ? '<a class="btn line sm" href="pagina.html?id='+pagina.id+'">Pagina van '+Reijn.esc(pagina.naam.split(' ')[0])+'</a>' : '')+
         '<span class="menu-wrap"><button class="iconbtn" data-menu>⋯</button><div class="menu">'+
           '<button data-toast="Gemarkeerd als ongelezen">Markeer als ongelezen</button>'+
@@ -371,10 +388,31 @@
       }]
     };
     data.mails.unshift(nieuw);
+
+    /* Een verstuurd profiel is het begin van een salestraject: hij komt
+       meteen als voorstel op het bord te staan. */
+    data.voorstellen = data.voorstellen || [];
+    data.voorstellen.unshift({
+      id: 'v' + Date.now(),
+      pagina: p.id,
+      klant: o.org,
+      contact: o.naam,
+      rol: p.functie,
+      uren: Math.max(8, Reijn.inzetInfo(p).vrij || 16),
+      tarief: 105,
+      start: Reijn.over(30),
+      status: 'voorstel',
+      verstuurd: Reijn.iso(Reijn.VANDAAG),
+      gewijzigd: Reijn.iso(Reijn.VANDAAG),
+      variant: v,
+      notitie: 'Profiel verstuurd via de mailopsteller.',
+      historie: [{ status: 'voorstel', datum: Reijn.iso(Reijn.VANDAAG) }]
+    });
+
     data.activity.unshift({ ic:'mail', kleur:'var(--tangerine)', tekst:'Link verstuurd naar <b>'+Reijn.esc(o.naam)+'</b> ('+Reijn.esc(o.org)+')', tijd:'nu' });
     Reijn.save(data);
     Reijn.closeModal('mCompose');
-    Reijn.toast('Verstuurd naar ' + o.mail + ' ✓');
+    Reijn.toast('Verstuurd naar ' + o.mail + ' ✓ · staat nu als voorstel op het salesbord');
 
     // naar de map Verzonden springen zodat de demo doorloopt
     map = 'verzonden'; actief = nieuw;
