@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0b0d10">
+<title>BeamDrive</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <nav id="rail" aria-label="Car controls">
+    <div id="clock" title="Tap for stats">--:--</div>
+
+    <button class="rail-btn" data-cmd="dash" aria-label="Dashboard">
+      <svg viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>
+    </button>
+    <button class="rail-btn" data-cmd="maps" aria-label="Navigation">
+      <svg viewBox="0 0 24 24"><path d="M12 2 4.5 20.3l.7.7L12 18l6.8 3 .7-.7z"/></svg>
+    </button>
+    <button class="rail-btn" data-cmd="media" aria-label="Media">
+      <svg viewBox="0 0 24 24"><path d="M12 3v10.6A4 4 0 1 0 14 17V7h4V3z"/></svg>
+    </button>
+    <button class="rail-btn" data-cmd="apps" aria-label="All apps">
+      <svg viewBox="0 0 24 24"><circle cx="5" cy="5" r="2.2"/><circle cx="12" cy="5" r="2.2"/><circle cx="19" cy="5" r="2.2"/><circle cx="5" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="19" cy="12" r="2.2"/><circle cx="5" cy="19" r="2.2"/><circle cx="12" cy="19" r="2.2"/><circle cx="19" cy="19" r="2.2"/></svg>
+    </button>
+    <button class="rail-btn" data-cmd="back" aria-label="Back">
+      <svg viewBox="0 0 24 24"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20z"/></svg>
+    </button>
+
+    <div id="np" hidden>
+      <div id="np-title"></div>
+      <div class="np-row">
+        <button class="np-btn" data-media="prev" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg></button>
+        <button class="np-btn" data-media="toggle" aria-label="Play or pause" id="np-toggle"><svg viewBox="0 0 24 24"><path id="np-icon" d="M8 5v14l11-7z"/></svg></button>
+        <button class="np-btn" data-media="next" aria-label="Next"><svg viewBox="0 0 24 24"><path d="m6 18 8.5-6L6 6zM16 6v12h2V6z"/></svg></button>
+      </div>
+    </div>
+
+    <div id="link" title="Connection"><span class="dot"></span></div>
+  </nav>
+
+  <main id="stage">
+    <canvas id="screen"></canvas>
+    <div id="overlay">
+      <div class="ov-title" id="ov-title">Connecting to your phone…</div>
+      <div class="ov-sub" id="ov-sub">Make sure the car is on your phone's hotspot and BeamDrive is open.</div>
+      <button id="ov-start" hidden>Start casting</button>
+      <form id="pair" hidden autocomplete="off">
+        <input id="pair-code" maxlength="8" autocapitalize="characters" spellcheck="false" aria-label="Pairing code">
+        <button type="submit">Connect</button>
+        <div id="pair-err"></div>
+      </form>
+      <button id="pair-change" class="ghost" hidden>Use a different code</button>
+    </div>
+    <pre id="stats" hidden></pre>
+  </main>
+</div>
+<script>window.BEAM_MODE = "rtc";</script>
+<script src="app.js"></script>
+</body>
+</html>

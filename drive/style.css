@@ -1,0 +1,75 @@
+:root {
+  --bg: #0b0d10;
+  --rail: #14171c;
+  --rail-hi: #1f242b;
+  --ink: #e8ecf1;
+  --ink-dim: #8a94a3;
+  --accent: #4f9cff;
+  --ok: #3ad08a;
+  --warn: #ffb547;
+  --bad: #ff5d5d;
+  --rail-w: 112px;
+  --line: #222831;
+  --stats-bg: rgba(0,0,0,.65);
+}
+:root[data-theme="light"] {
+  --bg: #f2f4f7;
+  --rail: #ffffff;
+  --rail-hi: #e4e8ee;
+  --ink: #12161c;
+  --ink-dim: #5a6472;
+  --accent: #1f6fe5;
+  --ok: #13a06b;
+  --warn: #b86e00;
+  --bad: #d93636;
+  --line: #e1e5eb;
+  --stats-bg: rgba(255,255,255,.85);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
+  font: 16px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none; }
+#app { display: flex; height: 100%; width: 100%; }
+
+#rail { width: var(--rail-w); flex: 0 0 var(--rail-w); background: var(--rail);
+  display: flex; flex-direction: column; align-items: center; padding: 14px 0; gap: 10px; }
+#clock { font-size: 26px; font-weight: 600; letter-spacing: .5px; padding: 6px 0 12px; font-variant-numeric: tabular-nums; }
+.rail-btn { width: 84px; height: 84px; border: 0; border-radius: 22px; background: transparent;
+  display: grid; place-items: center; color: var(--ink); cursor: pointer; transition: background .12s; }
+.rail-btn svg { width: 40px; height: 40px; fill: currentColor; }
+.rail-btn:active, .rail-btn.active { background: var(--rail-hi); }
+.rail-btn.active { color: var(--accent); }
+
+#np { margin-top: auto; width: 100%; padding: 10px 8px 4px; border-top: 1px solid var(--line); }
+#np-title { font-size: 13px; color: var(--ink-dim); text-align: center; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px; }
+.np-row { display: flex; justify-content: space-between; }
+.np-btn { width: 32px; height: 48px; border: 0; background: transparent; color: var(--ink); padding: 0; display: grid; place-items: center; }
+.np-btn svg { width: 28px; height: 28px; fill: currentColor; }
+#np-toggle svg { width: 34px; height: 34px; }
+
+#link { padding: 10px 0 2px; }
+#np[hidden] + #link { margin-top: auto; }
+.dot { display: block; width: 12px; height: 12px; border-radius: 50%; background: var(--bad); }
+.dot.ok { background: var(--ok); }
+.dot.warn { background: var(--warn); }
+
+#stage { position: relative; flex: 1; display: grid; place-items: center; overflow: hidden; }
+#screen { display: block; background: #000; image-rendering: auto; }
+#overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 12px; text-align: center; padding: 40px; background: var(--bg); }
+#overlay.hidden { display: none; }
+.ov-title { font-size: 32px; font-weight: 600; }
+.ov-sub { font-size: 18px; color: var(--ink-dim); max-width: 560px; }
+#stats { position: absolute; top: 10px; right: 10px; margin: 0; padding: 8px 12px; border-radius: 8px;
+  background: var(--stats-bg); font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace; pointer-events: none; }
+#ov-start { margin-top: 18px; padding: 22px 48px; border: 0; border-radius: 40px; background: var(--accent);
+  color: var(--bg); font: 600 24px/1 system-ui, sans-serif; cursor: pointer; }
+#ov-start:active { filter: brightness(.85); }
+#pair { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 18px; }
+#pair-code { width: 260px; font: 600 44px/1 ui-monospace, Consolas, monospace; letter-spacing: 12px; text-align: center;
+  text-transform: uppercase; background: var(--rail); color: var(--ink); border: 2px solid var(--rail-hi); border-radius: 18px; padding: 14px; }
+#pair button { padding: 20px 40px; border: 0; border-radius: 40px; background: var(--accent); color: var(--bg); font: 600 22px/1 system-ui, sans-serif; }
+#pair-err { flex-basis: 100%; color: var(--warn); min-height: 1.3em; }
+.ghost { margin-top: 10px; background: transparent; border: 0; color: var(--ink-dim); font: 16px system-ui, sans-serif; }
+#pair[hidden], #ov-start[hidden], #pair-change[hidden] { display: none; }
