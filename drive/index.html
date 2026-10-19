@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0b0d10">
 <title>BeamDrive</title>
-<link rel="stylesheet" href="style.css?v=0.9.0">
+<link rel="stylesheet" href="style.css?v=0.9.1">
 </head>
 <body>
 <div id="app">
@@ -41,13 +41,21 @@
         <button type="submit">Connect</button>
         <div id="pair-err"></div>
       </form>
+      <div id="netinfo" hidden></div>
       <div id="direct" hidden></div>
       <button id="pair-change" class="ghost" hidden>Use a different code</button>
+      <div id="modes" hidden>
+        <span>Connection:</span>
+        <button data-mode="auto">Auto</button>
+        <button data-mode="direct">Direct</button>
+        <button data-mode="relay">Relay</button>
+      </div>
+      <button id="reload" class="ghost">Reload page</button>
     </div>
     <pre id="stats" hidden></pre>
   </main>
 </div>
-<script>window.BEAM_MODE = "rtc"; window.BEAM_PAGE_VERSION = "0.9.0";</script>
-<script src="app.js?v=0.9.0"></script>
+<script>window.BEAM_MODE = "rtc"; window.BEAM_PAGE_VERSION = "0.9.1";</script>
+<script src="app.js?v=0.9.1"></script>
 </body>
 </html>
