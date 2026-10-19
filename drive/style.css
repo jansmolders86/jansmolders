@@ -48,8 +48,8 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
 .np-btn svg { width: 28px; height: 28px; fill: currentColor; }
 #np-toggle svg { width: 34px; height: 34px; }
 
-#link { padding: 10px 0 2px; }
-#np[hidden] + #link { margin-top: auto; }
+#link { padding: 10px 0 2px; margin-top: auto; }
+
 .dot { display: block; width: 12px; height: 12px; border-radius: 50%; background: var(--bad); }
 .dot.ok { background: var(--ok); }
 .dot.warn { background: var(--warn); }
