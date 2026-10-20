@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" role="img" aria-label="Bestaande tuin ontruimd (placeholderafbeelding)">
+<rect width="400" height="260" fill="#e9e3d3"/><rect y="150" width="400" height="110" fill="#b9a98a"/>
+<rect x="0" y="40" width="400" height="10" fill="#c9b99a" opacity="0.5"/>
+<circle cx="226" cy="135" r="30" fill="#8fbb9b" opacity="0.9"/><circle cx="226" cy="136" r="29" fill="#8fbb9b" opacity="0.9"/><circle cx="159" cy="136" r="28" fill="#2e6441" opacity="0.9"/><circle cx="87" cy="141" r="18" fill="#3f7d53" opacity="0.9"/><circle cx="334" cy="135" r="31" fill="#3f7d53" opacity="0.9"/><circle cx="339" cy="133" r="35" fill="#5f9a71" opacity="0.9"/><circle cx="143" cy="132" r="37" fill="#8fbb9b" opacity="0.9"/>
+<rect x="10" y="222" width="190.20000000000002" height="28" rx="8" fill="#ffffff" opacity="0.88"/>
+<text x="20" y="241" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#1f4d36">Bestaande tuin ontruimd</text>
+<text x="390" y="20" text-anchor="end" font-family="system-ui, sans-serif" font-size="10" fill="#1f4d36" opacity="0.6">placeholder · demo</text>
+</svg>
