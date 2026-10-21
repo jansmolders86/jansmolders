@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0b0d10">
 <title>BeamDrive</title>
-<link rel="stylesheet" href="style.css?v=0.12.3">
+<link rel="stylesheet" href="style.css?v=0.13.1">
 </head>
 <body>
 <div id="app">
@@ -26,6 +26,15 @@
     </button>
 
 
+    <div id="batt" hidden title="Phone battery">
+      <svg viewBox="0 0 24 12" aria-hidden="true"><rect x="0.75" y="0.75" width="19.5" height="10.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="21" y="3.5" width="2.2" height="5" rx="1" fill="currentColor"/><rect id="batt-fill" x="2.5" y="2.5" width="16" height="7" rx="1.2" fill="currentColor"/></svg>
+      <div id="batt-pct">--%</div>
+      <div id="batt-temp" hidden></div>
+    </div>
+    <button class="rail-btn" id="stop-btn" data-cmd="stop" aria-label="Stop casting" hidden>
+      <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+      <span class="stop-ask">Stop?</span>
+    </button>
     <div id="link" title="Connection"><span class="dot"></span></div>
     <div id="ver"></div>
   </nav>
@@ -48,7 +57,7 @@
     <pre id="stats" hidden></pre>
   </main>
 </div>
-<script>window.BEAM_MODE = "rtc"; window.BEAM_PAGE_VERSION = "0.12.3";</script>
-<script src="app.js?v=0.12.3"></script>
+<script>window.BEAM_MODE = "rtc"; window.BEAM_PAGE_VERSION = "0.13.1";</script>
+<script src="app.js?v=0.13.1"></script>
 </body>
 </html>

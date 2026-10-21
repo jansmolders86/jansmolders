@@ -48,7 +48,22 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
 .np-btn svg { width: 28px; height: 28px; fill: currentColor; }
 #np-toggle svg { width: 34px; height: 34px; }
 
-#link { padding: 10px 0 2px; margin-top: auto; }
+#link { padding: 10px 0 2px; }
+/* Phone battery, pinned to the bottom of the rail with the stop button. */
+#batt { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  color: var(--ink); font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; padding-bottom: 6px; }
+#batt[hidden] { display: none; }
+#batt svg { width: 34px; height: 17px; }
+#batt.low { color: var(--bad); }
+#batt.charging #batt-pct::before { content: "⚡"; }
+#batt-temp { font-size: 12px; font-weight: 500; color: var(--warn); }
+#batt-temp[hidden] { display: none; }
+#stop-btn { color: var(--bad); position: relative; }
+#stop-btn[hidden] { display: none; }
+#stop-btn .stop-ask { display: none; }
+#stop-btn.ask { background: var(--bad); color: #fff; }
+#stop-btn.ask svg { display: none; }
+#stop-btn.ask .stop-ask { display: block; font: 600 18px system-ui, sans-serif; }
 #ver { white-space: pre-line; font-size: 11px; line-height: 1.3; color: var(--ink-dim); text-align: center; padding-bottom: 2px; }
 #ver.bad { color: var(--warn); }
 
