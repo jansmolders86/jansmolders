@@ -51,19 +51,6 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
 #link { padding: 10px 0 2px; margin-top: auto; }
 #ver { white-space: pre-line; font-size: 11px; line-height: 1.3; color: var(--ink-dim); text-align: center; padding-bottom: 2px; }
 #ver.bad { color: var(--warn); }
-#modes { display: flex; gap: 8px; align-items: center; margin-top: 14px; color: var(--ink-dim); }
-#modes[hidden] { display: none; }
-#modes button { border: 1px solid var(--rail-hi); background: transparent; color: var(--ink); border-radius: 18px;
-  padding: 10px 20px; font: 16px system-ui, sans-serif; }
-#modes button.on { background: var(--accent); color: var(--bg); border-color: var(--accent); }
-#netinfo { font-size: 18px; padding: 10px 18px; border-radius: 14px; background: var(--rail); max-width: 640px; }
-#netinfo[hidden] { display: none; }
-#netinfo.ok { color: var(--ok); }
-#netinfo.bad { color: var(--warn); }
-#direct { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 8px; }
-#direct[hidden] { display: none; }
-#direct a { color: var(--accent); font: 18px ui-monospace, Consolas, monospace; padding: 10px 18px;
-  border: 1px solid var(--rail-hi); border-radius: 14px; text-decoration: none; }
 
 .dot { display: block; width: 12px; height: 12px; border-radius: 50%; background: var(--bad); }
 .dot.ok { background: var(--ok); }
@@ -88,3 +75,8 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
 #pair-err { flex-basis: 100%; color: var(--warn); min-height: 1.3em; }
 .ghost { margin-top: 10px; background: transparent; border: 0; color: var(--ink-dim); font: 16px system-ui, sans-serif; }
 #pair[hidden], #ov-start[hidden], #pair-change[hidden] { display: none; }
+
+/* Shown on top of the video when the phone can't act on touches. */
+#notice { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); z-index: 5;
+  max-width: 80%; padding: 12px 18px; border-radius: 12px; background: #b3261e; color: #fff;
+  font-size: 18px; line-height: 1.3; text-align: center; pointer-events: none; }
