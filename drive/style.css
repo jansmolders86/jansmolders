@@ -90,6 +90,29 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
 .ghost { margin-top: 10px; background: transparent; border: 0; color: var(--ink-dim); font: 16px system-ui, sans-serif; }
 #pair[hidden], #ov-start[hidden], #pair-change[hidden] { display: none; }
 
+/* Your apps while not casting: tap to open on the phone (sound comes through the car). */
+#appgrid { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; max-width: 900px; margin-top: 18px; }
+#appgrid[hidden] { display: none; }
+#appgrid button { width: 128px; padding: 14px 8px 12px; border: 0; border-radius: 22px; background: var(--rail);
+  color: var(--ink); font: 15px system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+#appgrid button:active { background: var(--rail-hi); }
+#appgrid img { width: 64px; height: 64px; }
+#appgrid span { max-width: 112px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Phone notifications (while not casting): small cards top-right, gone after a few seconds. */
+#toasts { position: absolute; top: 14px; right: 14px; z-index: 6; display: flex; flex-direction: column; gap: 10px;
+  width: min(440px, 45%); pointer-events: none; }
+.toast { pointer-events: auto; display: flex; gap: 14px; align-items: flex-start; padding: 14px 16px;
+  border-radius: 18px; background: var(--rail); color: var(--ink); box-shadow: 0 6px 24px rgba(0,0,0,.35);
+  animation: toast-in .25s ease-out; transition: opacity .3s, transform .3s; }
+.toast.out { opacity: 0; transform: translateX(30px); }
+.toast img { width: 40px; height: 40px; border-radius: 10px; flex: 0 0 40px; }
+.toast .t-app { font-size: 13px; color: var(--ink-dim); }
+.toast .t-title { font-size: 19px; font-weight: 600; margin-top: 2px; }
+.toast .t-text { font-size: 17px; color: var(--ink); margin-top: 2px; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+@keyframes toast-in { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: none; } }
+
 /* Shown on top of the video when the phone can't act on touches. */
 #notice { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); z-index: 5;
   max-width: 80%; padding: 12px 18px; border-radius: 12px; background: #b3261e; color: #fff;

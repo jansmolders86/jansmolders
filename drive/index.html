@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0b0d10">
 <title>BeamDrive</title>
-<link rel="stylesheet" href="style.css?v=0.14.0">
+<link rel="stylesheet" href="style.css?v=0.15.1">
 </head>
 <body>
 <div id="app">
@@ -40,10 +40,12 @@
   <main id="stage">
     <canvas id="screen"></canvas>
     <div id="notice" hidden></div>
+    <div id="toasts" aria-live="polite"></div>
     <div id="overlay">
       <div class="ov-title" id="ov-title">Connecting to your phone…</div>
       <div class="ov-sub" id="ov-sub">Make sure BeamDrive is open on your phone.</div>
       <button id="ov-start" hidden>Start casting</button>
+      <div id="appgrid" hidden></div>
       <form id="pair" hidden autocomplete="off">
         <input id="pair-code" maxlength="8" autocapitalize="characters" spellcheck="false" aria-label="Pairing code">
         <button type="submit">Connect</button>
@@ -55,7 +57,7 @@
     <pre id="stats" hidden></pre>
   </main>
 </div>
-<script>window.BEAM_MODE = "rtc"; window.BEAM_PAGE_VERSION = "0.14.0";</script>
-<script src="app.js?v=0.14.0"></script>
+<script>window.BEAM_MODE = "rtc"; window.BEAM_PAGE_VERSION = "0.15.1";</script>
+<script src="app.js?v=0.15.1"></script>
 </body>
 </html>
