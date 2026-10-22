@@ -38,6 +38,8 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
 .rail-btn svg { width: 40px; height: 40px; fill: currentColor; }
 .rail-btn:active, .rail-btn.active { background: var(--rail-hi); }
 .rail-btn.active { color: var(--accent); }
+/* Not casting: Home, Maps, Apps and Back only work on the phone screen, so show them as inactive. */
+body.not-casting .rail-btn:not(#stop-btn) { opacity: .3; pointer-events: none; }
 
 #np { margin-top: auto; width: 100%; padding: 10px 8px 4px; border-top: 1px solid var(--line); }
 #np-title { font-size: 13px; color: var(--ink-dim); text-align: center; white-space: nowrap;
@@ -73,7 +75,12 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
 #stage { position: relative; flex: 1; display: grid; place-items: center; overflow: hidden; }
 #screen { display: block; background: #000; image-rendering: auto; }
 #overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 12px; text-align: center; padding: 40px; background: var(--bg); }
+  justify-content: flex-start; gap: 12px; text-align: center; padding: 40px; background: var(--bg);
+  overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; }
+/* Centred when it fits, scrollable (from the top) when it doesn't, e.g. with many apps. */
+#overlay > * { flex-shrink: 0; }
+#overlay > :first-child { margin-top: auto; }
+#overlay > :last-child { margin-bottom: auto; }
 #overlay.hidden { display: none; }
 .ov-title { font-size: 32px; font-weight: 600; }
 .ov-sub { font-size: 18px; color: var(--ink-dim); max-width: 560px; }
@@ -91,7 +98,7 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
 #pair[hidden], #ov-start[hidden], #pair-change[hidden] { display: none; }
 
 /* Your apps while not casting: tap to open on the phone (sound comes through the car). */
-#appgrid { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; max-width: 900px; margin-top: 18px; }
+#appgrid { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; max-width: 1180px; margin-top: 18px; }
 #appgrid[hidden] { display: none; }
 #appgrid button { width: 128px; padding: 14px 8px 12px; border: 0; border-radius: 22px; background: var(--rail);
   color: var(--ink); font: 15px system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -99,19 +106,21 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
 #appgrid img { width: 64px; height: 64px; }
 #appgrid span { max-width: 112px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* Phone notifications (while not casting): small cards top-right, gone after a few seconds. */
-#toasts { position: absolute; top: 14px; right: 14px; z-index: 6; display: flex; flex-direction: column; gap: 10px;
-  width: min(440px, 45%); pointer-events: none; }
-.toast { pointer-events: auto; display: flex; gap: 14px; align-items: flex-start; padding: 14px 16px;
-  border-radius: 18px; background: var(--rail); color: var(--ink); box-shadow: 0 6px 24px rgba(0,0,0,.35);
+/* Phone notifications (while not casting): big cards on the left, the driver's side, easy to
+   catch from the corner of your eye. Gone after a few seconds; tap to dismiss. */
+#toasts { position: absolute; top: 16px; left: 16px; z-index: 6; display: flex; flex-direction: column; gap: 14px;
+  width: min(760px, 62%); pointer-events: none; }
+.toast { pointer-events: auto; display: flex; gap: 20px; align-items: center; padding: 22px 26px;
+  border-radius: 26px; background: var(--rail); color: var(--ink); box-shadow: 0 10px 34px rgba(0,0,0,.45);
+  border-left: 6px solid var(--accent);
   animation: toast-in .25s ease-out; transition: opacity .3s, transform .3s; }
-.toast.out { opacity: 0; transform: translateX(30px); }
-.toast img { width: 40px; height: 40px; border-radius: 10px; flex: 0 0 40px; }
-.toast .t-app { font-size: 13px; color: var(--ink-dim); }
-.toast .t-title { font-size: 19px; font-weight: 600; margin-top: 2px; }
-.toast .t-text { font-size: 17px; color: var(--ink); margin-top: 2px; overflow: hidden;
+.toast.out { opacity: 0; transform: translateX(-40px); }
+.toast img { width: 72px; height: 72px; border-radius: 16px; flex: 0 0 72px; }
+.toast .t-app { font-size: 18px; color: var(--ink-dim); }
+.toast .t-title { font-size: 30px; font-weight: 700; margin-top: 2px; line-height: 1.15; }
+.toast .t-text { font-size: 26px; color: var(--ink); margin-top: 4px; line-height: 1.25; overflow: hidden;
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
-@keyframes toast-in { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: none; } }
+@keyframes toast-in { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: none; } }
 
 /* Shown on top of the video when the phone can't act on touches. */
 #notice { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); z-index: 5;
