@@ -59,6 +59,15 @@ body.not-casting .rail-btn:not(#cast-btn) { opacity: .3; pointer-events: none; }
 #batt.charging #batt-pct::before { content: "⚡"; }
 #batt-temp { font-size: 12px; font-weight: 500; color: var(--warn); }
 #batt-temp[hidden] { display: none; }
+/* Zoom: fill the window (crops a little top/bottom) or fit the whole phone screen. */
+#zoom-btn[hidden] { display: none; }
+#zoom-btn .i-fit { display: none; }
+#zoom-btn.on { color: var(--accent); }
+#zoom-btn.on .i-fill { display: none; }
+#zoom-btn.on .i-fit { display: block; }
+#ver[hidden] { display: none; }
+#link { cursor: pointer; padding-bottom: 6px; }
+
 /* One button for both: blue play when not casting, red stop while casting. */
 #cast-btn { position: relative; }
 #cast-btn[hidden] { display: none; }
@@ -79,7 +88,8 @@ body.not-casting .rail-btn:not(#cast-btn) { opacity: .3; pointer-events: none; }
 .dot.warn { background: var(--warn); }
 
 #stage { position: relative; flex: 1; display: grid; place-items: center; overflow: hidden; }
-#screen { display: block; background: #000; image-rendering: auto; }
+#screen { display: block; background: #000; image-rendering: auto;
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
 #overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
   justify-content: flex-start; gap: 12px; text-align: center; padding: 40px; background: var(--bg);
   overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; }
@@ -89,19 +99,22 @@ body.not-casting .rail-btn:not(#cast-btn) { opacity: .3; pointer-events: none; }
 #overlay > :last-child { margin-bottom: auto; }
 #overlay.hidden { display: none; }
 /* Home (connected, not casting): Gemini on top, then your apps; no connection text. */
-#overlay.home { justify-content: flex-start; padding-top: 28px; }
+#overlay.home { justify-content: flex-start; padding-top: 28px; padding-bottom: 120px; }
 #overlay.home > :first-child { margin-top: 0; }
 #overlay.home .ov-title, #overlay.home #reload, #overlay.home #pair-change { display: none; }
 #overlay.home .ov-sub { min-height: 1.3em; }
-#gemini { display: flex; align-items: center; gap: 16px; padding: 20px 40px; border: 0; border-radius: 48px;
-  background: var(--rail); color: var(--ink); font: 600 26px system-ui, sans-serif;
-  box-shadow: 0 0 0 2px var(--rail-hi); transition: transform .12s, box-shadow .2s; }
+/* Talk to Gemini: a small round mic button, bottom right (home screen only). */
+#gemini { position: absolute; right: 24px; bottom: 24px; z-index: 7; width: 76px; height: 76px; border: 0; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; background: var(--rail); color: var(--accent);
+  box-shadow: 0 6px 22px rgba(0,0,0,.4), 0 0 0 2px var(--rail-hi); transition: transform .12s, box-shadow .2s; }
 #gemini[hidden] { display: none; }
-#gemini svg { width: 36px; height: 36px; fill: var(--accent); }
-#gemini:active { transform: scale(.95); }
+#gemini svg { width: 38px; height: 38px; fill: currentColor; }
+#gemini:active { transform: scale(.92); }
 #gemini.launching { box-shadow: 0 0 0 3px var(--accent); animation: app-pulse 1s ease-in-out infinite; }
 #gemini.ok { box-shadow: 0 0 0 3px var(--ok); }
 #gemini.fail { box-shadow: 0 0 0 3px var(--warn); }
+/* With the mic button showing, "Stop reading" sits just left of it. */
+body.home #tts-stop { right: 116px; }
 .ov-title { font-size: 32px; font-weight: 600; }
 .ov-sub { font-size: 18px; color: var(--ink-dim); max-width: 560px; }
 #stats { position: absolute; top: 10px; right: 10px; margin: 0; padding: 8px 12px; border-radius: 8px;
