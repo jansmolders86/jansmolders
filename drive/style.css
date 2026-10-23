@@ -102,7 +102,16 @@ body.not-casting .rail-btn:not(#stop-btn) { opacity: .3; pointer-events: none; }
 #appgrid[hidden] { display: none; }
 #appgrid button { width: 128px; padding: 14px 8px 12px; border: 0; border-radius: 22px; background: var(--rail);
   color: var(--ink); font: 15px system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-#appgrid button:active { background: var(--rail-hi); }
+#appgrid button { position: relative; transition: transform .12s, background .2s, box-shadow .2s; }
+/* Press feedback: shrinks under your finger, then pulses until the phone confirms. */
+#appgrid button:active { background: var(--rail-hi); transform: scale(.92); }
+#appgrid button.launching { box-shadow: 0 0 0 3px var(--accent); animation: app-pulse 1s ease-in-out infinite; }
+#appgrid button.ok { box-shadow: 0 0 0 3px var(--ok); }
+#appgrid button.fail { box-shadow: 0 0 0 3px var(--warn); }
+#appgrid button.ok::after, #appgrid button.fail::after { position: absolute; top: 6px; right: 8px; font-size: 18px; font-weight: 700; }
+#appgrid button.ok::after { content: "✓"; color: var(--ok); }
+#appgrid button.fail::after { content: "!"; color: var(--warn); }
+@keyframes app-pulse { 50% { box-shadow: 0 0 0 7px transparent; transform: scale(.97); } }
 #appgrid img { width: 64px; height: 64px; }
 #appgrid span { max-width: 112px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
@@ -120,6 +129,15 @@ body.not-casting .rail-btn:not(#stop-btn) { opacity: .3; pointer-events: none; }
 .toast .t-title { font-size: 30px; font-weight: 700; margin-top: 2px; line-height: 1.15; }
 .toast .t-text { font-size: 26px; color: var(--ink); margin-top: 4px; line-height: 1.25; overflow: hidden;
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.toast .t-body { flex: 1; min-width: 0; }
+.toast .t-reply { font-size: 24px; margin-top: 10px; padding: 10px 14px; border-radius: 14px; background: var(--rail-hi); }
+.toast .t-reply[hidden] { display: none; }
+.toast .t-actions { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+.toast .t-actions:empty { display: none; }
+.toast .t-actions button { font: 600 22px system-ui, sans-serif; padding: 14px 24px; border-radius: 16px; border: 0; }
+.toast .t-actions button.primary { background: var(--accent); color: var(--bg); }
+.toast .t-actions button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--rail-hi); }
+.toast.replying { border-left-color: var(--ok); align-items: flex-start; }
 @keyframes toast-in { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: none; } }
 
 /* Shown on top of the video when the phone can't act on touches. */
