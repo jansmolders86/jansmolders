@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0b0d10">
 <title>BeamDrive</title>
-<link rel="stylesheet" href="style.css?v=0.18.1">
+<link rel="stylesheet" href="style.css?v=0.19.1">
 </head>
 <body class="not-casting">
 <div id="app">
@@ -29,8 +29,9 @@
       <div id="batt-pct">--%</div>
       <div id="batt-temp" hidden></div>
     </div>
-    <button class="rail-btn" id="stop-btn" data-cmd="stop" aria-label="Stop casting" hidden>
-      <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+    <button class="rail-btn" id="cast-btn" aria-label="Start or stop casting" hidden>
+      <svg class="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.2-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+      <svg class="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
       <span class="stop-ask">Stop?</span>
     </button>
     <div id="link" title="Connection"><span class="dot"></span></div>
@@ -41,10 +42,16 @@
     <canvas id="screen"></canvas>
     <div id="notice" hidden></div>
     <div id="toasts" aria-live="polite"></div>
+    <button id="tts-stop" hidden aria-label="Stop reading aloud">
+      <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg><span>Stop reading</span>
+    </button>
     <div id="overlay">
+      <button id="gemini" hidden aria-label="Talk to Gemini">
+        <svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>
+        <span>Talk to Gemini</span>
+      </button>
       <div class="ov-title" id="ov-title">Connecting to your phone…</div>
       <div class="ov-sub" id="ov-sub">Make sure BeamDrive is open on your phone.</div>
-      <button id="ov-start" hidden>Start casting</button>
       <div id="appgrid" hidden></div>
       <form id="pair" hidden autocomplete="off">
         <input id="pair-code" maxlength="8" autocapitalize="characters" spellcheck="false" aria-label="Pairing code">
@@ -57,7 +64,7 @@
     <pre id="stats" hidden></pre>
   </main>
 </div>
-<script>window.BEAM_MODE = "rtc"; window.BEAM_PAGE_VERSION = "0.18.1";</script>
-<script src="app.js?v=0.18.1"></script>
+<script>window.BEAM_MODE = "rtc"; window.BEAM_PAGE_VERSION = "0.19.1";</script>
+<script src="app.js?v=0.19.1"></script>
 </body>
 </html>

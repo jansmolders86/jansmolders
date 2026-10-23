@@ -39,7 +39,7 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
 .rail-btn:active, .rail-btn.active { background: var(--rail-hi); }
 .rail-btn.active { color: var(--accent); }
 /* Not casting: Home, Maps, Apps and Back only work on the phone screen, so show them as inactive. */
-body.not-casting .rail-btn:not(#stop-btn) { opacity: .3; pointer-events: none; }
+body.not-casting .rail-btn:not(#cast-btn) { opacity: .3; pointer-events: none; }
 
 #np { margin-top: auto; width: 100%; padding: 10px 8px 4px; border-top: 1px solid var(--line); }
 #np-title { font-size: 13px; color: var(--ink-dim); text-align: center; white-space: nowrap;
@@ -59,12 +59,18 @@ body.not-casting .rail-btn:not(#stop-btn) { opacity: .3; pointer-events: none; }
 #batt.charging #batt-pct::before { content: "⚡"; }
 #batt-temp { font-size: 12px; font-weight: 500; color: var(--warn); }
 #batt-temp[hidden] { display: none; }
-#stop-btn { color: var(--bad); position: relative; }
-#stop-btn[hidden] { display: none; }
-#stop-btn .stop-ask { display: none; }
-#stop-btn.ask { background: var(--bad); color: #fff; }
-#stop-btn.ask svg { display: none; }
-#stop-btn.ask .stop-ask { display: block; font: 600 18px system-ui, sans-serif; }
+/* One button for both: blue play when not casting, red stop while casting. */
+#cast-btn { position: relative; }
+#cast-btn[hidden] { display: none; }
+#cast-btn .stop-ask, #cast-btn .i-stop { display: none; }
+#cast-btn.play { background: var(--accent); color: var(--bg); }
+#cast-btn.play.launching { animation: app-pulse 1s ease-in-out infinite; }
+#cast-btn.stop { color: var(--bad); }
+#cast-btn.stop .i-play { display: none; }
+#cast-btn.stop .i-stop { display: block; }
+#cast-btn.ask { background: var(--bad); color: #fff; }
+#cast-btn.ask svg { display: none !important; }
+#cast-btn.ask .stop-ask { display: block; font: 600 18px system-ui, sans-serif; }
 #ver { cursor: pointer; white-space: pre-line; font-size: 11px; line-height: 1.3; color: var(--ink-dim); text-align: center; padding-bottom: 2px; }
 #ver.bad { color: var(--warn); }
 
@@ -82,20 +88,31 @@ body.not-casting .rail-btn:not(#stop-btn) { opacity: .3; pointer-events: none; }
 #overlay > :first-child { margin-top: auto; }
 #overlay > :last-child { margin-bottom: auto; }
 #overlay.hidden { display: none; }
+/* Home (connected, not casting): Gemini on top, then your apps; no connection text. */
+#overlay.home { justify-content: flex-start; padding-top: 28px; }
+#overlay.home > :first-child { margin-top: 0; }
+#overlay.home .ov-title, #overlay.home #reload, #overlay.home #pair-change { display: none; }
+#overlay.home .ov-sub { min-height: 1.3em; }
+#gemini { display: flex; align-items: center; gap: 16px; padding: 20px 40px; border: 0; border-radius: 48px;
+  background: var(--rail); color: var(--ink); font: 600 26px system-ui, sans-serif;
+  box-shadow: 0 0 0 2px var(--rail-hi); transition: transform .12s, box-shadow .2s; }
+#gemini[hidden] { display: none; }
+#gemini svg { width: 36px; height: 36px; fill: var(--accent); }
+#gemini:active { transform: scale(.95); }
+#gemini.launching { box-shadow: 0 0 0 3px var(--accent); animation: app-pulse 1s ease-in-out infinite; }
+#gemini.ok { box-shadow: 0 0 0 3px var(--ok); }
+#gemini.fail { box-shadow: 0 0 0 3px var(--warn); }
 .ov-title { font-size: 32px; font-weight: 600; }
 .ov-sub { font-size: 18px; color: var(--ink-dim); max-width: 560px; }
 #stats { position: absolute; top: 10px; right: 10px; margin: 0; padding: 8px 12px; border-radius: 8px;
   background: var(--stats-bg); font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace; pointer-events: none; }
-#ov-start { margin-top: 18px; padding: 22px 48px; border: 0; border-radius: 40px; background: var(--accent);
-  color: var(--bg); font: 600 24px/1 system-ui, sans-serif; cursor: pointer; }
-#ov-start:active { filter: brightness(.85); }
 #pair { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 18px; }
 #pair-code { width: 260px; font: 600 44px/1 ui-monospace, Consolas, monospace; letter-spacing: 12px; text-align: center;
   text-transform: uppercase; background: var(--rail); color: var(--ink); border: 2px solid var(--rail-hi); border-radius: 18px; padding: 14px; }
 #pair button { padding: 20px 40px; border: 0; border-radius: 40px; background: var(--accent); color: var(--bg); font: 600 22px/1 system-ui, sans-serif; }
 #pair-err { flex-basis: 100%; color: var(--warn); min-height: 1.3em; }
 .ghost { margin-top: 10px; background: transparent; border: 0; color: var(--ink-dim); font: 16px system-ui, sans-serif; }
-#pair[hidden], #ov-start[hidden], #pair-change[hidden] { display: none; }
+#pair[hidden], #pair-change[hidden] { display: none; }
 
 /* Your apps while not casting: tap to open on the phone (sound comes through the car). */
 #appgrid { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; max-width: 1180px; margin-top: 18px; }
@@ -107,6 +124,9 @@ body.not-casting .rail-btn:not(#stop-btn) { opacity: .3; pointer-events: none; }
 #appgrid button:active { background: var(--rail-hi); transform: scale(.92); }
 #appgrid button.launching { box-shadow: 0 0 0 3px var(--accent); animation: app-pulse 1s ease-in-out infinite; }
 #appgrid button.ok { box-shadow: 0 0 0 3px var(--ok); }
+/* Long press: the ring fills while you hold; ⚡ marks apps that have an action. */
+#appgrid button.holding { box-shadow: 0 0 0 3px var(--accent); transform: scale(.92); transition: transform .6s, box-shadow .6s; }
+#appgrid button.has-action::before { content: "⚡"; position: absolute; top: 6px; left: 9px; font-size: 16px; }
 #appgrid button.fail { box-shadow: 0 0 0 3px var(--warn); }
 #appgrid button.ok::after, #appgrid button.fail::after { position: absolute; top: 6px; right: 8px; font-size: 18px; font-weight: 700; }
 #appgrid button.ok::after { content: "✓"; color: var(--ok); }
@@ -139,6 +159,14 @@ body.not-casting .rail-btn:not(#stop-btn) { opacity: .3; pointer-events: none; }
 .toast .t-actions button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--rail-hi); }
 .toast.replying { border-left-color: var(--ok); align-items: flex-start; }
 @keyframes toast-in { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: none; } }
+
+/* Shown while a notification is being read aloud. */
+#tts-stop { position: absolute; right: 20px; bottom: 20px; z-index: 7; display: flex; align-items: center; gap: 12px;
+  padding: 18px 28px; border: 0; border-radius: 40px; background: var(--bad); color: #fff;
+  font: 600 22px system-ui, sans-serif; box-shadow: 0 8px 28px rgba(0,0,0,.4); }
+#tts-stop[hidden] { display: none; }
+#tts-stop svg { width: 26px; height: 26px; fill: currentColor; }
+#tts-stop:active { transform: scale(.95); }
 
 /* Shown on top of the video when the phone can't act on touches. */
 #notice { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); z-index: 5;
