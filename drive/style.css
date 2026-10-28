@@ -51,6 +51,7 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
 .rail-btn.orient { color: var(--accent); }
 /* Your car on the map (or the blue arrow), centred on its position and turned by script. */
 .map-car { display: flex; align-items: center; justify-content: center; transition: transform .5s; }
+.map-car img.orig { width: 64px; transform: rotate(-90deg); }
 .map-car img { width: 36px; height: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)); }
 
 /* Tesla-style navigation: search box top left, then the next-turn and arrival cards. */
@@ -82,8 +83,7 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
   color: #e8ecf1; font: 600 19px system-ui, sans-serif; box-shadow: 0 6px 22px rgba(0,0,0,.45); }
 .nav-eta-text { flex: 1; }
 .nav-stop { width: 48px; height: 48px; border: 0; border-radius: 50%; background: #d93025; color: #fff; font-size: 20px; }
-/* On the map, notifications sit to the right of the navigation cards. */
-body.map #toasts { left: calc(min(440px, 40%) + 32px); width: min(560px, 45%); }
+/* Notifications stay in their usual place (top left) on the map too, on top of everything. */
 .map-recenter { position: absolute; right: 30px; bottom: 118px; z-index: 2; }
 .map-recenter[hidden] { display: none; }
 /* Keep the map's own attribution small and out of the way. */
