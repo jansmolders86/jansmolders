@@ -39,7 +39,19 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
 .rail-btn:active, .rail-btn.active { background: var(--rail-hi); }
 .rail-btn.active { color: var(--accent); }
 /* Not casting: Home, Maps, Apps and Back only work on the phone screen, so show them as inactive. */
-body.not-casting .rail-btn:not(#cast-btn) { opacity: .3; pointer-events: none; }
+/* Car map (side panel → Maps while not casting). */
+#mapview { position: absolute; inset: 0; z-index: 5; background: #1d2024; }
+#mapview[hidden] { display: none; }
+#mapview .map-canvas { position: absolute; inset: 0; }
+.map-btn { width: 64px; height: 64px; border: 0; border-radius: 50%; background: var(--rail); color: var(--ink);
+  font: 600 30px/1 system-ui, sans-serif; box-shadow: 0 6px 20px rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; }
+.map-btn:active { transform: scale(.92); }
+.map-btn svg { width: 30px; height: 30px; fill: var(--accent); }
+.map-zoom { position: absolute; right: 30px; top: 24px; z-index: 2; display: flex; flex-direction: column; gap: 12px; }
+.map-recenter { position: absolute; right: 30px; bottom: 118px; z-index: 2; }
+.map-recenter[hidden] { display: none; }
+/* Keep the map's own attribution small and out of the way. */
+#mapview .maplibregl-ctrl-bottom-right { right: 110px; }
 
 #np { margin-top: auto; width: 100%; padding: 10px 8px 4px; border-top: 1px solid var(--line); }
 #np-title { font-size: 13px; color: var(--ink-dim); text-align: center; white-space: nowrap;
