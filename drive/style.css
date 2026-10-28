@@ -48,6 +48,42 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
 .map-btn:active { transform: scale(.92); }
 .map-btn svg { width: 30px; height: 30px; fill: var(--accent); }
 .map-zoom { position: absolute; right: 30px; top: 24px; z-index: 2; display: flex; flex-direction: column; gap: 12px; }
+.rail-btn.orient { color: var(--accent); }
+/* Your car on the map (or the blue arrow), centred on its position and turned by script. */
+.map-car { display: flex; align-items: center; justify-content: center; transition: transform .5s; }
+.map-car img { width: 36px; height: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)); }
+
+/* Tesla-style navigation: search box top left, then the next-turn and arrival cards. */
+.nav { position: absolute; left: 16px; top: 16px; z-index: 3; width: min(440px, 40%); display: flex; flex-direction: column; gap: 10px; }
+.nav-search { display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 18px; border-radius: 16px;
+  background: rgba(40, 44, 49, .96); box-shadow: 0 6px 22px rgba(0,0,0,.45); }
+.nav-search svg { width: 28px; height: 28px; fill: #9aa3ad; flex: 0 0 28px; }
+.nav-search input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; color: #e8ecf1;
+  font: 500 22px system-ui, sans-serif; }
+.nav-search input::placeholder { color: #8a929c; }
+.nav-search input::-webkit-search-cancel-button { display: none; }
+.nav-clear { border: 0; background: transparent; color: #9aa3ad; font-size: 22px; padding: 8px; }
+.nav-clear[hidden], .nav-results[hidden], .nav-turn[hidden], .nav-eta[hidden] { display: none; }
+.nav-results { border-radius: 16px; overflow: hidden; background: rgba(40, 44, 49, .98); box-shadow: 0 6px 22px rgba(0,0,0,.45); }
+.nav-result { display: block; width: 100%; text-align: left; padding: 14px 20px; border: 0; border-top: 1px solid #353a40;
+  background: transparent; color: #e8ecf1; }
+.nav-result:first-child { border-top: 0; }
+.nav-result:active { background: #353a40; }
+.nav-main { font: 600 20px system-ui, sans-serif; }
+.nav-sub { font: 15px system-ui, sans-serif; color: #8a929c; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-note { padding: 16px 20px; color: #c4cad1; font: 17px system-ui, sans-serif; }
+.nav.navigating .nav-search { display: none; }
+.nav-turn { display: flex; align-items: center; gap: 18px; padding: 18px 22px; border-radius: 16px; background: #2b3036; color: #fff;
+  box-shadow: 0 6px 22px rgba(0,0,0,.45); }
+.nav-arrow svg { width: 64px; height: 64px; display: block; color: #fff; }
+.nav-dist { font: 700 34px system-ui, sans-serif; }
+.nav-road { font: 500 20px system-ui, sans-serif; color: #c4cad1; margin-top: 2px; }
+.nav-eta { display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 22px; border-radius: 16px; background: rgba(40, 44, 49, .96);
+  color: #e8ecf1; font: 600 19px system-ui, sans-serif; box-shadow: 0 6px 22px rgba(0,0,0,.45); }
+.nav-eta-text { flex: 1; }
+.nav-stop { width: 48px; height: 48px; border: 0; border-radius: 50%; background: #d93025; color: #fff; font-size: 20px; }
+/* On the map, notifications sit to the right of the navigation cards. */
+body.map #toasts { left: calc(min(440px, 40%) + 32px); width: min(560px, 45%); }
 .map-recenter { position: absolute; right: 30px; bottom: 118px; z-index: 2; }
 .map-recenter[hidden] { display: none; }
 /* Keep the map's own attribution small and out of the way. */
