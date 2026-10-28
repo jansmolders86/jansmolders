@@ -1,0 +1,243 @@
+:root {
+  --bg: #0b0d10;
+  --rail: #14171c;
+  --rail-hi: #1f242b;
+  --ink: #e8ecf1;
+  --ink-dim: #8a94a3;
+  --accent: #4f9cff;
+  --ok: #3ad08a;
+  --warn: #ffb547;
+  --bad: #ff5d5d;
+  --rail-w: 112px;
+  --line: #222831;
+  --stats-bg: rgba(0,0,0,.65);
+}
+:root[data-theme="light"] {
+  --bg: #f2f4f7;
+  --rail: #ffffff;
+  --rail-hi: #e4e8ee;
+  --ink: #12161c;
+  --ink-dim: #5a6472;
+  --accent: #1f6fe5;
+  --ok: #13a06b;
+  --warn: #b86e00;
+  --bad: #d93636;
+  --line: #e1e5eb;
+  --stats-bg: rgba(255,255,255,.85);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
+  font: 16px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none; }
+#app { display: flex; height: 100%; width: 100%; }
+
+#rail { width: var(--rail-w); flex: 0 0 var(--rail-w); background: var(--rail);
+  display: flex; flex-direction: column; align-items: center; padding: 14px 0; gap: 10px; }
+.rail-btn { width: 84px; height: 84px; border: 0; border-radius: 22px; background: transparent;
+  display: grid; place-items: center; color: var(--ink); cursor: pointer; transition: background .12s; }
+.rail-btn svg { width: 40px; height: 40px; fill: currentColor; }
+.rail-btn:active, .rail-btn.active { background: var(--rail-hi); }
+.rail-btn.active { color: var(--accent); }
+/* Not casting: Home, Maps, Apps and Back only work on the phone screen, so show them as inactive. */
+/* Car map (side panel → Maps while not casting). */
+#mapview { position: absolute; inset: 0; z-index: 5; background: #1d2024; }
+#mapview[hidden] { display: none; }
+#mapview .map-canvas { position: absolute; inset: 0; }
+.map-btn { width: 64px; height: 64px; border: 0; border-radius: 50%; background: var(--rail); color: var(--ink);
+  font: 600 30px/1 system-ui, sans-serif; box-shadow: 0 6px 20px rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; }
+.map-btn:active { transform: scale(.92); }
+.map-btn svg { width: 30px; height: 30px; fill: var(--accent); }
+.map-zoom { position: absolute; right: 30px; top: 24px; z-index: 2; display: flex; flex-direction: column; gap: 12px; }
+.rail-btn.orient { color: var(--accent); }
+/* Your car on the map (or the blue arrow), centred on its position and turned by script. */
+.map-car { display: flex; align-items: center; justify-content: center; transition: transform .5s; }
+.map-car img.orig { width: 64px; transform: rotate(-90deg); }
+.map-car img { width: 36px; height: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)); }
+
+/* Tesla-style navigation: search box top left, then the next-turn and arrival cards. */
+.nav { position: absolute; left: 16px; top: 16px; z-index: 3; width: min(440px, 40%); display: flex; flex-direction: column; gap: 10px; }
+.nav-search { display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 18px; border-radius: 16px;
+  background: rgba(40, 44, 49, .96); box-shadow: 0 6px 22px rgba(0,0,0,.45); }
+.nav-search svg { width: 28px; height: 28px; fill: #9aa3ad; flex: 0 0 28px; }
+.nav-search input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; color: #e8ecf1;
+  font: 500 22px system-ui, sans-serif; }
+.nav-search input::placeholder { color: #8a929c; }
+.nav-search input::-webkit-search-cancel-button { display: none; }
+.nav-clear { border: 0; background: transparent; color: #9aa3ad; font-size: 22px; padding: 8px; }
+.nav-clear[hidden], .nav-results[hidden], .nav-turn[hidden], .nav-eta[hidden] { display: none; }
+.nav-results { border-radius: 16px; overflow: hidden; background: rgba(40, 44, 49, .98); box-shadow: 0 6px 22px rgba(0,0,0,.45); }
+.nav-result { display: block; width: 100%; text-align: left; padding: 14px 20px; border: 0; border-top: 1px solid #353a40;
+  background: transparent; color: #e8ecf1; }
+.nav-result:first-child { border-top: 0; }
+.nav-result:active { background: #353a40; }
+.nav-main { font: 600 20px system-ui, sans-serif; }
+.nav-sub { font: 15px system-ui, sans-serif; color: #8a929c; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-note { padding: 16px 20px; color: #c4cad1; font: 17px system-ui, sans-serif; }
+.nav.navigating .nav-search { display: none; }
+.nav-turn { display: flex; align-items: center; gap: 18px; padding: 18px 22px; border-radius: 16px; background: #2b3036; color: #fff;
+  box-shadow: 0 6px 22px rgba(0,0,0,.45); }
+.nav-arrow svg { width: 64px; height: 64px; display: block; color: #fff; }
+.nav-dist { font: 700 34px system-ui, sans-serif; }
+.nav-road { font: 500 20px system-ui, sans-serif; color: #c4cad1; margin-top: 2px; }
+.nav-eta { display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 22px; border-radius: 16px; background: rgba(40, 44, 49, .96);
+  color: #e8ecf1; font: 600 19px system-ui, sans-serif; box-shadow: 0 6px 22px rgba(0,0,0,.45); }
+.nav-eta-text { flex: 1; }
+.nav-stop { width: 48px; height: 48px; border: 0; border-radius: 50%; background: #d93025; color: #fff; font-size: 20px; }
+/* Notifications stay in their usual place (top left) on the map too, on top of everything. */
+.map-recenter { position: absolute; right: 30px; bottom: 118px; z-index: 2; }
+.map-recenter[hidden] { display: none; }
+/* Keep the map's own attribution small and out of the way. */
+#mapview .maplibregl-ctrl-bottom-right { right: 110px; }
+
+#np { margin-top: auto; width: 100%; padding: 10px 8px 4px; border-top: 1px solid var(--line); }
+#np-title { font-size: 13px; color: var(--ink-dim); text-align: center; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px; }
+.np-row { display: flex; justify-content: space-between; }
+.np-btn { width: 32px; height: 48px; border: 0; background: transparent; color: var(--ink); padding: 0; display: grid; place-items: center; }
+.np-btn svg { width: 28px; height: 28px; fill: currentColor; }
+#np-toggle svg { width: 34px; height: 34px; }
+
+#link { padding: 10px 0 2px; }
+/* Phone battery, pinned to the bottom of the rail with the stop button. */
+#batt { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  color: var(--ink); font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; padding-bottom: 6px; }
+#batt[hidden] { display: none; }
+#batt svg { width: 34px; height: 17px; }
+#batt.low { color: var(--bad); }
+#batt.charging #batt-pct::before { content: "⚡"; }
+#batt-temp { font-size: 12px; font-weight: 500; color: var(--warn); }
+#batt-temp[hidden] { display: none; }
+/* Zoom: fill the window (crops a little top/bottom) or fit the whole phone screen. */
+#zoom-btn[hidden] { display: none; }
+#zoom-btn .i-fit { display: none; }
+#zoom-btn.on { color: var(--accent); }
+#zoom-btn.on .i-fill { display: none; }
+#zoom-btn.on .i-fit { display: block; }
+#ver[hidden] { display: none; }
+#link { cursor: pointer; padding-bottom: 6px; }
+
+/* One button for both: blue play when not casting, red stop while casting. */
+#cast-btn { position: relative; }
+#cast-btn[hidden] { display: none; }
+#cast-btn .stop-ask, #cast-btn .i-stop { display: none; }
+#cast-btn.play { background: var(--accent); color: var(--bg); }
+#cast-btn.play.launching { animation: app-pulse 1s ease-in-out infinite; }
+#cast-btn.stop { color: var(--bad); }
+#cast-btn.stop .i-play { display: none; }
+#cast-btn.stop .i-stop { display: block; }
+#cast-btn.ask { background: var(--bad); color: #fff; }
+#cast-btn.ask svg { display: none !important; }
+#cast-btn.ask .stop-ask { display: block; font: 600 18px system-ui, sans-serif; }
+#ver { cursor: pointer; white-space: pre-line; font-size: 11px; line-height: 1.3; color: var(--ink-dim); text-align: center; padding-bottom: 2px; }
+#ver.bad { color: var(--warn); }
+
+.dot { display: block; width: 12px; height: 12px; border-radius: 50%; background: var(--bad); }
+.dot.ok { background: var(--ok); }
+.dot.warn { background: var(--warn); }
+
+#stage { position: relative; flex: 1; display: grid; place-items: center; overflow: hidden; }
+#screen { display: block; background: #000; image-rendering: auto;
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+#overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-start; gap: 12px; text-align: center; padding: 40px; background: var(--bg);
+  overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; }
+/* Centred when it fits, scrollable (from the top) when it doesn't, e.g. with many apps. */
+#overlay > * { flex-shrink: 0; }
+#overlay > :first-child { margin-top: auto; }
+#overlay > :last-child { margin-bottom: auto; }
+#overlay.hidden { display: none; }
+/* Home (connected, not casting): Gemini on top, then your apps; no connection text. */
+#overlay.home { justify-content: flex-start; padding-top: 24px; padding-bottom: 120px; }
+#overlay.home > :first-child { margin-top: 0; }
+#overlay.home .ov-title, #overlay.home #reload, #overlay.home #pair-change { display: none; }
+#overlay.home .ov-sub { display: none; }
+/* Status note, bottom left, on the same line as the buttons on the right. */
+#status { position: absolute; left: 24px; bottom: 30px; z-index: 7; max-width: 46%; min-height: 64px;
+  display: flex; align-items: center; padding: 12px 22px; box-sizing: border-box; border-radius: 20px;
+  background: var(--rail); color: var(--ink); font-size: 19px; line-height: 1.3;
+  box-shadow: 0 8px 26px rgba(0,0,0,.4); transition: opacity .3s; }
+#status[hidden] { display: none; }
+#status.out { opacity: 0; }
+/* Talk to Gemini: a small round mic button, bottom right (home screen only). */
+#gemini { position: absolute; right: 24px; bottom: 24px; z-index: 7; width: 76px; height: 76px; border: 0; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; background: var(--rail); color: var(--accent);
+  box-shadow: 0 6px 22px rgba(0,0,0,.4), 0 0 0 2px var(--rail-hi); transition: transform .12s, box-shadow .2s; }
+#gemini[hidden] { display: none; }
+#gemini svg { width: 38px; height: 38px; fill: currentColor; }
+#gemini:active { transform: scale(.92); }
+#gemini.launching { box-shadow: 0 0 0 3px var(--accent); animation: app-pulse 1s ease-in-out infinite; }
+#gemini.ok { box-shadow: 0 0 0 3px var(--ok); }
+#gemini.fail { box-shadow: 0 0 0 3px var(--warn); }
+/* With the mic button showing, "Stop reading" sits just left of it, centred on the same line
+   (mic: 76 px high at 24 px from the bottom; this: 64 px at 30 px). */
+body.home #tts-stop { right: 116px; }
+.ov-title { font-size: 32px; font-weight: 600; }
+.ov-sub { font-size: 18px; color: var(--ink-dim); max-width: 560px; }
+#stats { position: absolute; top: 10px; right: 10px; margin: 0; padding: 8px 12px; border-radius: 8px;
+  background: var(--stats-bg); font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace; pointer-events: none; }
+#pair { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 18px; }
+#pair-code { width: 260px; font: 600 44px/1 ui-monospace, Consolas, monospace; letter-spacing: 12px; text-align: center;
+  text-transform: uppercase; background: var(--rail); color: var(--ink); border: 2px solid var(--rail-hi); border-radius: 18px; padding: 14px; }
+#pair button { padding: 20px 40px; border: 0; border-radius: 40px; background: var(--accent); color: var(--bg); font: 600 22px/1 system-ui, sans-serif; }
+#pair-err { flex-basis: 100%; color: var(--warn); min-height: 1.3em; }
+.ghost { margin-top: 10px; background: transparent; border: 0; color: var(--ink-dim); font: 16px system-ui, sans-serif; }
+#pair[hidden], #pair-change[hidden] { display: none; }
+
+/* Your apps while not casting: tap to open on the phone (sound comes through the car). */
+#appgrid { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; max-width: 1180px; margin-top: 18px; }
+#appgrid[hidden] { display: none; }
+#appgrid button { width: 128px; padding: 14px 8px 12px; border: 0; border-radius: 22px; background: var(--rail);
+  color: var(--ink); font: 15px system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+#appgrid button { position: relative; transition: transform .12s, background .2s, box-shadow .2s; }
+/* Press feedback: shrinks under your finger, then pulses until the phone confirms. */
+#appgrid button:active { background: var(--rail-hi); transform: scale(.92); }
+#appgrid button.launching { box-shadow: 0 0 0 3px var(--accent); animation: app-pulse 1s ease-in-out infinite; }
+#appgrid button.ok { box-shadow: 0 0 0 3px var(--ok); }
+/* Long press: the ring fills while you hold; ⚡ marks apps that have an action. */
+#appgrid button.holding { box-shadow: 0 0 0 3px var(--accent); transform: scale(.92); transition: transform .6s, box-shadow .6s; }
+#appgrid button.has-action::before { content: "⚡"; position: absolute; top: 6px; left: 9px; font-size: 16px; }
+#appgrid button.fail { box-shadow: 0 0 0 3px var(--warn); }
+#appgrid button.ok::after, #appgrid button.fail::after { position: absolute; top: 6px; right: 8px; font-size: 18px; font-weight: 700; }
+#appgrid button.ok::after { content: "✓"; color: var(--ok); }
+#appgrid button.fail::after { content: "!"; color: var(--warn); }
+@keyframes app-pulse { 50% { box-shadow: 0 0 0 7px transparent; transform: scale(.97); } }
+#appgrid img { width: 64px; height: 64px; }
+#appgrid span { max-width: 112px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Phone notifications (while not casting): big cards on the left, the driver's side, easy to
+   catch from the corner of your eye. Gone after a few seconds; tap to dismiss. */
+#toasts { position: absolute; top: 16px; left: 16px; z-index: 6; display: flex; flex-direction: column; gap: 14px;
+  width: min(760px, 62%); pointer-events: none; }
+.toast { pointer-events: auto; display: flex; gap: 20px; align-items: center; padding: 22px 26px;
+  border-radius: 26px; background: var(--rail); color: var(--ink); box-shadow: 0 10px 34px rgba(0,0,0,.45);
+  border-left: 6px solid var(--accent);
+  animation: toast-in .25s ease-out; transition: opacity .3s, transform .3s; }
+.toast.out { opacity: 0; transform: translateX(-40px); }
+.toast img { width: 72px; height: 72px; border-radius: 16px; flex: 0 0 72px; }
+.toast .t-app { font-size: 18px; color: var(--ink-dim); }
+.toast .t-title { font-size: 30px; font-weight: 700; margin-top: 2px; line-height: 1.15; }
+.toast .t-text { font-size: 26px; color: var(--ink); margin-top: 4px; line-height: 1.25; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.toast .t-body { flex: 1; min-width: 0; }
+.toast .t-reply { font-size: 24px; margin-top: 10px; padding: 10px 14px; border-radius: 14px; background: var(--rail-hi); }
+.toast .t-reply[hidden] { display: none; }
+.toast .t-actions { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+.toast .t-actions:empty { display: none; }
+.toast .t-actions button { font: 600 22px system-ui, sans-serif; padding: 14px 24px; border-radius: 16px; border: 0; }
+.toast .t-actions button.primary { background: var(--accent); color: var(--bg); }
+.toast .t-actions button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--rail-hi); }
+.toast.replying { border-left-color: var(--ok); align-items: flex-start; }
+@keyframes toast-in { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: none; } }
+
+/* Shown while a notification is being read aloud. */
+#tts-stop { position: absolute; right: 24px; bottom: 30px; z-index: 7; display: flex; align-items: center; gap: 12px;
+  height: 64px; padding: 0 28px; box-sizing: border-box; border: 0; border-radius: 40px; background: var(--bad); color: #fff;
+  font: 600 22px system-ui, sans-serif; box-shadow: 0 8px 28px rgba(0,0,0,.4); }
+#tts-stop[hidden] { display: none; }
+#tts-stop svg { width: 26px; height: 26px; fill: currentColor; }
+#tts-stop:active { transform: scale(.95); }
+
+/* Shown on top of the video when the phone can't act on touches. */
+#notice { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); z-index: 5;
+  max-width: 80%; padding: 12px 18px; border-radius: 12px; background: #b3261e; color: #fff;
+  font-size: 18px; line-height: 1.3; text-align: center; pointer-events: none; }
