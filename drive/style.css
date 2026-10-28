@@ -40,7 +40,7 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
 .rail-btn.active { color: var(--accent); }
 /* Not casting: Home, Maps, Apps and Back only work on the phone screen, so show them as inactive. */
 /* Car map (side panel → Maps while not casting). */
-#mapview { position: absolute; inset: 0; z-index: 5; background: #1d2024; }
+#mapview { position: absolute; inset: 0; z-index: 5; background: #3d3e42; }
 #mapview[hidden] { display: none; }
 #mapview .map-canvas { position: absolute; inset: 0; }
 .map-btn { width: 64px; height: 64px; border: 0; border-radius: 50%; background: var(--rail); color: var(--ink);
