@@ -62,6 +62,11 @@
   .go:disabled{opacity:.5;cursor:wait}
   #status{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);min-height:1em;max-width:460px}
 
+  /* Instrument picker */
+  #instBar{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:4;display:flex;gap:4px;padding:5px;border-radius:999px;background:rgba(18,16,26,.82);border:1px solid var(--line);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);max-width:calc(100% - 16px)}
+  #instBar button{border:0;border-radius:999px;min-height:40px;padding:0 13px;background:transparent;color:var(--text);font:600 14px 'Space Grotesk',sans-serif;cursor:pointer;white-space:nowrap}
+  #instBar button.on{background:var(--pitch);color:#120814}
+  @media (max-width:400px){ #instBar button{padding:0 9px;font-size:13px} }
   /* Help sheet (mobile) */
   #helpSheet{position:absolute;inset:auto 0 0 0;z-index:6;background:var(--panel);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:18px calc(18px + var(--sar)) calc(18px + var(--sab)) calc(18px + var(--sal));display:none;max-height:75%;overflow:auto}
   #helpSheet.open{display:block}
@@ -114,6 +119,12 @@
   <div id="stage">
     <video id="video" playsinline muted autoplay></video>
     <canvas id="canvas"></canvas>
+    <div id="instBar" role="radiogroup" aria-label="Instrument">
+      <button data-i="theremin" class="on">〰️ Theremin</button>
+      <button data-i="piano">🎹 Piano</button>
+      <button data-i="guitar">🎸 Guitar</button>
+      <button data-i="organ">🎶 Organ</button>
+    </div>
     <div id="settings" hidden>
   <label>Scale
     <select id="scale">
@@ -131,7 +142,7 @@
       <option value="5">F</option><option value="7">G</option><option value="9" selected>A</option><option value="11">B</option>
     </select>
   </label>
-  <label>Wave
+  <label id="waveWrap">Wave (theremin)
     <select id="wave">
       <option value="sine">Sine (classic)</option>
       <option value="triangle" selected>Triangle</option>
@@ -154,9 +165,10 @@
         <strong>Pitch hand (right side of the screen):</strong><br>
         ↕ height → note<br>
         ✊→🖐️ open your hand → brighter tone<br>
-        🤏 pinch thumb + index → vibrato<br>
+        🤏 pinch thumb + index → vibrato (theremin, organ) or play the note again (piano, guitar)<br>
         ☝️✌️🤟 fingers up → harmony (1 solo · 2 fifth · 3 major chord · 4 + octave · 5 full chord)<br><br>
         <strong>Volume hand (left side):</strong> higher = louder. With only one hand, volume stays at medium.<br><br>
+        🎹🎸 Piano and guitar play a note each time your hand reaches a new note; chords are strummed on guitar.<br><br>
         Move your pitch hand out of view to go silent. Good, even light helps the tracking.
       </div>
       <button class="go" id="helpClose" style="margin-top:16px;width:100%">Got it</button>
@@ -169,7 +181,7 @@
       <div class="bar"><i id="volBar" style="background:var(--vol)"></i></div></div>
     <div class="meter"><div class="k">Bright</div><div class="v" id="briOut">–</div>
       <div class="bar"><i id="briBar" style="background:var(--accent)"></i></div></div>
-    <div class="meter"><div class="k">Vibrato</div><div class="v" id="vibOut">–</div>
+    <div class="meter"><div class="k" id="vibK">Vibrato</div><div class="v" id="vibOut">–</div>
       <div class="bar"><i id="vibBar" style="background:var(--vib)"></i></div></div>
     <div class="meter" id="m-harm"><div class="k">Fingers</div><div class="v" id="harmOut">–</div>
       <div class="fingers" id="fingerDots"><b></b><b></b><b></b><b></b><b></b></div></div>
@@ -177,9 +189,10 @@
       <strong>Pitch hand (right):</strong><br>
       ↕ height → note<br>
       ✊→🖐️ open hand → brighter tone<br>
-      🤏 pinch thumb + index → vibrato<br>
+      🤏 pinch thumb + index → vibrato (theremin, organ) or play the note again (piano, guitar)<br>
       ☝️✌️🤟 fingers up → harmony (1 = solo, 2 = +fifth, 3 = major chord, 4 = +octave, 5 = full chord)<br><br>
       <strong>Volume hand (left):</strong> higher = louder. No left hand? Volume stays at medium.<br><br>
+      🎹🎸 Piano and guitar play a note each time your hand reaches a new note; chords are strummed on guitar.<br><br>
       Take your pitch hand out of view to go silent. Good light helps tracking.
     </div>
   </aside>
@@ -212,6 +225,8 @@ const cfg = {};
 let rungsCache = null;
 function readCfg(){
   cfg.scale = $("scale").value; cfg.root = +$("root").value; cfg.range = +$("range").value;
+  cfg.inst = cfg.inst || "theremin";
+  if(audio) prewarm();
   rungsCache = null;
 }
 readCfg();
@@ -221,6 +236,9 @@ function buildAudio(){
   const ac = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: "interactive" });
   const master = ac.createGain(); master.gain.value = 0;
   const filter = ac.createBiquadFilter(); filter.type = "lowpass"; filter.Q.value = 4; filter.frequency.value = 1200;
+  const contBus = ac.createGain(); contBus.gain.value = 1;   // theremin / organ oscillators
+  const pluckBus = ac.createGain(); pluckBus.gain.value = 1; // piano / guitar samples
+  contBus.connect(filter); pluckBus.connect(filter);
   const comp = ac.createDynamicsCompressor();
   const delay = ac.createDelay(1.0); delay.delayTime.value = 0.32;
   const fb = ac.createGain(); fb.gain.value = 0.3;
@@ -239,12 +257,127 @@ function buildAudio(){
     const o = ac.createOscillator(); o.type = $("wave").value; o.frequency.value = 220;
     const g = ac.createGain(); g.gain.value = i===0 ? 1 : 0;
     lfoGain.connect(o.detune);
-    o.connect(g); g.connect(filter); o.start();
+    o.connect(g); g.connect(contBus); o.start();
     voices.push({o,g});
   }
-  return {ac, master, filter, delay, fb, wet, lfo, lfoGain, voices};
+  const organWave = ac.createPeriodicWave(new Float32Array(9), Float32Array.from([0,1,.75,.45,.5,0,.3,0,.22]));
+  return {ac, master, filter, contBus, pluckBus, delay, fb, wet, lfo, lfoGain, voices, organWave, plucks:[]};
 }
-function setWave(type){ if(audio) audio.voices.forEach(v=>v.o.type=type); }
+function setWave(type){
+  if(!audio) return;
+  if(cfg.inst === "organ") audio.voices.forEach(v => v.o.setPeriodicWave(audio.organWave));
+  else audio.voices.forEach(v => v.o.type = type);
+}
+
+// ---------- Instruments ----------
+const INSTR = {
+  theremin:{ kind:"osc" }, organ:{ kind:"osc" },
+  piano:{ kind:"pluck" }, guitar:{ kind:"pluck" }
+};
+const isPluck = () => INSTR[cfg.inst].kind === "pluck";
+const bufCache = { piano:new Map(), guitar:new Map() };
+
+// Karplus-Strong plucked string, rendered once per note
+function renderGuitar(midi){
+  const sr = audio.ac.sampleRate, f = midiToHz(midi);
+  const T60 = clamp(4.2 - (midi - 40) * 0.07, 1.2, 4.2);
+  const len = Math.floor(sr * Math.min(T60, 3.5));
+  const N = Math.max(2, Math.floor(sr / f - 0.5));
+  const loss = Math.pow(10, -3 / (f * T60));
+  const out = new Float32Array(len);
+  for(let i=0;i<N;i++) out[i] = Math.random()*2 - 1;
+  for(let i=1;i<N;i++) out[i] = 0.6*out[i] + 0.4*out[i-1];        // softer pick
+  const pos = Math.max(1, Math.floor(N * 0.18));                     // pluck position comb
+  for(let i=N-1;i>=pos;i--) out[i] -= 0.5*out[i-pos];
+  out[N] = loss * out[0];
+  for(let i=N+1;i<len;i++) out[i] = loss * 0.5 * (out[i-N] + out[i-N-1]);
+  const fade = Math.floor(sr*0.05); for(let i=0;i<fade;i++) out[len-1-i] *= i/fade;
+  return { buf: toBuffer(out, 0.7), rate: f / (sr / (N + 0.5)) };
+}
+
+// Additive piano: slightly inharmonic partials, two detuned strings, two-stage decay, hammer thump
+function renderPiano(midi){
+  const sr = audio.ac.sampleRate, f = midiToHz(midi);
+  const dur = clamp(4.5 - (midi - 40) * 0.06, 1.4, 4.5);
+  const len = Math.floor(sr * dur), out = new Float32Array(len);
+  const B = 0.00025 * Math.pow(2, (midi - 60) / 24);
+  const baseTau = clamp(2.6 - (midi - 48) * 0.045, 0.5, 3.2);
+  for(let k=1;k<=18;k++){
+    const fk = k * f * Math.sqrt(1 + B*k*k);
+    if(fk > sr * 0.45) break;
+    const amp = (k===1 ? 1 : 0.9 / Math.pow(k, 1.25)) * (k===7 || k===14 ? 0.3 : 1); // hammer node dips
+    const tau = baseTau / (1 + 0.45*(k-1));
+    for(const det of [-0.0006, 0.0006]){
+      const w = 2*Math.PI*fk*(1+det)/sr, c = 2*Math.cos(w);
+      let s1 = Math.sin(Math.random()*6.28), s0 = Math.sin(Math.asin(s1) - w);
+      const dFast = Math.exp(-1/(sr*tau*0.22)), dSlow = Math.exp(-1/(sr*tau));
+      let eF = 0.55*amp, eS = 0.45*amp;
+      for(let n=0;n<len;n++){
+        const s2 = c*s1 - s0; s0 = s1; s1 = s2;
+        out[n] += s2 * (eF + eS); eF *= dFast; eS *= dSlow;
+      }
+    }
+  }
+  const atk = Math.floor(sr*0.003); for(let n=0;n<atk;n++) out[n] *= n/atk;
+  let lp = 0; const th = Math.floor(sr*0.012);                       // hammer thump
+  for(let n=0;n<th;n++){ lp += 0.15*((Math.random()*2-1) - lp); out[n] += lp * 0.35 * (1 - n/th); }
+  const fade = Math.floor(sr*0.08); for(let i=0;i<fade;i++) out[len-1-i] *= i/fade;
+  return { buf: toBuffer(out, 0.6), rate: 1 };
+}
+function toBuffer(data, peak){
+  let m = 0; for(let i=0;i<data.length;i++) m = Math.max(m, Math.abs(data[i]));
+  const g = m ? peak / m : 1; for(let i=0;i<data.length;i++) data[i] *= g;
+  const b = audio.ac.createBuffer(1, data.length, audio.ac.sampleRate); b.copyToChannel(data, 0); return b;
+}
+function getNote(inst, midi){
+  const c = bufCache[inst]; let v = c.get(midi);
+  if(!v){ v = inst === "piano" ? renderPiano(midi) : renderGuitar(midi); c.set(midi, v); }
+  return v;
+}
+// Render the notes in the playable range in the background so the first strikes don't stutter
+let warmJob = 0;
+function prewarm(){
+  if(!audio || !isPluck()) return;
+  const inst = cfg.inst, job = ++warmJob, base = 45 + (cfg.root - 9);
+  const notes = []; for(let m = base; m <= base + cfg.range*12 + 19; m++) notes.push(m);
+  notes.sort((a,b) => Math.abs(a - base - cfg.range*6) - Math.abs(b - base - cfg.range*6));
+  (function step(){
+    if(job !== warmJob) return;
+    if(notes.length) getNote(inst, notes.shift());
+    if(notes.length) setTimeout(step, 20);
+  })();
+}
+function safeStop(src, when){ try { src.stop(when); } catch {} }
+function strike(midi, harm){
+  const ac = audio.ac, t = ac.currentTime, inst = cfg.inst;
+  const damp = inst === "guitar" ? 0.06 : 0.35;                      // stop previous notes
+  audio.plucks.forEach(p => { p.g.gain.cancelScheduledValues(t); p.g.gain.setTargetAtTime(0, t, damp/3); safeStop(p.src, t + damp*2); });
+  audio.plucks = [];
+  const iv = HARMONY[harm], vel = 1 / Math.sqrt(iv.length);
+  iv.forEach((step, i) => {
+    const { buf, rate } = getNote(inst, midi + step);
+    const src = ac.createBufferSource(); src.buffer = buf; src.playbackRate.value = rate;
+    const g = ac.createGain(); g.gain.value = vel * (i===0 ? 1 : 0.8);
+    src.connect(g); g.connect(audio.pluckBus);
+    const when = t + (inst === "guitar" ? i * 0.022 : i * 0.004);    // guitar strum
+    src.start(when);
+    const p = { src, g }; audio.plucks.push(p);
+    src.onended = () => { const k = audio.plucks.indexOf(p); if(k >= 0) audio.plucks.splice(k, 1); };
+  });
+}
+function setInstrument(name){
+  cfg.inst = name;
+  document.querySelectorAll("#instBar button").forEach(b => b.classList.toggle("on", b.dataset.i === name));
+  $("waveWrap").style.display = name === "theremin" ? "" : "none";
+  $("vibK").textContent = isPluck() ? "Pinch = play" : "Vibrato";
+  S.curNote = null; rungsCache = null;
+  if(!audio) return;
+  const t = audio.ac.currentTime;
+  audio.contBus.gain.setTargetAtTime(isPluck() ? 0 : 1, t, 0.03);
+  if(!isPluck()) audio.plucks.forEach(p => { p.g.gain.setTargetAtTime(0, t, 0.05); safeStop(p.src, t + 0.3); });
+  setWave($("wave").value);
+  prewarm();
+}
 function setEcho(x){ if(audio){ const t=audio.ac.currentTime; audio.fb.gain.setTargetAtTime(x,t,.1); audio.wet.gain.setTargetAtTime(x,t,.1);} }
 
 // ---------- Screen mapping (video is drawn "cover"-cropped & mirrored) ----------
@@ -294,8 +427,9 @@ function heightToMidi(y){
   const t = clamp((BOT - y) / (BOT - TOP), 0, 1);
   const base = 45 + (cfg.root - 9);
   const midi = base + t * cfg.range * 12;
-  if(cfg.scale === "off") return midi;
-  const steps = SCALES[cfg.scale];
+  const sc = (cfg.scale === "off" && isPluck()) ? "chromatic" : cfg.scale;
+  if(sc === "off") return midi;
+  const steps = SCALES[sc];
   let best = midi, bestD = 1e9;
   for(let n=Math.floor(midi)-12; n<=Math.ceil(midi)+12; n++){
     if(steps.includes(((n - base) % 12 + 12) % 12)){
@@ -308,7 +442,8 @@ const midiToHz = m => 440 * Math.pow(2, (m - 69) / 12);
 const midiName = m => { const r = Math.round(m); return NOTE_NAMES[(r%12+12)%12] + (Math.floor(r/12)-1); };
 
 // ---------- State ----------
-const S = { y:0.5, vol:0.5, bri:0.5, vib:0, fingerHist:[], harm:1, last:null };
+const S = { y:0.5, vol:0.5, bri:0.5, vib:0, fingerHist:[], harm:1, last:null,
+            curNote:null, curHarm:0, pendNote:null, pendCount:0, pinchDown:false, lastStrike:0, handIn:false };
 function stableFingerCount(n){
   S.fingerHist.push(n); if(S.fingerHist.length > 8) S.fingerHist.shift();
   const counts = {}; S.fingerHist.forEach(c => counts[c] = (counts[c]||0)+1);
@@ -352,23 +487,16 @@ function loop(now){
     const py = (toScreen(lm[0]).y + toScreen(lm[9]).y) / 2;
     S.y += (py - S.y) * 0.35;
     S.bri += (openness(lm) - S.bri) * 0.25;
-    S.vib += (pinch(lm) - S.vib) * 0.25;
+    const rawPinch = pinch(lm);
+    S.vib += (rawPinch - S.vib) * 0.25;
     const fs = fingerStates(lm);
-    const harm = stableFingerCount(fs.filter(Boolean).length);
+    let pinchTap = false;
+    if(rawPinch > 0.75 && !S.pinchDown){ S.pinchDown = true; pinchTap = true; }
+    else if(rawPinch < 0.45) S.pinchDown = false;
+    // while pinching, the finger count is unreliable — hold the last harmony
+    const harm = S.pinchDown && isPluck() ? S.harm : stableFingerCount(fs.filter(Boolean).length);
 
     const midi = heightToMidi(S.y);
-    const hz = midiToHz(midi);
-    const glide = cfg.scale === "off" ? 0.02 : 0.035;
-    const iv = HARMONY[harm];
-    audio.voices.forEach((v,i) => {
-      if(i < iv.length){
-        v.o.frequency.setTargetAtTime(hz * Math.pow(2, iv[i]/12), t, glide);
-        v.g.gain.setTargetAtTime(1 / Math.sqrt(iv.length) * (i===0?1:0.75), t, 0.05);
-      } else v.g.gain.setTargetAtTime(0, t, 0.05);
-    });
-    audio.filter.frequency.setTargetAtTime(250 * Math.pow(2, S.bri * 5.5), t, 0.05);
-    audio.lfoGain.gain.setTargetAtTime(S.vib * 60, t, 0.05);
-    audio.lfo.frequency.setTargetAtTime(4 + S.vib * 3, t, 0.1);
 
     let vol = 0.55;
     if(volHand){
@@ -376,13 +504,42 @@ function loop(now){
       vol = clamp((BOT - vy) / (BOT - TOP), 0, 1);
     }
     S.vol += (vol - S.vol) * 0.3;
-    audio.master.gain.setTargetAtTime(muted ? 0 : S.vol * 0.5, t, 0.04);
+
+    if(!isPluck()){
+      const hz = midiToHz(midi);
+      const glide = cfg.scale === "off" ? 0.02 : 0.035;
+      const iv = HARMONY[harm];
+      audio.voices.forEach((v,i) => {
+        if(i < iv.length){
+          v.o.frequency.setTargetAtTime(hz * Math.pow(2, iv[i]/12), t, glide);
+          v.g.gain.setTargetAtTime(1 / Math.sqrt(iv.length) * (i===0?1:0.75), t, 0.05);
+        } else v.g.gain.setTargetAtTime(0, t, 0.05);
+      });
+      audio.filter.frequency.setTargetAtTime(250 * Math.pow(2, S.bri * 5.5), t, 0.05);
+      const baseVib = cfg.inst === "organ" ? 8 : 0;
+      audio.lfoGain.gain.setTargetAtTime(baseVib + S.vib * 60, t, 0.05);
+      audio.lfo.frequency.setTargetAtTime((cfg.inst === "organ" ? 6 : 4) + S.vib * 3, t, 0.1);
+      audio.master.gain.setTargetAtTime(muted ? 0 : S.vol * 0.5, t, 0.04);
+    } else {
+      audio.filter.frequency.setTargetAtTime(700 * Math.pow(2, S.bri * 4.2), t, 0.05);
+      audio.lfoGain.gain.setTargetAtTime(0, t, 0.05);
+      audio.master.gain.setTargetAtTime(muted ? 0 : (0.15 + 0.85 * S.vol) * 0.6, t, 0.04);
+      const note = Math.round(midi);
+      if(note !== S.pendNote){ S.pendNote = note; S.pendCount = 0; } else S.pendCount++;
+      const stable = S.pendCount >= 2;                       // ~2 frames on the same note
+      const changed = note !== S.curNote || harm !== S.curHarm || !S.handIn;
+      if(stable && (changed || pinchTap) && now - S.lastStrike > 90){
+        strike(note, harm); S.curNote = note; S.curHarm = harm; S.lastStrike = now;
+      }
+      S.handIn = true;
+    }
 
     drawHand(lm, "#ff4fd8", fs);
     drawPitchLine(S.y, W, H, midiName(midi));
     updateHud(midi, harm, fs);
   } else {
-    audio.master.gain.setTargetAtTime(0, t, 0.08);
+    if(!isPluck()) audio.master.gain.setTargetAtTime(0, t, 0.08); // piano/guitar keep ringing
+    S.handIn = false;
     $("noteOut").textContent = "–";
     S.fingerHist = [];
   }
@@ -422,7 +579,7 @@ function rungs(){
 function drawGuides(W,H){
   const k = u();
   ctx.font = `600 ${Math.round(13*k)}px 'JetBrains Mono', monospace`;
-  if(cfg.scale !== "off"){
+  if(cfg.scale !== "off" || isPluck()){
     for(const r of rungs()){
       const py = r.y*H;
       ctx.strokeStyle = r.root ? "rgba(255,79,216,.45)" : "rgba(255,255,255,.12)";
@@ -477,6 +634,7 @@ $("startBtn").onclick = async () => {
     // iOS: play a silent blip inside the tap to unlock audio output
     const b = audio.ac.createBuffer(1, 1, 22050), src = audio.ac.createBufferSource(); src.buffer = b; src.connect(audio.ac.destination); src.start(0);
     setEcho(+$("echo").value);
+    setInstrument(cfg.inst);
 
     // Ask for the camera first so the permission prompt appears while the user is still tapping
     statusEl.textContent = "Asking for camera…";
@@ -517,6 +675,9 @@ $("echo").oninput = e => { setEcho(+e.target.value); $("echoVal").textContent = 
 $("muteBtn").onclick = () => { muted = !muted; $("muteBtn").textContent = muted ? "🔇" : "🔊"; $("muteBtn").classList.toggle("on", muted); };
 $("setBtn").onclick = () => { const s = $("settings"); s.hidden = !s.hidden; $("setBtn").classList.toggle("on", !s.hidden); };
 $("helpBtn").onclick = () => $("helpSheet").classList.add("open");
+document.querySelectorAll("#instBar button").forEach(b => b.onclick = () => setInstrument(b.dataset.i));
+addEventListener("keydown", e => { const i = ["theremin","piano","guitar","organ"][+e.key - 1]; if(i) setInstrument(i); });
+setInstrument("theremin");
 $("helpClose").onclick = () => $("helpSheet").classList.remove("open");
 </script>
 </body>
