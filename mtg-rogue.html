@@ -857,7 +857,7 @@ button.tile.adv{border-color:rgba(200,162,74,.42)}
   filter:drop-shadow(0 0 10px rgba(236,190,90,.85))}
 #mapSvg .gold.open{opacity:1;stroke-dasharray:none;stroke-width:6.2;
   filter:drop-shadow(0 0 11px rgba(236,190,90,.8));animation:roadPulse 2.2s ease-in-out infinite}
-/* the last stretch, into the spire */
+/* the last stretch, into the final duel */
 #mapSvg .gold.bossy{stroke:#c0392f;filter:drop-shadow(0 0 9px rgba(198,54,44,.6))}
 #mapSvg .gold.bossy.open{filter:drop-shadow(0 0 13px rgba(198,54,44,.85))}
 @keyframes roadPulse{0%,100%{opacity:.7}50%{opacity:1}}
@@ -898,7 +898,7 @@ button.tile.adv{border-color:rgba(200,162,74,.42)}
   0%,100%{box-shadow:0 0 0 0 rgba(244,214,142,.6),0 0 20px rgba(226,178,78,.35),0 8px 22px rgba(0,0,0,.7)}
   55%{box-shadow:0 0 0 15px rgba(244,214,142,0),0 0 34px rgba(226,178,78,.6),0 8px 22px rgba(0,0,0,.7)}
 }
-/* the kit draws the spire's keeper in red, and the last stretch of road with
+/* the kit draws the last seat in red, and the stretch of road into it with
  * him; this sits after the walked/open rules so it always wins */
 .mapNode.boss .disc{
   border-width:3px;border-color:rgba(214,74,60,.95);
@@ -928,14 +928,14 @@ button.tile.adv{border-color:rgba(200,162,74,.42)}
 /* near the right edge the name hangs back inside the frame */
 .mapNode.tagLeft .tag{transform:translateX(-84%)}
 /* The road is close-packed and the marks already say what a stop is, so a
- * name is shown for where you stand, for the spire you are climbing to, and
- * for whatever the pointer is on. Any more than that and the chips sit on
- * each other's stones. */
+ * name is shown for where you stand and for whatever the pointer is on. Any
+ * more than that and the chips sit on each other's stones -- and the last
+ * stop wants no caption at all: the red ring says what it is. */
 .mapNode{z-index:1}
 .mapNode.here,.mapNode.open{z-index:2}
 .mapNode:hover{z-index:6}
 .mapNode .tag{opacity:0;z-index:3}
-.mapNode.here .tag,.mapNode.boss .tag{opacity:.92}
+.mapNode.here .tag{opacity:.92}
 .mapNode:hover .tag{opacity:1}
 .mapNode.boss .tag{color:#edb0a6}
 
@@ -6722,7 +6722,7 @@ const ICON = {
     'stroke-linecap="round" stroke-linejoin="round"><path d="M5 19L14 10"/><path d="M19 19L10 10"/>' +
     '<rect x="2.6" y="3.4" width="6.2" height="4.2" rx="1" transform="rotate(-20 5.7 5.5)"/>' +
     '<rect x="15.2" y="3.4" width="6.2" height="4.2" rx="1" transform="rotate(20 18.3 5.5)"/></svg>',
-  spire: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.6l2.3 5.1 5.1-.5-3.3 4 3.3 4-5.1-.5L12 18.8 9.7 13.7l-5.1.5 3.3-4-3.3-4 5.1.5z"/>' +
+  sigil: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.6l2.3 5.1 5.1-.5-3.3 4 3.3 4-5.1-.5L12 18.8 9.7 13.7l-5.1.5 3.3-4-3.3-4 5.1.5z"/>' +
     '<path d="M11 19h2v3.4h-2z"/></svg>'
 };
 
@@ -6734,7 +6734,7 @@ const NODE_KIND = {
   camp:    { icon: "flame",  art: "ic_mana",         tag: "Campfire",  bg: "bg_camp" },
   shop:    { icon: "chest",  art: "ic_reward",       tag: "Merchant",  bg: "bg_shop" },
   mystery: { icon: "ask",    art: "ic_portal",       tag: "Unknown",   bg: "bg_map" },
-  boss:    { icon: "spire",  art: "ic_planeswalker", tag: "The Spire", bg: "bg_map" }
+  boss:    { icon: "sigil",  art: "ic_planeswalker", tag: "Final duel", bg: "bg_map" }
 };
 
 /* a mark for a node or a button: the kit's artwork if it has one, else the
@@ -6756,8 +6756,8 @@ function iconMark(name, artKey) {
  *
  * The stops themselves follow the same house rules: the first floors are
  * fights, there is a merchant floor in the middle and a fire before the
- * spire, and nothing may follow itself -- no two fires, elites or merchants
- * in a row down any path.
+ * last duel, and nothing may follow itself -- no two fires, elites or
+ * merchants in a row down any path.
  */
 function linkPath(a, b) {
   const mx = (a.x + b.x) / 2;
@@ -6800,7 +6800,7 @@ function makeRunMap(floors, lanes, walks) {
     edges.push({ f: f, a: a, b: b });
   };
 
-  const top = floors - 2;              // the last walked floor; above it, the spire
+  const top = floors - 2;              // the last walked floor; past it, the end
   for (let w = 0; w < walks; w++) {
     let l = w === 0 ? lanes >> 1 : Math.floor(rnd() * lanes);
     at(0, l);
@@ -6812,7 +6812,7 @@ function makeRunMap(floors, lanes, walks) {
       l = nl;
     }
   }
-  const bossLane = lanes >> 1;
+  const bossLane = lanes >> 1;          // every road arrives at the same last seat
   at(floors - 1, bossLane);
   for (let l = 0; l < lanes; l++) if (grid[top][l]) link(top, l, bossLane);
 
@@ -6833,7 +6833,7 @@ function makeRunMap(floors, lanes, walks) {
   }
 
   // where each stop sits on the plate: floors march right, lanes stack, and
-  // the whole road climbs toward the spire
+  // and the whole road climbs as it goes
   const rows = [];
   for (let f = 0; f < floors; f++) {
     const t = f / Math.max(1, floors - 1);
@@ -7278,7 +7278,7 @@ function showMap() {
   main.innerHTML = "";
   emberField({ count: 16, x: 4, spread: 30, y: 74, size: 3 });
   metaTitle(main, "\u2756", "CHOOSE YOUR PATH",
-    RUN.map.here ? "the road climbs toward the spire" : "your road begins");
+    RUN.map.here ? "the road climbs on" : "your road begins");
 
   const wrap = document.createElement("div");
   wrap.id = "mapWrap";
@@ -7665,8 +7665,8 @@ function afterBattle() {
 function showRunEnd(won) {
   const main = showMeta("bg_reward");
   main.innerHTML = "";
-  metaTitle(main, "\u2756", won ? "THE SPIRE IS YOURS" : "THE ROAD ENDS HERE",
-    won ? "nothing left to climb" : "the lanterns go out one by one");
+  metaTitle(main, "\u2756", won ? "THE CIRCLE IS HELD" : "THE ROAD ENDS HERE",
+    won ? "no seat left to face" : "the lanterns go out one by one");
   const d = document.createElement("div");
   d.className = "metaTitle";
   d.innerHTML = '<div class="sub">' + RUN.wins + " battles won \u00b7 " +
@@ -9028,7 +9028,7 @@ function renderTitle() {
 
   for (const [go, title, tag, blurb] of [
     ["shop", "Shopkeeper", "spend gold", "The merchant's counter: single cards, wares and a booster, priced in gold."],
-    ["map", "Progression", "the road", "The branching road to the spire, with every campfire, shop and battle on it."],
+    ["map", "Progression", "the road", "The branching road to the last duel, with every campfire, shop and battle on it."],
     ["camp", "Campfire", "rest or temper", "Heal, put a permanent counter on a creature, or take what the flask offers."]
   ]) {
     const b = tile(title, tag, blurb, {});
