@@ -188,7 +188,9 @@ body.home #tts-stop { right: 116px; }
 #pair button { padding: 20px 40px; border: 0; border-radius: 40px; background: var(--accent); color: var(--bg); font: 600 22px/1 system-ui, sans-serif; }
 #pair-err { flex-basis: 100%; color: var(--warn); min-height: 1.3em; }
 .ghost { margin-top: 10px; background: transparent; border: 0; color: var(--ink-dim); font: 16px system-ui, sans-serif; }
-#pair[hidden], #pair-change[hidden] { display: none; }
+#pair[hidden], #pair-change[hidden], #pair-sas[hidden], #pair-ok[hidden] { display: none; }
+#pair-sas { margin-top: 18px; font: 700 64px/1 ui-monospace, Consolas, monospace; letter-spacing: 6px; color: var(--ink); }
+#pair-ok { margin-top: 18px; padding: 20px 40px; border: 0; border-radius: 40px; background: var(--accent); color: var(--bg); font: 600 22px/1 system-ui, sans-serif; }
 
 /* Your apps while not casting: tap to open on the phone (sound comes through the car). */
 #appgrid { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; max-width: 1180px; margin-top: 18px; }
