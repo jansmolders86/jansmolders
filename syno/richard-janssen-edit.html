@@ -227,6 +227,13 @@ a{color:inherit}
 .tile:nth-child(2) .tile-img{background-image:url('gallery-2.jpg');transform-origin:bottom right}
 .tile:nth-child(3) .tile-img{background-image:url('gallery-3.jpg');background-position:center 28%;transform-origin:top right}
 .tile:nth-child(4) .tile-img{background-image:url('gallery-4.jpg');background-position:center 35%;transform-origin:bottom left}
+/* andere merken dan Reijn: eigen beeld in header en galerij (Reijn houdt video en foto's) */
+html:not([data-brand="reijn"]) .hero-bg{background:url('header.png') center 30%/cover no-repeat}
+html:not([data-brand="reijn"]) .hero-video{display:none}
+html:not([data-brand="reijn"]) .tile:nth-child(1) .tile-img{background-image:url('gallery-festival.png');background-position:46% center}
+html:not([data-brand="reijn"]) .tile:nth-child(2) .tile-img{background-image:url('gallery-ski.png');background-position:45% center}
+html:not([data-brand="reijn"]) .tile:nth-child(3) .tile-img{background-image:url('gallery-sport.png');background-position:55% center}
+html:not([data-brand="reijn"]) .tile:nth-child(4) .tile-img{background-image:url('gallery-reizen.png');background-position:45% center}
 .tile-scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(20,15,12,.78),transparent 52%)}
 .tile-cap{position:absolute;left:20px;right:20px;bottom:18px;color:#fff;z-index:2}
 .tile-cap .k{font-family:var(--mono);font-size:11px;letter-spacing:.18em;opacity:.8;text-transform:uppercase}
@@ -1041,6 +1048,13 @@ body.edit-mode .nav{top:var(--ed-bar-h)}
   /* hero header video: force-mute, nudge autoplay, fall back to gradient on failure */
   (function(){
     var vid = document.querySelector('.hero-video');
+    /* andere merken dan Reijn: stilstaande header i.p.v. video, en 'Sport' bij de voetbalfoto */
+    if(window.Merk && Merk.actief !== 'reijn'){
+      var sportCap = document.querySelector('.gallery .tile:nth-child(3) .tile-cap .t');
+      if(sportCap){ sportCap.textContent = 'Sport'; }
+      if(vid){ vid.remove(); }             // niet laten downloaden; de header is nu een afbeelding
+      return;
+    }
     if(!vid) return;
     if(reduce){ vid.removeAttribute('autoplay'); vid.style.display = 'none'; return; }
     vid.muted = true;                       // required for autoplay; also honours "no audio"
