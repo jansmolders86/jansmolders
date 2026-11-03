@@ -294,3 +294,9 @@ body.home #tts-stop { right: 116px; }
 :root[data-theme="light"] .nav-road { color: #4b5563; }
 :root[data-theme="light"] .map-car .beam { mix-blend-mode: normal;
   background: linear-gradient(to top, rgba(255,205,90,.75), rgba(255,215,120,.3) 50%, rgba(255,220,140,0)); }
+
+/* Engine sound on/off in the side panel (only when an engine sound is chosen in the app). */
+#engine-btn .i-off { display: none; }
+#engine-btn.muted .i-on { display: none; }
+#engine-btn.muted .i-off { display: block; }
+#engine-btn:not(.muted) { color: var(--accent); }
