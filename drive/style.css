@@ -62,7 +62,7 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
 .map-car img { width: 36px; height: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)); }
 
 /* Tesla-style navigation: search box top left, then the next-turn and arrival cards. */
-.nav { position: absolute; left: 16px; top: 16px; z-index: 3; width: min(440px, 40%); display: flex; flex-direction: column; gap: 10px; }
+.nav { position: absolute; left: 16px; top: 16px; z-index: 3; width: min(480px, calc(100% - 120px)); display: flex; flex-direction: column; gap: 10px; }
 .nav-search { display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 18px; border-radius: 16px;
   background: rgba(40, 44, 49, .96); box-shadow: 0 6px 22px rgba(0,0,0,.45); }
 .nav-search svg { width: 28px; height: 28px; fill: #9aa3ad; flex: 0 0 28px; }
@@ -91,10 +91,17 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
   box-shadow: 0 6px 22px rgba(0,0,0,.45); }
 .nav-arrow svg { width: 64px; height: 64px; display: block; color: #fff; }
 .nav-dist { font: 700 34px system-ui, sans-serif; }
-.nav-road { font: 500 20px system-ui, sans-serif; color: #c4cad1; margin-top: 2px; }
+.nav-turn-text { flex: 1; min-width: 0; }
+/* Long instructions wrap inside the card (also at slashes) and stop after three lines. */
+.nav-road { font: 500 20px system-ui, sans-serif; color: #c4cad1; margin-top: 2px; line-height: 1.25;
+  overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.nav-arrow { flex: 0 0 64px; }
 .nav-eta { display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 22px; border-radius: 16px; background: rgba(40, 44, 49, .96);
   color: #e8ecf1; font: 600 19px system-ui, sans-serif; box-shadow: 0 6px 22px rgba(0,0,0,.45); }
-.nav-eta-text { flex: 1; }
+.nav-eta-text { flex: 1; min-width: 0; }
+.nav-eta-main { font: 700 22px system-ui, sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-eta-sub { font: 500 17px system-ui, sans-serif; color: #aab1ba; margin-top: 2px; white-space: nowrap; }
+:root[data-theme="light"] .nav-eta-sub { color: #6b7280; }
 .nav-voice { width: 48px; height: 48px; border: 0; border-radius: 50%; background: rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center; flex: 0 0 48px; }
 .nav-voice svg { width: 26px; height: 26px; fill: #e8ecf1; }
 .nav-voice.off svg { fill: #8a929c; }
