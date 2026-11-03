@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0b0d10">
 <!-- Only scripts from this site, MapLibre (pinned) and Google Maps may run; no inline scripts, no plugins. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-kn1tBD2QXK4PnxJqLxZHw3rKMcLAD8vCnuZBNe1xwPY=' 'wasm-unsafe-eval' 'unsafe-eval' blob: https://unpkg.com/maplibre-gl@4.7.1/ https://maps.googleapis.com https://maps.gstatic.com https://*.googleapis.com https://*.gstatic.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://unpkg.com/maplibre-gl@4.7.1/ https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https: wss: data: blob:; media-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-p6gXc4EHRVXRsTlYbImZZeBbaGnHzXPu2IrGhZHaVuY=' 'wasm-unsafe-eval' 'unsafe-eval' blob: https://unpkg.com/maplibre-gl@4.7.1/ https://maps.googleapis.com https://maps.gstatic.com https://*.googleapis.com https://*.gstatic.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://unpkg.com/maplibre-gl@4.7.1/ https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https: wss: data: blob:; media-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>BeamDrive</title>
-<link rel="stylesheet" href="style.css?v=0.34.3">
+<link rel="stylesheet" href="style.css?v=0.38.0">
 </head>
 <body class="not-casting">
 <div id="app">
@@ -19,8 +19,8 @@
     <button class="rail-btn" data-cmd="maps" aria-label="Navigation">
       <svg viewBox="0 0 24 24"><path d="M12 2 4.5 20.3l.7.7L12 18l6.8 3 .7-.7z"/></svg>
     </button>
-    <button class="rail-btn" data-cmd="apps" aria-label="All apps">
-      <svg viewBox="0 0 24 24"><circle cx="5" cy="5" r="2.2"/><circle cx="12" cy="5" r="2.2"/><circle cx="19" cy="5" r="2.2"/><circle cx="5" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="19" cy="12" r="2.2"/><circle cx="5" cy="19" r="2.2"/><circle cx="12" cy="19" r="2.2"/><circle cx="19" cy="19" r="2.2"/></svg>
+    <button class="rail-btn" id="settings-btn" aria-label="Settings for this car">
+      <svg viewBox="0 0 24 24"><path d="M19.14 12.94a7.07 7.07 0 0 0 .06-.94 7.07 7.07 0 0 0-.06-.94l2.03-1.58a.48.48 0 0 0 .12-.61l-1.92-3.32a.48.48 0 0 0-.59-.22l-2.39.96a7 7 0 0 0-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84a.48.48 0 0 0-.48.41l-.36 2.54a7 7 0 0 0-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.87a.47.47 0 0 0 .12.61l2.03 1.58a7.3 7.3 0 0 0 0 1.88l-2.03 1.58a.48.48 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.04.7 1.62.94l.36 2.54c.05.24.25.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54a7 7 0 0 0 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.48.48 0 0 0-.12-.61zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg>
     </button>
     <button class="rail-btn" data-cmd="back" aria-label="Back">
       <svg viewBox="0 0 24 24"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20z"/></svg>
@@ -32,10 +32,6 @@
       <div id="batt-pct">--%</div>
       <div id="batt-temp" hidden></div>
     </div>
-    <button class="rail-btn" id="engine-btn" aria-label="Engine sound on or off" title="Engine sound" hidden>
-      <svg class="i-on" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.47 4.47 0 0 0 2.5-4zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg>
-      <svg class="i-off" viewBox="0 0 24 24"><path d="M16.5 12A4.5 4.5 0 0 0 14 8v2.18l2.45 2.45c.03-.2.05-.41.05-.63zM19 12c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.8 8.8 0 0 0 21 12a9 9 0 0 0-7-8.77v2.06A7 7 0 0 1 19 12zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a9 9 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z"/></svg>
-    </button>
     <button class="rail-btn" id="zoom-btn" aria-label="Zoom to fill" title="Zoom to fill / fit" hidden>
       <svg class="i-fill" viewBox="0 0 24 24"><path d="M4 9V4h5v2H6v3H4zm11-5h5v5h-2V6h-3V4zM6 15v3h3v2H4v-5h2zm12 0h2v5h-5v-2h3v-3z"/></svg>
       <svg class="i-fit" viewBox="0 0 24 24"><path d="M9 4v5H4V7h3V4h2zm6 0h2v3h3v2h-5V4zM4 15h5v5H7v-3H4v-2zm11 0h5v2h-3v3h-2v-5z"/></svg>
@@ -76,9 +72,24 @@
       <button id="reload" class="ghost">Reload page</button>
     </div>
     <pre id="stats" hidden></pre>
+    <div id="car-settings" hidden>
+      <div class="cs-card">
+        <div class="cs-head"><h2>This car</h2><button class="cs-close" aria-label="Close">✕</button></div>
+        <p class="cs-note">Saved in this car's browser only. Your phone keeps your personal settings (addresses, keys, messages).</p>
+        <h3>Your car on the map</h3>
+        <div class="cs-pair"><div class="dd" id="cs-model"></div><div class="dd" id="cs-colour"></div></div>
+        <h3>Read notifications aloud</h3>
+        <div class="dd" id="cs-voice"></div>
+        <h3>Engine sound</h3>
+        <div class="dd" id="cs-engine"></div>
+        <h3>Paired phone</h3>
+        <div class="cs-row"><button class="cs-opt" id="cs-forget">Forget this phone and pair again</button></div>
+        <p class="cs-note" id="cs-ver"></p>
+      </div>
+    </div>
   </main>
 </div>
-<script>window.BEAM_MODE = "rtc"; window.BEAM_PAGE_VERSION = "0.34.3";</script>
-<script src="app.js?v=0.34.3"></script>
+<script>window.BEAM_PAGE_VERSION = "0.38.0";</script>
+<script src="app.js?v=0.38.0"></script>
 </body>
 </html>

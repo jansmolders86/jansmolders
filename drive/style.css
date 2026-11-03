@@ -57,8 +57,6 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
   clip-path: polygon(44% 100%, 56% 100%, 100% 0, 0 0); filter: blur(5px); mix-blend-mode: screen; }
 .map-car .beam.l { left: calc(50% - 37px); }
 .map-car .beam.r { left: calc(50% - 19px); }
-.map-car.orig .beam { bottom: calc(50% + 28px); }
-.map-car img.orig { width: 64px; transform: rotate(-90deg); }
 .map-car img { width: 36px; height: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)); }
 
 /* Tesla-style navigation: search box top left, then the next-turn and arrival cards. */
@@ -295,8 +293,45 @@ body.home #tts-stop { right: 116px; }
 :root[data-theme="light"] .map-car .beam { mix-blend-mode: normal;
   background: linear-gradient(to top, rgba(255,205,90,.75), rgba(255,215,120,.3) 50%, rgba(255,220,140,0)); }
 
-/* Engine sound on/off in the side panel (only when an engine sound is chosen in the app). */
-#engine-btn .i-off { display: none; }
-#engine-btn.muted .i-on { display: none; }
-#engine-btn.muted .i-off { display: block; }
-#engine-btn:not(.muted) { color: var(--accent); }
+
+/* One-time safety notice on a new car screen. */
+#safety { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.6); }
+#safety > div { max-width: 640px; margin: 24px; padding: 32px 36px; border-radius: 24px; background: var(--rail); color: var(--ink); box-shadow: 0 10px 34px rgba(0,0,0,.45); }
+#safety h2 { margin: 0 0 12px; font: 700 32px system-ui, sans-serif; }
+#safety p { margin: 0 0 24px; font: 22px/1.4 system-ui, sans-serif; color: var(--ink-dim); }
+#safety button { padding: 18px 40px; border: 0; border-radius: 40px; background: var(--accent); color: var(--bg); font: 600 22px system-ui, sans-serif; }
+
+/* Settings for this car (the gear in the side panel): saved in the car's browser. */
+#car-settings { position: absolute; inset: 0; z-index: 40; display: flex; align-items: flex-start; justify-content: center; overflow: auto; background: rgba(0,0,0,.55); }
+#car-settings[hidden] { display: none; }
+.cs-card { width: min(760px, calc(100% - 32px)); margin: 32px 16px; padding: 24px 28px 28px; border-radius: 24px; background: var(--rail); color: var(--ink); box-shadow: 0 10px 34px rgba(0,0,0,.45); }
+.cs-head { display: flex; align-items: center; justify-content: space-between; }
+.cs-head h2 { margin: 0; font: 700 30px system-ui, sans-serif; }
+.cs-close { width: 56px; height: 56px; border: 0; border-radius: 50%; background: var(--rail-hi); color: var(--ink); font-size: 22px; }
+.cs-card h3 { margin: 22px 0 10px; font: 600 20px system-ui, sans-serif; color: var(--ink-dim); }
+.cs-note { margin: 8px 0 0; font: 17px/1.4 system-ui, sans-serif; color: var(--ink-dim); }
+.cs-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.cs-opt { display: flex; align-items: center; gap: 10px; padding: 14px 22px; border: 2px solid transparent; border-radius: 16px; background: var(--rail-hi); color: var(--ink); font: 600 19px system-ui, sans-serif; }
+.cs-opt img { height: 44px; }
+.cs-opt.on { border-color: var(--accent); }
+
+/* Dropdowns with a picture (car settings). */
+.cs-pair { display: flex; gap: 12px; flex-wrap: wrap; }
+.cs-pair .dd { flex: 1 1 260px; }
+.dd { position: relative; }
+.dd[hidden] { display: none; }
+.dd-btn, .dd-opt { display: flex; align-items: center; gap: 14px; width: 100%; padding: 12px 18px; border: 0; border-radius: 16px;
+  background: var(--rail-hi); color: var(--ink); text-align: left; font: 600 20px system-ui, sans-serif; }
+.dd-btn { min-height: 76px; }
+.dd-pic { flex: 0 0 56px; height: 52px; display: flex; align-items: center; justify-content: center; }
+.dd-pic img { max-height: 52px; max-width: 56px; }
+.dd-pic svg { width: 34px; height: 34px; fill: var(--ink-dim); }
+.dd-txt { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.dd-sub { font: 400 16px system-ui, sans-serif; color: var(--ink-dim); margin-top: 2px; }
+.dd-chev { font-size: 22px; color: var(--ink-dim); }
+.dd-list { position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 5; max-height: 380px; overflow: auto; padding: 6px;
+  border-radius: 18px; background: var(--rail); box-shadow: 0 12px 34px rgba(0,0,0,.5); border: 1px solid var(--rail-hi); }
+.dd-list[hidden] { display: none; }
+.dd-opt { background: transparent; border-radius: 12px; }
+.dd-opt.on { background: var(--rail-hi); box-shadow: inset 3px 0 0 var(--accent); }
+.dd-opt:active { background: var(--rail-hi); }
