@@ -335,3 +335,12 @@ body.home #tts-stop { right: 116px; }
 .dd-opt { background: transparent; border-radius: 12px; }
 .dd-opt.on { background: var(--rail-hi); box-shadow: inset 3px 0 0 var(--accent); }
 .dd-opt:active { background: var(--rail-hi); }
+
+/* Engine on/off (ignition) next to the engine dropdown. */
+.cs-engine-row { flex-wrap: nowrap; align-items: stretch; }
+.cs-engine-row .dd { flex: 1 1 auto; }
+.ign { flex: 0 0 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; border-radius: 16px;
+  background: var(--rail-hi); color: var(--ink-dim); font: 600 18px system-ui, sans-serif; }
+.ign[hidden] { display: none; }
+.ign svg { width: 34px; height: 34px; fill: currentColor; }
+.ign.on { background: var(--ok); color: #fff; }

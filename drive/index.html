@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0b0d10">
 <!-- Only scripts from this site, MapLibre (pinned) and Google Maps may run; no inline scripts, no plugins. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-p6gXc4EHRVXRsTlYbImZZeBbaGnHzXPu2IrGhZHaVuY=' 'wasm-unsafe-eval' 'unsafe-eval' blob: https://unpkg.com/maplibre-gl@4.7.1/ https://maps.googleapis.com https://maps.gstatic.com https://*.googleapis.com https://*.gstatic.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://unpkg.com/maplibre-gl@4.7.1/ https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https: wss: data: blob:; media-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-jUa1hpkVt8W1lf9EDef6gum2guX05FPcnmLNa8WB1iM=' 'wasm-unsafe-eval' 'unsafe-eval' blob: https://unpkg.com/maplibre-gl@4.7.1/ https://maps.googleapis.com https://maps.gstatic.com https://*.googleapis.com https://*.gstatic.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://unpkg.com/maplibre-gl@4.7.1/ https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https: wss: data: blob:; media-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>BeamDrive</title>
-<link rel="stylesheet" href="style.css?v=0.38.0">
+<link rel="stylesheet" href="style.css?v=0.38.2">
 </head>
 <body class="not-casting">
 <div id="app">
@@ -81,7 +81,12 @@
         <h3>Read notifications aloud</h3>
         <div class="dd" id="cs-voice"></div>
         <h3>Engine sound</h3>
-        <div class="dd" id="cs-engine"></div>
+        <div class="cs-pair cs-engine-row"><div class="dd" id="cs-engine"></div>
+          <button class="ign" id="cs-ignition" aria-label="Engine on or off">
+            <svg viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17-1.42 1.42A6.92 6.92 0 0 1 19 12a7 7 0 1 1-11.42-5.42L6.17 5.17A8.93 8.93 0 0 0 3 12a9 9 0 0 0 18 0c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
+            <span class="ign-label">On</span>
+          </button>
+        </div>
         <h3>Paired phone</h3>
         <div class="cs-row"><button class="cs-opt" id="cs-forget">Forget this phone and pair again</button></div>
         <p class="cs-note" id="cs-ver"></p>
@@ -89,7 +94,7 @@
     </div>
   </main>
 </div>
-<script>window.BEAM_PAGE_VERSION = "0.38.0";</script>
-<script src="app.js?v=0.38.0"></script>
+<script>window.BEAM_PAGE_VERSION = "0.38.2";</script>
+<script src="app.js?v=0.38.2"></script>
 </body>
 </html>
