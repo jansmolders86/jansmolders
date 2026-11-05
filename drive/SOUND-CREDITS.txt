@@ -1,0 +1,20 @@
+BeamDrive engine sounds: real recordings, openly licensed.
+Loops were prepared (trimmed, held at one measured rpm, looped) by the 350Chev project
+(github.com/Jxstrr0/350Chev, sounds/CREDITS.md); each file keeps its source's licence.
+
+Ferrari 360 V8 (v8f_rev, v8f_hi): "Ferrari 360 Spider engine" by PritzProductions,
+  CC0 1.0, https://freesound.org/people/PritzProductions/sounds/241083/
+Lamborghini Huracan V10 (v10a_idle, v10a_rev): "Lamborghini Huracan EVO start-up and idle" by JaimeLopes,
+  CC0 1.0, https://freesound.org/people/JaimeLopes/sounds/564373/
+Porsche flat-six (f6_mid, f6_hi): "2006 Porsche Cayman S engine sound" by John64,
+  CC BY-SA 3.0, https://commons.wikimedia.org/wiki/File:2006_Porsche_Cayman_S_engine_sound.wav
+Porsche idle (v6_idle): "2019 Porsche Cayenne idling" by Robo9418,
+  CC0 1.0, https://freesound.org/people/Robo9418/sounds/840317/
+Ferrari F50 V12 (v12f_mid, v12f_hi): "Ferrari F50 - engine and exhaust sound" by randomcarssounds (YouTube),
+  CC BY 3.0, https://commons.wikimedia.org/wiki/File:Ferrari_F50_-_engine_and_exhaust_sound_(YouTube_lXnOouQrUtM).opus
+V12 idle (v12_idle): "BMW M70 V12 idling" by Johannes Maximilian,
+  CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:M70.ogg
+Backfires (bf1-bf4): "Car backfires" by craigsmith,
+  CC0 1.0, https://freesound.org/people/craigsmith/sounds/675723/
+
+Files from CC BY-SA sources are shared under the same CC BY-SA licence.
