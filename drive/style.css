@@ -342,5 +342,11 @@ body.home #tts-stop { right: 116px; }
 .ign { flex: 0 0 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; border-radius: 16px;
   background: var(--rail-hi); color: var(--ink-dim); font: 600 18px system-ui, sans-serif; }
 .ign[hidden] { display: none; }
+.ign { min-height: 76px; }
 .ign svg { width: 34px; height: 34px; fill: currentColor; }
 .ign.on { background: var(--ok); color: #fff; }
+
+/* Notifications muted in this car: a small crossed-out dot on the gear so you don't forget. */
+#settings-btn { position: relative; }
+#settings-btn.quiet::after { content: ""; position: absolute; top: 8px; right: 8px; width: 14px; height: 14px; border-radius: 50%;
+  background: #e5484d; box-shadow: 0 0 0 3px var(--rail); }

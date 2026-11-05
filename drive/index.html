@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0b0d10">
 <!-- Only scripts from this site, MapLibre (pinned) and Google Maps may run; no inline scripts, no plugins. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-7u3QQ+NZAd1z77y7/XQjReItBvvXyWcIuiTW31eDgNw=' 'wasm-unsafe-eval' 'unsafe-eval' blob: https://unpkg.com/maplibre-gl@4.7.1/ https://maps.googleapis.com https://maps.gstatic.com https://*.googleapis.com https://*.gstatic.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://unpkg.com/maplibre-gl@4.7.1/ https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https: wss: data: blob:; media-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-EluFHUuCh++lpi6mSns03LK+fUtQS1l4IPF5TKZZrBQ=' 'wasm-unsafe-eval' 'unsafe-eval' blob: https://unpkg.com/maplibre-gl@4.7.1/ https://maps.googleapis.com https://maps.gstatic.com https://*.googleapis.com https://*.gstatic.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://unpkg.com/maplibre-gl@4.7.1/ https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https: wss: data: blob:; media-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>BeamDrive</title>
-<link rel="stylesheet" href="style.css?v=0.38.3">
+<link rel="stylesheet" href="style.css?v=0.38.4">
 </head>
 <body class="not-casting">
 <div id="app">
@@ -78,8 +78,14 @@
         <p class="cs-note">Saved in this car's browser only. Your phone keeps your personal settings (addresses, keys, messages).</p>
         <h3>Your car on the map</h3>
         <div class="cs-pair"><div class="dd" id="cs-model"></div><div class="dd" id="cs-colour"></div></div>
-        <h3>Read notifications aloud</h3>
-        <div class="dd" id="cs-voice"></div>
+        <h3>Notifications</h3>
+        <div class="cs-pair cs-engine-row"><div class="dd" id="cs-voice"></div>
+          <button class="ign" id="cs-notifs" aria-label="Notifications on or off">
+            <svg viewBox="0 0 24 24"><path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            <span class="ign-label">On</span>
+          </button>
+        </div>
+        <p class="cs-note" id="cs-notifs-note" hidden>Notifications are off: nothing pops up or is read aloud in this car until you switch them on again.</p>
         <h3>Engine sound</h3>
         <div class="cs-pair cs-engine-row"><div class="dd" id="cs-engine"></div>
           <button class="ign" id="cs-ignition" aria-label="Engine on or off">
@@ -94,7 +100,7 @@
     </div>
   </main>
 </div>
-<script>window.BEAM_PAGE_VERSION = "0.38.3";</script>
-<script src="app.js?v=0.38.3"></script>
+<script>window.BEAM_PAGE_VERSION = "0.38.4";</script>
+<script src="app.js?v=0.38.4"></script>
 </body>
 </html>
