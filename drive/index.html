@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0b0d10">
 <!-- Only scripts from this site, MapLibre (pinned) and Google Maps may run; no inline scripts, no plugins. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-H38BYwJDBzeEqKZsZvZaV4Vui7AenXIHnMnv7zSUn/M=' 'wasm-unsafe-eval' 'unsafe-eval' blob: https://unpkg.com/maplibre-gl@4.7.1/ https://maps.googleapis.com https://maps.gstatic.com https://*.googleapis.com https://*.gstatic.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://unpkg.com/maplibre-gl@4.7.1/ https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https: wss: data: blob:; media-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-TSzWpESrKJhhmX2M0yL3TVzjXJt/1yJYceGBRePBMg8=' 'wasm-unsafe-eval' 'unsafe-eval' blob: https://unpkg.com/maplibre-gl@4.7.1/ https://maps.googleapis.com https://maps.gstatic.com https://*.googleapis.com https://*.gstatic.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://unpkg.com/maplibre-gl@4.7.1/ https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https: wss: data: blob:; media-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>BeamDrive</title>
-<link rel="stylesheet" href="style.css?v=0.38.8">
+<link rel="stylesheet" href="style.css?v=0.39.0">
 </head>
 <body class="not-casting">
 <div id="app">
@@ -21,6 +21,10 @@
     </button>
     <button class="rail-btn" id="settings-btn" aria-label="Settings for this car">
       <svg viewBox="0 0 24 24"><path d="M19.14 12.94a7.07 7.07 0 0 0 .06-.94 7.07 7.07 0 0 0-.06-.94l2.03-1.58a.48.48 0 0 0 .12-.61l-1.92-3.32a.48.48 0 0 0-.59-.22l-2.39.96a7 7 0 0 0-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84a.48.48 0 0 0-.48.41l-.36 2.54a7 7 0 0 0-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.87a.47.47 0 0 0 .12.61l2.03 1.58a7.3 7.3 0 0 0 0 1.88l-2.03 1.58a.48.48 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.04.7 1.62.94l.36 2.54c.05.24.25.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54a7 7 0 0 0 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.48.48 0 0 0-.12-.61zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg>
+    </button>
+    <button class="rail-btn" id="notifs-btn" aria-label="Notifications on your phone" hidden>
+      <svg viewBox="0 0 24 24"><path d="M10 21.5h4a2 2 0 0 1-4 0zM16.3 13.1A6 6 0 0 0 15 13a6 6 0 0 0-5.9 7H3.5v-1.2l1.8-1.8v-5.2c0-3.1 1.7-5.6 4.5-6.3V4.8a1.5 1.5 0 0 1 3 0v.7c2.6.6 4.2 2.9 4.4 5.8z"/><circle cx="15.5" cy="18.5" r="4.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 16.2v2.5l1.6 1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span class="badge" hidden></span>
     </button>
     <button class="rail-btn" data-cmd="back" aria-label="Back">
       <svg viewBox="0 0 24 24"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20z"/></svg>
@@ -72,6 +76,14 @@
       <button id="reload" class="ghost">Reload page</button>
     </div>
     <pre id="stats" hidden></pre>
+    <div id="notif-list" hidden>
+      <div class="cs-card">
+        <div class="cs-head"><h2>Notifications on your phone</h2><button class="cs-close" aria-label="Close">✕</button></div>
+        <p class="cs-note" id="nl-note">Loading…</p>
+        <div id="nl-items"></div>
+        <div class="nl-foot"><button class="nl-clear" id="nl-clear" hidden>Clear all</button></div>
+      </div>
+    </div>
     <div id="car-settings" hidden>
       <div class="cs-card">
         <div class="cs-head"><h2>This car</h2><button class="cs-close" aria-label="Close">✕</button></div>
@@ -100,7 +112,7 @@
     </div>
   </main>
 </div>
-<script>window.BEAM_PAGE_VERSION = "0.38.8";</script>
-<script src="app.js?v=0.38.8"></script>
+<script>window.BEAM_PAGE_VERSION = "0.39.0";</script>
+<script src="app.js?v=0.39.0"></script>
 </body>
 </html>

@@ -350,3 +350,26 @@ body.home #tts-stop { right: 116px; }
 #settings-btn { position: relative; }
 #settings-btn.quiet::after { content: ""; position: absolute; top: 8px; right: 8px; width: 14px; height: 14px; border-radius: 50%;
   background: #e5484d; box-shadow: 0 0 0 3px var(--rail); }
+
+/* The bell with a clock: notifications still on your phone. */
+#notifs-btn { position: relative; }
+#notifs-btn .badge { position: absolute; top: 6px; right: 6px; min-width: 22px; height: 22px; padding: 0 6px; box-sizing: border-box;
+  border-radius: 11px; background: #e5484d; color: #fff; font: 700 13px/22px system-ui, sans-serif; text-align: center; }
+#notifs-btn .badge[hidden] { display: none; }
+#notif-list { position: absolute; inset: 0; z-index: 40; display: flex; align-items: flex-start; justify-content: center; overflow: auto; background: rgba(0,0,0,.55); }
+#notif-list[hidden] { display: none; }
+.nl-item { display: flex; gap: 14px; align-items: flex-start; padding: 14px 0; border-top: 1px solid var(--line, rgba(127,127,127,.25)); }
+.nl-item:first-child { border-top: 0; }
+.nl-item img { width: 44px; height: 44px; border-radius: 10px; flex: none; }
+.nl-body { flex: 1; min-width: 0; }
+.nl-app { font-size: 15px; opacity: .7; }
+.nl-title { font-size: 20px; font-weight: 600; margin-top: 2px; }
+.nl-text { font-size: 18px; opacity: .85; margin-top: 2px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.nl-acts { display: flex; gap: 10px; flex: none; align-items: center; }
+.nl-acts button { min-width: 64px; min-height: 64px; border-radius: 14px; border: 0; font-size: 18px; font-weight: 600; cursor: pointer;
+  background: rgba(127,127,127,.18); color: inherit; padding: 0 16px; }
+.nl-acts button.primary { background: #3e6ae1; color: #fff; }
+.nl-item.out { opacity: 0; transition: opacity .25s; }
+.nl-foot { display: flex; justify-content: flex-end; margin-top: 8px; }
+.nl-clear { min-height: 60px; padding: 0 22px; border-radius: 14px; border: 0; background: rgba(127,127,127,.18); color: inherit; font-size: 18px; font-weight: 600; cursor: pointer; }
+.nl-clear[hidden] { display: none; }
