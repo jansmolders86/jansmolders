@@ -374,47 +374,20 @@ body.home #tts-stop { right: 116px; }
 .nl-clear { min-height: 60px; padding: 0 22px; border-radius: 14px; border: 0; background: rgba(127,127,127,.18); color: inherit; font-size: 18px; font-weight: 600; cursor: pointer; }
 .nl-clear[hidden] { display: none; }
 
-/* The music screen: what's playing on the left, picking music on the right. Fits any height
-   (the Tesla's browser is short): only the right side scrolls. */
-#music { position: absolute; inset: 0; z-index: 38; background: var(--bg); color: var(--ink); display: flex; gap: 24px; padding: 16px 20px 16px; box-sizing: border-box; overflow: hidden; }
+/* The music screen: search and the feed fill the screen; a slim now-playing bar at the bottom,
+   lifted a little so the Tesla's dock never covers it. */
+#music { position: absolute; inset: 0; z-index: 38; background: var(--bg); color: var(--ink); display: flex; flex-direction: column;
+  padding: 14px 18px calc(14px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; overflow: hidden; gap: 8px; }
 #music[hidden] { display: none; }
-.mu-now { flex: 0 0 clamp(300px, 36%, 440px); display: flex; flex-direction: column; gap: 10px; min-height: 0; }
-.mu-top { display: flex; align-items: center; gap: 10px; }
-.mu-app { flex: 1; font: 600 18px system-ui, sans-serif; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mu-open { height: 48px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--rail-hi); color: var(--ink); font: 600 16px system-ui, sans-serif; }
-.mu-head { display: flex; gap: 16px; align-items: center; min-height: 0; }
-.mu-art { flex: none; width: clamp(96px, 24vh, 190px); aspect-ratio: 1; border-radius: 14px; overflow: hidden; background: var(--rail-hi); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(0,0,0,.3); }
-.mu-art img { width: 100%; height: 100%; object-fit: cover; }
-.mu-art img[hidden], .mu-art-empty[hidden] { display: none; }
-.mu-art-empty { font-size: 54px; color: var(--ink-dim); }
-.mu-meta { flex: 1; min-width: 0; }
-.mu-title { font: 700 clamp(20px, 3.4vh, 28px)/1.15 system-ui, sans-serif; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
-.mu-artist { margin-top: 4px; font: 500 17px/1.3 system-ui, sans-serif; color: var(--ink-dim); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-.mu-progress input { width: 100%; height: 30px; accent-color: var(--accent); margin: 0; }
-.mu-times { display: flex; justify-content: space-between; font: 500 14px system-ui, sans-serif; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
-.mu-ctrls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.mu-ctrls > button { width: 64px; height: 64px; border: 0; border-radius: 50%; background: var(--rail-hi); display: flex; align-items: center; justify-content: center; flex: none; }
-.mu-ctrls svg { width: 30px; height: 30px; fill: var(--ink); }
-.mu-ctrls .mu-big { width: 78px; height: 78px; background: var(--accent); }
-.mu-ctrls .mu-big svg { width: 38px; height: 38px; fill: #fff; }
-#mu-play .i-pause, #mu-play.playing .i-play { display: none; }
-#mu-play.playing .i-pause { display: block; }
-.mu-acts { display: flex; gap: 8px; }
-.mu-acts:empty { display: none; }
-.mu-acts button { width: 56px; height: 56px; border: 0; border-radius: 14px; background: var(--rail-hi); color: var(--ink); font: 600 13px system-ui, sans-serif; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.mu-acts img { width: 28px; height: 28px; }
-:root[data-theme="light"] .mu-acts img { filter: invert(1); }
-.mu-note { min-height: 20px; font: 500 15px system-ui, sans-serif; color: var(--ink-dim); }
-.mu-pick { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
-.mu-pick-top { display: flex; gap: 10px; align-items: center; }
+.mu-top { display: flex; gap: 10px; align-items: center; flex: none; }
 .mu-search { flex: 1; display: flex; gap: 10px; min-width: 0; }
-.mu-search input { flex: 1; min-width: 0; height: 56px; padding: 0 16px; border-radius: 14px; border: 1px solid var(--line); background: var(--rail); color: var(--ink); font: 500 19px system-ui, sans-serif; }
+.mu-search input { flex: 1; min-width: 0; height: 56px; padding: 0 18px; border-radius: 14px; border: 1px solid var(--line); background: var(--rail); color: var(--ink); font: 500 19px system-ui, sans-serif; }
 .mu-search button { height: 56px; width: 56px; border: 0; border-radius: 14px; background: var(--rail-hi); display: flex; align-items: center; justify-content: center; flex: none; }
 .mu-search button svg { width: 28px; height: 28px; fill: var(--ink); }
 .mu-search #mu-mic.listening { background: var(--bad); }
 .mu-search #mu-mic.listening svg { fill: #fff; }
-.mu-shelves { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 12px; }
-.mu-shelf h3 { margin: 14px 0 8px; font: 700 19px system-ui, sans-serif; }
+.mu-shelves { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 6px; }
+.mu-shelf h3 { margin: 12px 0 8px; font: 700 19px system-ui, sans-serif; }
 .mu-shelf:first-child h3 { margin-top: 2px; }
 .mu-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .mu-tile { position: relative; height: 72px; border: 0; border-radius: 14px; padding: 0 14px; text-align: left; color: #fff; font: 700 17px/1.15 system-ui, sans-serif;
@@ -422,11 +395,31 @@ body.home #tts-stop { right: 116px; }
 .mu-tile span { position: relative; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .mu-tile.plain { background: var(--rail-hi); color: var(--ink); text-shadow: none; font-weight: 600; }
 .mu-tile.busy { opacity: .6; }
+.mu-note { flex: none; min-height: 0; font: 500 15px system-ui, sans-serif; color: var(--ink-dim); }
+.mu-note:empty { display: none; }
+.mu-bar { flex: none; display: flex; align-items: center; gap: 12px; height: 68px; padding: 0 12px 0 8px; border-radius: 16px; background: var(--rail); border: 1px solid var(--line); margin-bottom: 6px; }
+.mu-pp { width: 52px; height: 52px; border: 0; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; flex: none; }
+.mu-pp svg { width: 26px; height: 26px; fill: #fff; }
+#mu-play .i-pause, #mu-play.playing .i-play { display: none; }
+#mu-play.playing .i-pause { display: block; }
+.mu-mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.mu-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font: 600 16px system-ui, sans-serif; }
+.mu-line .mu-artist { color: var(--ink-dim); font-weight: 500; margin-left: 8px; }
+.mu-progress { display: flex; align-items: center; gap: 10px; font: 500 13px system-ui, sans-serif; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+.mu-progress input { flex: 1; min-width: 0; height: 24px; accent-color: var(--accent); margin: 0; }
+.mu-sm { width: 48px; height: 48px; border: 0; border-radius: 50%; background: var(--rail-hi); display: flex; align-items: center; justify-content: center; flex: none; }
+.mu-sm svg { width: 24px; height: 24px; fill: var(--ink); }
+.mu-acts { display: flex; gap: 6px; }
+.mu-acts:empty { display: none; }
+.mu-acts button { width: 48px; height: 48px; border: 0; border-radius: 12px; background: var(--rail-hi); color: var(--ink); font: 600 11px system-ui, sans-serif; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.mu-acts img { width: 24px; height: 24px; }
+:root[data-theme="light"] .mu-acts img { filter: invert(1); }
+@media (max-width: 760px) { .mu-acts { display: none; } }
 
 /* Spotify shelves: rows of covers that scroll sideways, like Spotify's own car view. */
 .sp-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
-.sp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-.sp-card { flex: 0 0 140px; width: 140px; border: 0; padding: 0; background: none; display: flex; flex-direction: column; justify-content: flex-start; align-self: flex-start; color: var(--ink); text-align: left; scroll-snap-align: start; }
+.sp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(156px, 1fr)); gap: 14px; }
+.sp-card { flex: 0 0 156px; width: 156px; border: 0; padding: 0; background: none; display: flex; flex-direction: column; justify-content: flex-start; align-self: flex-start; color: var(--ink); text-align: left; scroll-snap-align: start; }
 .sp-grid .sp-card { width: auto; }
 .sp-pic { position: relative; width: 100%; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: var(--rail-hi);
   display: flex; align-items: center; justify-content: center; font-size: 40px; color: var(--ink-dim); }
