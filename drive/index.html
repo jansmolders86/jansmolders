@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0b0d10">
 <!-- Only scripts from this site, MapLibre (pinned) and Google Maps may run; no inline scripts, no plugins. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-T25gS7m8YaZ7ah7fEcS98J1piKpHG1bf4Si2DNWErb8=' 'wasm-unsafe-eval' 'unsafe-eval' blob: https://unpkg.com/maplibre-gl@4.7.1/ https://maps.googleapis.com https://maps.gstatic.com https://*.googleapis.com https://*.gstatic.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://unpkg.com/maplibre-gl@4.7.1/ https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https: wss: data: blob:; media-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-/u2CyWqcQipYsUkCKqtLSoo7TU51dtL69C7+UaHMRaU=' 'wasm-unsafe-eval' 'unsafe-eval' blob: https://unpkg.com/maplibre-gl@4.7.1/ https://maps.googleapis.com https://maps.gstatic.com https://*.googleapis.com https://*.gstatic.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://unpkg.com/maplibre-gl@4.7.1/ https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https: wss: data: blob:; media-src 'self' blob: data:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>BeamDrive</title>
-<link rel="stylesheet" href="style.css?v=0.40.0">
+<link rel="stylesheet" href="style.css?v=0.40.1">
 </head>
 <body class="not-casting">
 <div id="app">
@@ -77,36 +77,42 @@
     </div>
     <pre id="stats" hidden></pre>
     <div id="music" hidden>
-      <div class="mu-top">
-        <div class="mu-app"><span id="mu-app"></span></div>
-        <button class="mu-open" id="mu-openapp">Open on phone</button>
-        <button class="cs-close" id="mu-close" aria-label="Close">✕</button>
-      </div>
-      <div class="mu-main">
-        <div class="mu-art"><img id="mu-art" alt="" hidden><div class="mu-art-empty" id="mu-art-empty">♪</div></div>
-        <div class="mu-side">
-          <div class="mu-title" id="mu-title">—</div>
-          <div class="mu-artist" id="mu-artist"></div>
-          <div class="mu-progress">
-            <input type="range" id="mu-seek" min="0" max="1000" value="0" aria-label="Position in the song">
-            <div class="mu-times"><span id="mu-pos">0:00</span><span id="mu-dur">0:00</span></div>
+      <div class="mu-now">
+        <div class="mu-top">
+          <div class="mu-app" id="mu-app"></div>
+          <button class="mu-open" id="mu-openapp">Open on phone</button>
+        </div>
+        <div class="mu-head">
+          <div class="mu-art"><img id="mu-art" alt="" hidden><div class="mu-art-empty" id="mu-art-empty">♪</div></div>
+          <div class="mu-meta">
+            <div class="mu-title" id="mu-title">—</div>
+            <div class="mu-artist" id="mu-artist"></div>
           </div>
-          <div class="mu-ctrls">
-            <button id="mu-prev" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg></button>
-            <button id="mu-play" class="mu-big" aria-label="Play or pause">
-              <svg class="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.2-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
-              <svg class="i-pause" viewBox="0 0 24 24"><path d="M7 5h3.5v14H7zm6.5 0H17v14h-3.5z"/></svg>
-            </button>
-            <button id="mu-next" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
-          </div>
+        </div>
+        <div class="mu-progress">
+          <input type="range" id="mu-seek" min="0" max="1000" value="0" aria-label="Position in the song">
+          <div class="mu-times"><span id="mu-pos">0:00</span><span id="mu-dur">0:00</span></div>
+        </div>
+        <div class="mu-ctrls">
+          <button id="mu-prev" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg></button>
+          <button id="mu-play" class="mu-big" aria-label="Play or pause">
+            <svg class="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.2-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+            <svg class="i-pause" viewBox="0 0 24 24"><path d="M7 5h3.5v14H7zm6.5 0H17v14h-3.5z"/></svg>
+          </button>
+          <button id="mu-next" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
           <div class="mu-acts" id="mu-acts"></div>
+        </div>
+        <div class="mu-note" id="mu-note"></div>
+      </div>
+      <div class="mu-pick">
+        <div class="mu-pick-top">
           <form class="mu-search" id="mu-search" autocomplete="off">
             <input id="mu-q" type="search" placeholder="Search a song, artist or playlist" enterkeyhint="search">
             <button type="button" id="mu-mic" aria-label="Search by voice"><svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11z"/></svg></button>
-            <button type="submit" id="mu-go">Play</button>
           </form>
-          <div class="mu-note" id="mu-note"></div>
+          <button class="cs-close" id="mu-close" aria-label="Close">✕</button>
         </div>
+        <div class="mu-shelves" id="mu-shelves"></div>
       </div>
     </div>
     <div id="notif-list" hidden>
@@ -145,7 +151,7 @@
     </div>
   </main>
 </div>
-<script>window.BEAM_PAGE_VERSION = "0.40.0";</script>
-<script src="app.js?v=0.40.0"></script>
+<script>window.BEAM_PAGE_VERSION = "0.40.1";</script>
+<script src="app.js?v=0.40.1"></script>
 </body>
 </html>
