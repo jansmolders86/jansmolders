@@ -434,3 +434,49 @@ body.home #tts-stop { right: 116px; }
 .mu-setup { display: flex; flex-direction: column; gap: 8px; padding: 18px; border-radius: 16px; background: var(--rail-hi); font: 500 17px/1.4 system-ui, sans-serif; }
 .mu-setup b { font-size: 20px; }
 .mu-setup span { color: var(--ink-dim); }
+
+/* While navigating: a compact turn card top left and the arrival card bottom left, like the
+   Tesla's own navigation, so the road ahead (the car sits lower right) stays clear. */
+.nav.navigating { bottom: 16px; width: min(330px, 32%); min-width: 250px; justify-content: space-between; pointer-events: none; }
+.nav.navigating > * { pointer-events: auto; }
+.nav.navigating .nav-turn { gap: 12px; padding: 10px 14px; border-radius: 14px; }
+.nav.navigating .nav-arrow { flex: 0 0 44px; }
+.nav.navigating .nav-arrow svg { width: 44px; height: 44px; }
+.nav.navigating .nav-dist { font-size: 26px; }
+.nav.navigating .nav-road { font-size: 16px; -webkit-line-clamp: 2; }
+.nav.navigating .nav-eta { gap: 8px; padding: 8px 8px 8px 14px; border-radius: 14px; }
+.nav.navigating .nav-eta-main { font-size: 18px; }
+.nav.navigating .nav-eta-sub { font-size: 14px; }
+.nav.navigating .nav-voice, .nav.navigating .nav-stop { width: 42px; height: 42px; flex: 0 0 42px; }
+
+/* Spotify's own look: a greeting, a compact grid of quick picks, rows of bigger covers. */
+.sp-hello { margin: 4px 0 12px; font: 800 28px system-ui, sans-serif; letter-spacing: -.01em; }
+.sp-quick { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; margin-bottom: 10px; }
+@media (max-width: 760px) { .sp-quick { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.sp-card.sp-mini { flex-direction: row; align-items: center; width: auto; height: 64px; gap: 14px; border-radius: 8px; overflow: hidden;
+  background: rgba(255,255,255,.07); align-self: stretch; }
+:root[data-theme="light"] .sp-card.sp-mini { background: rgba(0,0,0,.06); }
+.sp-mini .sp-pic { width: 64px; height: 64px; flex: none; border-radius: 0; font-size: 24px; }
+.sp-mini .sp-t { margin: 0 12px 0 0; font: 700 16px/1.2 system-ui, sans-serif; }
+#music .mu-shelf h3 { margin: 18px 0 10px; font: 800 22px system-ui, sans-serif; letter-spacing: -.01em; display: flex; align-items: center; }
+.sp-row { gap: 16px; }
+.sp-row .sp-card { flex: 0 0 172px; width: 172px; }
+.sp-pic { border-radius: 6px; }
+.sp-card .sp-t { margin-top: 8px; font: 700 17px/1.2 system-ui, sans-serif; }
+.sp-card .sp-s { font-size: 15px; }
+
+/* Next turn on the apps screen while navigating: a small card in the bottom-left corner. */
+#mini-turn { position: absolute; left: 16px; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 30; display: flex; align-items: center; gap: 12px;
+  max-width: min(400px, 60%); padding: 10px 16px 10px 12px; border: 0; border-radius: 14px; background: #2b3036; color: #fff; text-align: left;
+  box-shadow: 0 6px 22px rgba(0,0,0,.45); }
+#mini-turn[hidden] { display: none; }
+#mini-turn .mt-arrow { flex: 0 0 40px; }
+#mini-turn .mt-arrow svg { width: 40px; height: 40px; display: block; color: #fff; }
+#mini-turn .mt-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+#mini-turn .mt-dist { font: 700 22px system-ui, sans-serif; }
+#mini-turn .mt-road { font: 500 15px system-ui, sans-serif; color: #c4cad1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#mini-turn .mt-top { display: flex; align-items: baseline; gap: 12px; }
+#mini-turn .mt-eta { font: 500 14px system-ui, sans-serif; color: #aab1ba; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+:root[data-theme="light"] #mini-turn { background: #fff; color: #111; box-shadow: 0 6px 22px rgba(0,0,0,.18); }
+:root[data-theme="light"] #mini-turn .mt-arrow svg { color: #111; }
+:root[data-theme="light"] #mini-turn .mt-road, :root[data-theme="light"] #mini-turn .mt-eta { color: #4b5563; }
