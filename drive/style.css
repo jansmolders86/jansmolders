@@ -480,3 +480,12 @@ body.home #tts-stop { right: 116px; }
 :root[data-theme="light"] #mini-turn { background: #fff; color: #111; box-shadow: 0 6px 22px rgba(0,0,0,.18); }
 :root[data-theme="light"] #mini-turn .mt-arrow svg { color: #111; }
 :root[data-theme="light"] #mini-turn .mt-road, :root[data-theme="light"] #mini-turn .mt-eta { color: #4b5563; }
+
+/* On/off switches in the car settings (map features). */
+.cs-switch { display: flex; align-items: center; gap: 16px; padding: 12px 16px; margin-bottom: 8px; border-radius: 14px; background: var(--rail-hi); }
+.cs-switch span { flex: 1; display: flex; flex-direction: column; gap: 2px; font: 600 18px system-ui, sans-serif; }
+.cs-switch small { font: 500 14px system-ui, sans-serif; color: var(--ink-dim); }
+.sw { position: relative; flex: none; width: 72px; height: 42px; border: 0; border-radius: 21px; background: #5b636d; transition: background .15s; }
+.sw::after { content: ""; position: absolute; top: 4px; left: 4px; width: 34px; height: 34px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.sw.on { background: #3ac47d; }
+.sw.on::after { transform: translateX(30px); }
