@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0f12">
+<title>Face Capture</title>
+<style>
+  :root { --bg:#0d0f12; --fg:#eef1f4; --dim:#8a939e; --ok:#3ddc84; --warn:#ffb020; --bad:#ff5a5a; --slot:#2a3038; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--fg); font:16px/1.35 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+  body { display:flex; flex-direction:column; padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  header { padding:10px 14px 6px; display:flex; align-items:center; gap:10px; }
+  header h1 { font-size:17px; margin:0; font-weight:650; letter-spacing:.2px; }
+  header .count { margin-left:auto; color:var(--dim); font-variant-numeric:tabular-nums; }
+  #stage { position:relative; flex:1; min-height:0; margin:0 10px; border-radius:16px; overflow:hidden; background:#000; }
+  video { width:100%; height:100%; object-fit:cover; }
+  video.mirror { transform:scaleX(-1); }
+  #overlay { position:absolute; inset:0; pointer-events:none; }
+  #flash { position:absolute; inset:0; background:#fff; opacity:0; transition:opacity .25s; pointer-events:none; }
+  #msg { position:absolute; left:0; right:0; bottom:14px; text-align:center; pointer-events:none; }
+  #msg span { display:inline-block; background:rgba(0,0,0,.62); padding:8px 14px; border-radius:999px; font-weight:600; max-width:92%; }
+  #pose { position:absolute; top:10px; left:12px; font:12px/1.3 ui-monospace,Menlo,monospace; color:#cfd6dd; background:rgba(0,0,0,.5); padding:4px 8px; border-radius:8px; }
+  #slots { padding:8px 10px 10px; }
+  .ring { display:grid; grid-template-columns:64px repeat(19,1fr); gap:3px; margin-bottom:3px; align-items:center; }
+  .ring span { font-size:10px; color:var(--dim); white-space:nowrap; }
+  .ring i { display:block; height:14px; border-radius:3px; background:var(--slot); transition:background .2s; }
+  .ring i.na { background:transparent; }
+  .ring i.done { background:var(--ok); }
+  .ring i.near { outline:2px solid var(--warn); }
+  .ring.axis em { font-style:normal; font-size:9px; color:var(--dim); text-align:center; }
+  button.ready { box-shadow:0 0 0 3px rgba(61,220,132,.35); }
+  .slot { position:relative; aspect-ratio:3/4; border-radius:10px; background:var(--slot); overflow:hidden; display:flex; align-items:flex-end; justify-content:center; border:2px solid transparent; }
+  .slot img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .slot b { position:relative; font-size:11px; font-weight:600; background:rgba(0,0,0,.55); width:100%; text-align:center; padding:2px 0; }
+  .slot.done { border-color:var(--ok); }
+  .slot.next { border-color:var(--warn); }
+  footer { display:flex; gap:8px; padding:0 10px 12px; }
+  button { flex:1; border:0; border-radius:12px; padding:13px 8px; font-weight:650; font-size:15px; background:#222831; color:var(--fg); }
+  button.primary { background:var(--ok); color:#06210f; }
+  button:disabled { opacity:.4; }
+  #start { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:24px; text-align:center; background:var(--bg); z-index:5; }
+  #start p { color:var(--dim); margin:0; max-width:420px; }
+  #start button { flex:none; padding:14px 26px; }
+  #start label { color:var(--dim); font-size:14px; }
+  #sheet { position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:flex-end; z-index:10; }
+  #sheet .card { background:#171b21; width:100%; border-radius:18px 18px 0 0; padding:16px 16px calc(16px + env(safe-area-inset-bottom)); }
+  #sheet .card h2 { margin:0 0 8px; font-size:17px; }
+  #sheet .card p { color:var(--dim); margin:0 0 14px; font-size:14px; }
+  #sheet .row { display:flex; gap:8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Face Capture</h1>
+  <span class="count" id="count">0 photos · 0%</span>
+</header>
+<div id="stage">
+  <video id="video" playsinline muted></video>
+  <canvas id="overlay"></canvas>
+  <div id="flash"></div>
+  <div id="pose"></div>
+  <div id="msg"><span id="msgtext">Starting…</span></div>
+  <div id="start">
+    <h2 style="margin:0">Photos for your MetaHuman</h2>
+    <p><b>Best:</b> sit still with a neutral face and have someone walk slowly around you with the phone (back camera), at eye level, then a bit lower and a bit higher. <b>Alone:</b> phone on a stand at face height, turn your head slowly from side to side, chin a little down, level, then a little up.</p>
+    <p>Even light, no glasses, hair off the forehead, mouth closed. Photos are taken automatically; fill the grid (≈50 photos).</p>
+    <label><input type="checkbox" id="rear" checked> Someone else holds the phone (back camera)</label>
+    <button class="primary" id="go">Start camera</button>
+    <p id="err" style="color:var(--bad)"></p>
+  </div>
+</div>
+<div id="slots"></div>
+<footer>
+  <button id="flip">Flip camera</button>
+  <button id="shoot">Take photo</button>
+  <button class="primary" id="export" disabled>Export zip</button>
+</footer>
+<div id="sheet"><div class="card">
+  <h2 id="sheetTitle"></h2><p id="sheetText"></p>
+  <div class="row"><button id="sheetA"></button><button class="primary" id="sheetB"></button></div>
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script type="module">
+import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs";
+
+// ---------------------------------------------------------------- coverage grid for photogrammetry
+// Head pose relative to the camera, in cells: yaw -90..90 every 10°, three height rings. It does not matter
+// whether the phone moves around the head (best) or the head turns in front of the phone: both fill the grid.
+const RINGS = [ { id: "lo", pitch: -15, label: "from below" }, { id: "mid", pitch: 0, label: "eye level" }, { id: "hi", pitch: 18, label: "from above" } ];
+const YAWS = []; for (let y = -90; y <= 90; y += 10) YAWS.push(y);
+const SLOTS = [];
+for (const r of RINGS) for (const y of YAWS) {
+  if (Math.abs(y) > 70 && r.id !== "mid") continue;           // steep side views from above/below add little
+  SLOTS.push({ id: `${r.id}_${y >= 0 ? "l" : "r"}${Math.abs(y)}`, ring: r.id, yaw: y, pitch: r.pitch,
+               label: `${Math.abs(y)}° ${y > 0 ? "left" : y < 0 ? "right" : ""} ${r.label}`.replace("  ", " "),
+               profile: Math.abs(y) >= 80 });
+}
+const FRONT = "mid_l0";
+const NEED = Math.round(SLOTS.length * 0.85);                  // enough for a good reconstruction
+const TOL_YAW = 5, TOL_PITCH = 7, STILL_MS = 250;
+const $ = (id) => document.getElementById(id);
+const video = $("video"), overlay = $("overlay"), octx = overlay.getContext("2d");
+const shots = {};                // slot id -> {blob, url, meta}
+let extra = [];                  // manual extra shots
+let landmarker = null, stream = null, track = null, imageCapture = null, facing = "user";
+let lastPose = null, stillSince = 0, lastFace = null, busy = false, lastSeenYaw = 0, lostSince = 0;
+let sharpRef = 0, lastShotTs = 0;                // running reference for "sharp enough"
+
+// ---------------------------------------------------------------- UI: coverage grid
+const slotsEl = $("slots");
+slotsEl.innerHTML = RINGS.slice().reverse().map((r) => `<div class="ring"><span>${r.label}</span>` +
+  YAWS.map((y) => { const sl = SLOTS.find((s) => s.ring === r.id && s.yaw === y);
+    return sl ? `<i id="slot-${sl.id}" title="${sl.label}"></i>` : `<i class="na"></i>`; }).join("") + `</div>`).join("") +
+  `<div class="ring axis"><span></span>${YAWS.map((y) => `<em>${y % 30 === 0 ? (y > 0 ? "L" : y < 0 ? "R" : "") + Math.abs(y) : ""}</em>`).join("")}</div>`;
+function render() {
+  const n = SLOTS.filter((s) => shots[s.id]).length;
+  for (const s of SLOTS) $("slot-" + s.id).classList.toggle("done", !!shots[s.id]);
+  $("count").textContent = `${n + extra.length} photos · ${Math.min(100, Math.round(100 * n / NEED))}%`;
+  $("export").disabled = n + extra.length === 0;
+  $("export").classList.toggle("ready", n >= NEED);
+}
+function nextSlot() { return SLOTS.find((s) => !shots[s.id] && !s.profile) || SLOTS.find((s) => !shots[s.id]); }
+function say(t, color) { $("msgtext").textContent = t; $("msgtext").style.color = color || ""; }
+function ask(title, text, a, b, onB) {
+  $("sheetTitle").textContent = title; $("sheetText").textContent = text;
+  $("sheetA").textContent = a; $("sheetB").textContent = b;
+  $("sheet").style.display = "flex";
+  $("sheetA").onclick = () => ($("sheet").style.display = "none");
+  $("sheetB").onclick = () => { $("sheet").style.display = "none"; onB(); };
+}
+
+// ---------------------------------------------------------------- camera
+async function startCamera() {
+  if (stream) stream.getTracks().forEach((t) => t.stop());
+  stream = await navigator.mediaDevices.getUserMedia({
+    audio: false,
+    video: { facingMode: facing, width: { ideal: 3840 }, height: { ideal: 2160 }, frameRate: { ideal: 30 } },
+  });
+  video.srcObject = stream; await video.play();
+  track = stream.getVideoTracks()[0];
+  video.classList.toggle("mirror", facing === "user");
+  imageCapture = ("ImageCapture" in window) ? new ImageCapture(track) : null;
+  try {   // ask for the camera's own still resolution where supported (Chrome on Android)
+    if (imageCapture) {
+      const caps = await imageCapture.getPhotoCapabilities();
+      imageCapture._opts = caps.imageWidth ? { imageWidth: caps.imageWidth.max, imageHeight: caps.imageHeight.max } : {};
+    }
+  } catch { imageCapture = imageCapture && Object.assign(imageCapture, { _opts: {} }); }
+}
+
+async function grab() {
+  // full-resolution still where the browser allows it, otherwise the video frame
+  if (imageCapture) {
+    try { return { blob: await imageCapture.takePhoto(imageCapture._opts || {}), source: "takePhoto" }; } catch {}
+  }
+  const c = document.createElement("canvas");
+  c.width = video.videoWidth; c.height = video.videoHeight;
+  c.getContext("2d").drawImage(video, 0, 0);
+  const blob = await new Promise((r) => c.toBlob(r, "image/jpeg", 0.95));
+  return { blob, source: "videoFrame" };
+}
+
+// ---------------------------------------------------------------- face tracking
+async function initTracker() {
+  const files = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm");
+  landmarker = await FaceLandmarker.createFromOptions(files, {
+    baseOptions: {
+      modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+      delegate: "GPU",
+    },
+    runningMode: "VIDEO", numFaces: 1,
+    outputFaceBlendshapes: true, outputFacialTransformationMatrixes: true,
+  });
+}
+
+let pitchRef = null;   // nose height ratio when looking straight ahead (set by the front shot)
+function headPose(m, face) {
+  // How far the head is turned: from the facial transformation matrix (its 3rd column is the face's forward
+  // axis). Which way: from the face points themselves, so no matrix sign convention can flip the hints.
+  // Video frames are never mirrored (the preview is mirrored only by CSS), so these rules hold for both cameras.
+  const fx = m[8], fy = m[9], fz = m[10];
+  const yawMag = Math.atan2(Math.abs(fx), Math.abs(fz)) * 180 / Math.PI;
+  const pitchMag = Math.atan2(Math.abs(fy), Math.hypot(fx, fz)) * 180 / Math.PI;
+  // turned to the subject's own left -> the nose tip moves towards image right of the cheek midpoint
+  const midX = (face[234].x + face[454].x) / 2, halfW = Math.abs(face[454].x - face[234].x) / 2 || 1e-3;
+  const yawSign = Math.sign(face[1].x - midX) || 1;
+  // chin up -> the nose tip sits higher between the eye line and the mouth
+  const eyeY = (face[33].y + face[263].y) / 2, mouthY = (face[13].y + face[14].y) / 2;
+  const r = (face[1].y - eyeY) / ((mouthY - eyeY) || 1e-3);
+  const ref = pitchRef ?? 0.62;
+  const pitchSign = r < ref ? 1 : -1;
+  return { yaw: yawSign * yawMag, pitch: pitchSign * pitchMag, roll: Math.atan2(m[1], m[0]) * 180 / Math.PI, noseRatio: r,
+           yawFromPoints: Math.asin(Math.max(-1, Math.min(1, (face[1].x - midX) / halfW))) * 180 / Math.PI };
+}
+
+function blend(res, name) {
+  const c = res.faceBlendshapes?.[0]?.categories?.find((c) => c.categoryName === name);
+  return c ? c.score : 0;
+}
+
+// sharpness: variance of a Laplacian over the face area, on a small grey copy
+const scratch = document.createElement("canvas"), sctx = scratch.getContext("2d", { willReadFrequently: true });
+function sharpness(box) {
+  const W = 160, H = Math.round(160 * box.h / box.w) || 160;
+  scratch.width = W; scratch.height = H;
+  sctx.drawImage(video, box.x, box.y, box.w, box.h, 0, 0, W, H);
+  const d = sctx.getImageData(0, 0, W, H).data, g = new Float32Array(W * H);
+  for (let i = 0; i < W * H; i++) g[i] = 0.299 * d[4 * i] + 0.587 * d[4 * i + 1] + 0.114 * d[4 * i + 2];
+  let s = 0, s2 = 0, n = 0;
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    const i = y * W + x, l = 4 * g[i] - g[i - 1] - g[i + 1] - g[i - W] - g[i + W];
+    s += l; s2 += l * l; n++;
+  }
+  return s2 / n - (s / n) ** 2;
+}
+
+// motion: mean difference between consecutive tiny frames (for full side views, where face tracking gives up)
+const mcan = document.createElement("canvas"); mcan.width = 48; mcan.height = 36;
+const mctx = mcan.getContext("2d", { willReadFrequently: true }); let prevSmall = null;
+function motion() {
+  mctx.drawImage(video, 0, 0, 48, 36);
+  const d = mctx.getImageData(0, 0, 48, 36).data; let diff = 0;
+  if (prevSmall) for (let i = 0; i < d.length; i += 4) diff += Math.abs(d[i + 1] - prevSmall[i + 1]);
+  prevSmall = d; return diff / (48 * 36);
+}
+
+// ---------------------------------------------------------------- main loop
+let lastTs = -1;
+function loop() {
+  requestAnimationFrame(loop);
+  if (!landmarker || video.readyState < 2 || busy) return;
+  const ts = performance.now(); if (ts === lastTs) return; lastTs = ts;
+  const res = landmarker.detectForVideo(video, ts);
+  const mot = motion();
+  draw(res);
+
+  const face = res.faceLandmarks?.[0];
+  document.querySelectorAll(".ring i.near").forEach((e) => e.classList.remove("near"));
+  if (!face) {
+    lastFace = null; stillSince = 0;
+    // past ~70° the tracker gives up: keep shooting the side of the head while the image is steady
+    const sideYaw = lastSeenYaw > 60 ? 1 : lastSeenYaw < -60 ? -1 : 0;
+    if (sideYaw && shots[FRONT]) {
+      if (!lostSince) lostSince = ts;
+      const open = SLOTS.filter((s) => s.profile && Math.sign(s.yaw) === sideYaw && !shots[s.id]);
+      const sideExtras = extra.filter((e) => e.meta.side === sideYaw).length;
+      if (mot < 1.5 && ts - lostSince > 400 && ts - lastShotTs > 800 && (open.length || sideExtras < 3)) {
+        capture(open.length ? open[open.length - 1].id : null, { yaw: sideYaw * 90, pitch: 0, estimated: true, side: sideYaw });
+      } else say(mot < 1.5 ? "Side of the head…" : "Side of the head — steady…", "var(--warn)");
+    } else say("Looking for the face…", "var(--dim)");
+    return;
+  }
+  lostSince = 0;
+  const pose = headPose(res.facialTransformationMatrixes[0].data, face);
+  lastSeenYaw = pose.yaw;
+  $("pose").textContent = `yaw ${pose.yaw.toFixed(0)}°  pitch ${pose.pitch.toFixed(0)}°`;
+
+  const blink = Math.max(blend(res, "eyeBlinkLeft"), blend(res, "eyeBlinkRight"));
+  const jaw = blend(res, "jawOpen"), smile = Math.max(blend(res, "mouthSmileLeft"), blend(res, "mouthSmileRight"));
+  const xs = face.map((p) => p.x * video.videoWidth), ys = face.map((p) => p.y * video.videoHeight);
+  const box = { x: Math.min(...xs), y: Math.min(...ys) }; box.w = Math.max(...xs) - box.x; box.h = Math.max(...ys) - box.y;
+  const faceFrac = box.h / video.videoHeight;
+  const moving = lastPose && Math.hypot(pose.yaw - lastPose.yaw, pose.pitch - lastPose.pitch) > 1.5;
+  lastPose = pose;
+  if (moving || mot > 4) stillSince = 0; else if (!stillSince) stillSince = ts;
+
+  // the cell the head is in now (straight-ahead first: it calibrates up/down)
+  let target = null, best = 1e9;
+  for (const s of SLOTS) {
+    if (shots[s.id] || s.profile) continue;
+    if (!shots[FRONT] && s.id !== FRONT) continue;
+    const d = Math.hypot(pose.yaw - s.yaw, (pose.pitch - s.pitch) * 0.8);
+    if (d < best) { best = d; target = s; }
+  }
+  if (!target) { say(SLOTS.every((s) => shots[s.id]) ? "Grid complete — tap Export zip" : "Now the full side views: keep turning past the last column", "var(--ok)"); return; }
+  $("slot-" + target.id).classList.add("near");
+  if (faceFrac < 0.16) { say("Closer", "var(--warn)"); return; }
+  if (faceFrac > 0.8) { say("Further away", "var(--warn)"); return; }
+  const dy = target.yaw - pose.yaw, dp = target.pitch - pose.pitch;
+  if (Math.abs(dy) >= TOL_YAW || Math.abs(dp) >= TOL_PITCH) {
+    const ring = RINGS.find((r) => r.id === target.ring);
+    say(!shots[FRONT] ? "Straight at the camera first" :
+        Math.abs(dp) >= TOL_PITCH ? `Next: ${ring.label} (${dp > 0 ? "camera higher / chin up" : "camera lower / chin down"})` :
+        `Keep going around (${Math.abs(target.yaw)}° ${target.yaw > 0 ? "left" : target.yaw < 0 ? "right" : ""})`, ""); return;
+  }
+  if (blink > 0.45) { say("Eyes open", "var(--warn)"); return; }
+  if (jaw > 0.2 || smile > 0.5) { say("Neutral face, mouth closed", "var(--warn)"); return; }
+  if (!stillSince || ts - stillSince < STILL_MS) { say("Steady…", "var(--ok)"); return; }
+  const sh = sharpness(box);
+  sharpRef = Math.max(sharpRef * 0.995, sh);
+  if (sh < sharpRef * 0.45) { say("Too blurry — slower", "var(--warn)"); return; }
+  capture(target.id, { ...pose, sharpness: sh, blink, jawOpen: jaw });
+}
+
+function draw(res) {
+  const W = overlay.clientWidth, H = overlay.clientHeight;
+  if (overlay.width !== W) { overlay.width = W; overlay.height = H; }
+  octx.clearRect(0, 0, W, H);
+  const face = res.faceLandmarks?.[0]; if (!face) return;
+  // map normalized video coords to the cover-fitted element
+  const vw = video.videoWidth, vh = video.videoHeight, s = Math.max(W / vw, H / vh);
+  const ox = (W - vw * s) / 2, oy = (H - vh * s) / 2, mir = facing === "user";
+  octx.fillStyle = "rgba(61,220,132,.7)";
+  for (let i = 0; i < face.length; i += 6) {
+    let x = ox + face[i].x * vw * s; if (mir) x = W - x;
+    octx.fillRect(x - 1, oy + face[i].y * vh * s - 1, 2, 2);
+  }
+}
+
+// ---------------------------------------------------------------- capture
+async function capture(slotId, meta) {
+  busy = true;
+  try {
+    const { blob, source } = await grab();
+    const bmp = await createImageBitmap(blob);
+    const entry = {
+      blob, url: URL.createObjectURL(blob),
+      meta: { slot: slotId, ...meta, width: bmp.width, height: bmp.height, source, facing,
+              time: new Date().toISOString(), settings: track.getSettings ? track.getSettings() : {} },
+    };
+    if (slotId === FRONT && meta.noseRatio) pitchRef = meta.noseRatio;
+    lastShotTs = performance.now();   // straight-ahead reference for chin up/down
+    if (slotId) { if (shots[slotId]) URL.revokeObjectURL(shots[slotId].url); shots[slotId] = entry; }
+    else extra.push(entry);
+    feedback(); render();
+  } catch (e) { say("Capture failed: " + e.message, "var(--bad)"); }
+  stillSince = 0;
+  setTimeout(() => (busy = false), 500);
+}
+let actx = null;
+function feedback() {
+  $("flash").style.opacity = 0.6; setTimeout(() => ($("flash").style.opacity = 0), 120);
+  try { navigator.vibrate?.(60); } catch {}
+  try {
+    actx = actx || new AudioContext();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.frequency.value = 880; g.gain.value = 0.08; o.connect(g); g.connect(actx.destination);
+    o.start(); o.stop(actx.currentTime + 0.08);
+  } catch {}
+}
+
+// ---------------------------------------------------------------- export
+async function exportZip() {
+  const zip = new JSZip(), list = [];
+  let i = 1;
+  for (const s of SLOTS) if (shots[s.id]) {
+    const name = `${String(i++).padStart(3, "0")}_${s.id}.jpg`;
+    zip.file(name, shots[s.id].blob); list.push({ file: name, target: { yaw: s.yaw, pitch: s.pitch }, ...shots[s.id].meta });
+  }
+  for (const e of extra) {
+    const name = `${String(i++).padStart(3, "0")}_extra.jpg`;
+    zip.file(name, e.blob); list.push({ file: name, ...e.meta });
+  }
+  zip.file("capture.json", JSON.stringify({
+    tool: "FaceCapture 2 (orbit)", created: new Date().toISOString(), userAgent: navigator.userAgent,
+    note: "yaw > 0 = subject turned to their own left; pitch > 0 = chin up; angles from MediaPipe face landmarker",
+    photos: list,
+  }, null, 2));
+  const blob = await zip.generateAsync({ type: "blob" });
+  const fname = `face_capture_${new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-")}.zip`;
+  const file = new File([blob], fname, { type: "application/zip" });
+  if (navigator.canShare?.({ files: [file] })) {   // phones: share sheet (Drive, WhatsApp, mail, Files…)
+    try { await navigator.share({ files: [file], title: "Face capture" }); return; } catch (e) { if (e.name === "AbortError") return; }
+  }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fname;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+// ---------------------------------------------------------------- wiring
+$("go").onclick = async () => {
+  $("go").disabled = true; $("err").textContent = "";
+  try {
+    facing = $("rear").checked ? "environment" : "user";
+    say("Loading face tracker…");
+    await Promise.all([startCamera(), initTracker()]);
+    $("start").style.display = "none";
+    loop();
+  } catch (e) {
+    $("go").disabled = false;
+    $("err").textContent = (e.name === "NotAllowedError" ? "Camera permission was refused. " : "") + (e.message || e);
+  }
+};
+$("flip").onclick = async () => { facing = facing === "user" ? "environment" : "user"; try { await startCamera(); } catch (e) { say(e.message, "var(--bad)"); } };
+$("shoot").onclick = () => capture(null, { manual: true, ...(lastPose || {}) });
+$("export").onclick = () => exportZip().catch((e) => say("Export failed: " + e.message, "var(--bad)"));
+render();
+</script>
+</body>
+</html>
