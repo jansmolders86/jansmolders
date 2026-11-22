@@ -22,6 +22,7 @@
   #msg span { display:inline-block; background:rgba(0,0,0,.62); padding:8px 14px; border-radius:999px; font-weight:600; max-width:92%; }
   #pose { position:absolute; top:10px; left:12px; font:12px/1.3 ui-monospace,Menlo,monospace; color:#cfd6dd; background:rgba(0,0,0,.5); padding:4px 8px; border-radius:8px; }
   #slots { padding:8px 10px 10px; }
+  .snd { background:none; border:none; font-size:20px; padding:0 0 0 10px; cursor:pointer; }
   .ring { display:grid; grid-template-columns:64px repeat(19,1fr); gap:3px; margin-bottom:3px; align-items:center; }
   .ring span { font-size:10px; color:var(--dim); white-space:nowrap; }
   .ring i { display:block; height:14px; border-radius:3px; background:var(--slot); transition:background .2s; }
@@ -53,7 +54,7 @@
 <body>
 <header>
   <h1>Face Capture</h1>
-  <span class="count" id="count">0 photos · 0%</span>
+  <span class="count" id="count">0 photos · 0%</span><button id="snd" class="snd" title="Sound guide">🔊</button>
 </header>
 <div id="stage">
   <video id="video" playsinline muted></video>
@@ -64,7 +65,8 @@
   <div id="start">
     <h2 style="margin:0">Photos for your MetaHuman</h2>
     <p><b>Best:</b> sit still with a neutral face and have someone walk slowly around you with the phone (back camera), at eye level, then a bit lower and a bit higher. <b>Alone:</b> phone on a stand at face height, turn your head slowly from side to side, chin a little down, level, then a little up.</p>
-    <p>Even light, no glasses, hair off the forehead, mouth closed. Photos are taken automatically; fill the grid (≈50 photos).</p>
+    <p>Even light, no glasses, hair off the forehead, mouth closed. Photos are taken automatically; fill as much of the grid as you can, export whenever you like.</p>
+    <p><b>Sound guide</b> (media volume up): ticks speed up as you near an angle still needed. High tick = chin up, low tick = chin down, middle = just keep turning. Chime + buzz = photo taken.</p>
     <label><input type="checkbox" id="rear" checked> Someone else holds the phone (back camera)</label>
     <button class="primary" id="go">Start camera</button>
     <p id="err" style="color:var(--bad)"></p>
@@ -276,6 +278,7 @@ function loop() {
   }
   if (!target) { say(SLOTS.every((s) => shots[s.id]) ? "Grid complete — tap Export zip" : "Now the full side views: keep turning past the last column", "var(--ok)"); return; }
   $("slot-" + target.id).classList.add("near");
+  guide(best, target.pitch - pose.pitch, ts);
   if (faceFrac < 0.16) { say("Closer", "var(--warn)"); return; }
   if (faceFrac > 0.8) { say("Further away", "var(--warn)"); return; }
   const dy = target.yaw - pose.yaw, dp = target.pitch - pose.pitch;
@@ -329,16 +332,39 @@ async function capture(slotId, meta) {
   stillSince = 0;
   setTimeout(() => (busy = false), 500);
 }
-let actx = null;
+// ---------------------------------------------------------------- sound: a metal detector for angles
+// Ticks speed up as the head nears an angle that still needs a photo. Tick pitch: high = chin up / camera higher,
+// low = chin down / camera lower, middle = height is right, keep turning. A rising chime + buzz = photo taken.
+let actx = null, soundOn = true, nextTick = 0;
+function audio() {
+  if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+  if (actx.state === "suspended") actx.resume();
+  return actx;
+}
+function tone(freq, dur, vol, type = "sine", delay = 0) {
+  if (!soundOn) return;
+  try {
+    const ac = audio(), t = ac.currentTime + delay, o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + dur + 0.02);
+  } catch {}
+}
+function guide(d, dp, ts) {             // d: degrees to the nearest open cell, dp: how far chin should go up (+) / down (-)
+  if (!soundOn || ts < nextTick) return;
+  const inCell = d < TOL_YAW;
+  const near = Math.max(0, Math.min(1, 1 - (d - TOL_YAW) / 35));
+  nextTick = ts + (inCell ? 85 : 950 - 820 * near * near);
+  const f = Math.abs(dp) >= TOL_PITCH ? (dp > 0 ? 1180 : 420) : 700;
+  tone(f, inCell ? 0.04 : 0.06, 0.06 + 0.22 * near, "triangle");
+}
 function feedback() {
   $("flash").style.opacity = 0.6; setTimeout(() => ($("flash").style.opacity = 0), 120);
-  try { navigator.vibrate?.(60); } catch {}
-  try {
-    actx = actx || new AudioContext();
-    const o = actx.createOscillator(), g = actx.createGain();
-    o.frequency.value = 880; g.gain.value = 0.08; o.connect(g); g.connect(actx.destination);
-    o.start(); o.stop(actx.currentTime + 0.08);
-  } catch {}
+  try { navigator.vibrate?.(70); } catch {}
+  tone(988, 0.12, 0.3); tone(1480, 0.22, 0.3, "sine", 0.1);           // "got it"
+  nextTick = performance.now() + 450;                                  // a short silence after each photo
+  if (SLOTS.every((s) => shots[s.id])) [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.25, 0.3, "sine", 0.35 + i * 0.12));
 }
 
 // ---------------------------------------------------------------- export
@@ -358,7 +384,15 @@ async function exportZip() {
     note: "yaw > 0 = subject turned to their own left; pitch > 0 = chin up; angles from MediaPipe face landmarker",
     photos: list,
   }, null, 2));
-  const blob = await zip.generateAsync({ type: "blob" });
+  const btn = $("export"), label = btn.textContent;
+  btn.disabled = true; btn.textContent = "Packing…";
+  say(`Packing ${list.length} photos…`, "var(--warn)");
+  let blob;
+  try {
+    blob = await zip.generateAsync({ type: "blob", compression: "STORE", streamFiles: true },   // JPEGs don't shrink: just store
+      (m) => { btn.textContent = `Packing ${Math.round(m.percent)}%`; });
+  } finally { btn.textContent = label; btn.disabled = false; }
+  say(`Zip ready (${(blob.size / 1e6).toFixed(0)} MB) — choose where to send it`, "var(--ok)");
   const fname = `face_capture_${new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-")}.zip`;
   const file = new File([blob], fname, { type: "application/zip" });
   if (navigator.canShare?.({ files: [file] })) {   // phones: share sheet (Drive, WhatsApp, mail, Files…)
@@ -371,6 +405,7 @@ async function exportZip() {
 // ---------------------------------------------------------------- wiring
 $("go").onclick = async () => {
   $("go").disabled = true; $("err").textContent = "";
+  try { audio(); tone(700, 0.05, 0.15); } catch {}   // browsers only allow sound after a tap
   try {
     facing = $("rear").checked ? "environment" : "user";
     say("Loading face tracker…");
@@ -383,6 +418,7 @@ $("go").onclick = async () => {
   }
 };
 $("flip").onclick = async () => { facing = facing === "user" ? "environment" : "user"; try { await startCamera(); } catch (e) { say(e.message, "var(--bad)"); } };
+$("snd").onclick = () => { soundOn = !soundOn; $("snd").textContent = soundOn ? "🔊" : "🔇"; if (soundOn) tone(700, 0.05, 0.2); };
 $("shoot").onclick = () => capture(null, { manual: true, ...(lastPose || {}) });
 $("export").onclick = () => exportZip().catch((e) => say("Export failed: " + e.message, "var(--bad)"));
 render();
